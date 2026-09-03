@@ -859,3 +859,53 @@
   * `src/app/AppShell.tsx` — safe `matchMedia` availability guard required to restore shared UI-test execution during the concurrent UX-2 color-mode task.
 * **Result:** T5.1 acceptance criteria met. A reader can understand the recovery problem, agent-assisted interaction, WebMCP implementation, human authority boundary, setup path, and contest-build limitation from `README.md` without needing to run the app or read the full build specification.
 * **Next eligible task:** None. T5.2 remains BLOCKED pending a manually recorded, public sub-three-minute demo video.
+
+### Entry: UX-4 — Dark-mode alert contrast hardening (user-directed, out-of-backlog)
+* **Status:** DONE
+* **Trigger:** operator report on 2026-09-03 that outlined alerts have unreadable text and close controls in dark mode.
+* **Acceptance criteria:** All outlined alert severities use active color-scheme surface and readable foreground tokens; severity icon/border affordances remain visible; no recovery, WebMCP, command-layer, or authority-boundary behavior changes.
+* **Planned Files:**
+  * `src/styles/theme.ts` — replace literal outlined-alert surface color with the active scheme token and apply readable foreground/action tokens across alert severities.
+  * `src/styles/theme.test.tsx` — add a regression assertion for outlined alert contrast token usage.
+  * `docs/IMPLEMENTATION_LOG.md` — record validation and completion evidence.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run test:e2e`, `npm run build`, plus dark-mode browser screenshot and console check.
+* **Implementation:** Replaced the literal white outlined-alert background with the active paper token. All `info`, `success`, `warning`, and `error` outlined alerts now share a readable primary-text foreground and secondary-text close control, with severity color retained for icon and border affordances.
+* **Regression coverage:** Added `src/styles/theme.test.tsx` assertions for scheme-aware surface/foreground/action tokens and for all four outlined severity variants. The test failed before the fix because the theme returned `backgroundColor: '#ffffff'`; it passes after the change.
+* **Browser verification:** Opened `http://127.0.0.1:5173/` in dark mode and captured the outlined WebMCP info notice. The notice rendered on the dark paper surface with readable message, setup-hint action, icon, and border contrast.
+* **Validation Results (all passed):**
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — 12 test files, 56 tests passed.
+  * `npm run test:e2e` — 5 Playwright tests passed, including three axe checks.
+  * `npm run build` — `tsc -b && vite build` exit 0. Only the existing non-blocking 500 kB chunk-size warning was emitted.
+* **Result:** Dark-mode outlined alerts are legible for every severity without changing recovery, WebMCP, persistence, or human-approval behavior.
+
+### Entry: UX-5 — Workspace UI/UX custom agent (user-directed, out-of-backlog)
+* **Status:** DONE
+* **Trigger:** operator request on 2026-09-03 to create a reusable `UI/UX` custom agent for specification-first product design, accessible frontend implementation, visual refinement, and UI/UX review.
+* **Planned Files:**
+  * `.github/agents/ui-ux.agent.md` (new) — user-invocable, workspace-shared UI/UX agent that applies the repository's frontend-design, design-taste-frontend, high-end-visual-design, and redesign-existing-projects skills while keeping product specifications, safety, accessibility, performance, existing stack, and repository constraints authoritative.
+  * `docs/IMPLEMENTATION_LOG.md` (edit) — record creation and validation evidence.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`
+* **Implementation:** Created the discoverable workspace agent with four modes (specification, design, implementation, review), proportional specification/approval rules, WCAG 2.2 AA and performance baselines, visual-design guidance, review severity reporting, and evidence-based completion criteria. The agent explicitly resolves conflicts in favor of project constraints and treats the four design skills as supporting guidance rather than permission to add disallowed external assets, dependencies, or framework changes.
+* **Validation Results (all passed):**
+  * `.github/agents/ui-ux.agent.md` — frontmatter inspected (`name`, keyword-rich `description`, `argument-hint`, `user-invocable`) and no editor diagnostics were reported.
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — `vitest run`: 12 test files and 56 tests passed.
+  * `npm run build` — `tsc -b && vite build` exit 0; existing non-blocking 500 kB bundle-size warning remains.
+* **Changed Files:**
+  * `.github/agents/ui-ux.agent.md` — user-invocable custom UI/UX agent.
+  * `docs/IMPLEMENTATION_LOG.md` — scope and verification record.
+* **Result:** The `UI/UX` agent is ready to select from the agent picker for specification-first, accessible frontend design and review work in this workspace.
+
+### Follow-up: UX-5 — Design-taste skill reference (user-directed)
+* **Status:** DONE
+* **Trigger:** operator installed `.agents/skills/design-taste-frontend/` and manually added its reference to the workspace `UI/UX` agent.
+* **Planned Files:**
+  * `.github/agents/ui-ux.agent.md` (edit) — constrain use of the skill to its stated landing-page, portfolio, and suitable-redesign scope.
+  * `docs/IMPLEMENTATION_LOG.md` (edit) — reconcile the UX-5 audit record from three to four design skills.
+* **Validation:** Markdown/frontmatter diagnostics and repository whitespace check; no runtime application behavior changes.
+* **Implementation:** Scoped `design-taste-frontend` to the landing-page, portfolio, and suitable-redesign work it supports. Its own exclusions prevent it from being treated as a mandatory pattern source for Mend's dashboard-like recovery workflow.
+* **Validation Results:** No diagnostics reported for the updated agent or log. `npm run lint`, `npm run typecheck`, `npm run test:run` (12 files, 56 tests), and `npm run build` all passed; the existing bundle-size warning remains non-blocking.
+* **Result:** The agent reference and UX-5 audit record now accurately cover all four installed design skills.

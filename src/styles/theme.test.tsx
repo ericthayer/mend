@@ -92,6 +92,33 @@ describe('Mend color schemes', () => {
     expect(mendTheme).toHaveProperty('colorSchemes.dark.palette.text.primary', '#eef3f8');
   });
 
+  it('uses readable scheme-aware styling for every outlined alert severity', () => {
+    const alertTheme = mendTheme.components?.MuiAlert;
+
+    expect(alertTheme?.styleOverrides?.outlined).toMatchObject({
+      backgroundColor: 'var(--mui-palette-background-paper)',
+      color: 'var(--mui-palette-text-primary)',
+      '& .MuiAlert-action .MuiIconButton-root': {
+        color: 'var(--mui-palette-text-secondary)',
+      },
+    });
+
+    for (const severity of ['info', 'success', 'warning', 'error']) {
+      expect(alertTheme?.variants).toContainEqual(
+        expect.objectContaining({
+          props: { variant: 'outlined', severity },
+          style: expect.objectContaining({
+            borderColor: `var(--mui-palette-${severity}-main)`,
+            color: 'var(--mui-palette-text-primary)',
+            '& .MuiAlert-icon': {
+              color: `var(--mui-palette-${severity}-main)`,
+            },
+          }),
+        })
+      );
+    }
+  });
+
   it('follows prefers-color-scheme and responds to changes', async () => {
     const controller = createMatchMediaController(true);
     Object.defineProperty(window, 'matchMedia', {

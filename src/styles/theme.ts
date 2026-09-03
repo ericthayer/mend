@@ -73,6 +73,21 @@ const DARK_PALETTE = {
   divider: 'rgba(238, 243, 248, 0.14)',
 };
 
+const OUTLINED_ALERT_SEVERITIES = ['info', 'success', 'warning', 'error'] as const;
+
+function createOutlinedAlertVariant(severity: (typeof OUTLINED_ALERT_SEVERITIES)[number]) {
+  return {
+    props: { variant: 'outlined' as const, severity },
+    style: {
+      borderColor: `var(--mui-palette-${severity}-main)`,
+      color: 'var(--mui-palette-text-primary)',
+      '& .MuiAlert-icon': {
+        color: `var(--mui-palette-${severity}-main)`,
+      },
+    },
+  };
+}
+
 export const mendTheme = createTheme({
   cssVariables: {
     colorSchemeSelector: 'class',
@@ -187,21 +202,14 @@ export const mendTheme = createTheme({
           alignItems: 'flex-start',
         },
         outlined: {
-          backgroundColor: '#ffffff',
-        },
-      },
-      variants: [
-        {
-          props: { variant: 'outlined', severity: 'info' },
-          style: {
-            borderColor: 'var(--mui-palette-divider)',
-            color: 'var(--mui-palette-text-primary)',
-            '& .MuiAlert-icon': {
-              color: 'var(--mui-palette-text-secondary)',
-            },
+          backgroundColor: 'var(--mui-palette-background-paper)',
+          color: 'var(--mui-palette-text-primary)',
+          '& .MuiAlert-action .MuiIconButton-root': {
+            color: 'var(--mui-palette-text-secondary)',
           },
         },
-      ],
+      },
+      variants: OUTLINED_ALERT_SEVERITIES.map(createOutlinedAlertVariant),
     },
     MuiDialog: {
       styleOverrides: {
