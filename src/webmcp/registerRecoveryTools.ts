@@ -18,6 +18,16 @@ type ActiveRegistration = {
 
 let activeRegistration: ActiveRegistration | null = null;
 
+function logRegisteredToolNames(tools: RecoveryToolDefinition[]): void {
+  if (!import.meta.env.DEV) {
+    return;
+  }
+
+  const names = tools.map((tool) => tool.name);
+  const label = names.length > 0 ? names.join(', ') : '(none)';
+  console.info(`[webmcp] registering tools: ${label}`);
+}
+
 export function cleanupRecoveryToolRegistration(): void {
   if (!activeRegistration) {
     return;
@@ -68,6 +78,8 @@ export function registerRecoveryTools(
   const controller = new AbortController();
 
   try {
+    logRegisteredToolNames(input.tools);
+
     const cleanup = registerToolSet({
       modelContext: capability.modelContext,
       tools: input.tools,

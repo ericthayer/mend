@@ -32,6 +32,9 @@ export function installModelContextMock(targetDocument: Document = document) {
     listRegisteredToolNames(): string[] {
       return Array.from(registeredTools.keys());
     },
+    listRegisteredTools(): RegisteredTool[] {
+      return Array.from(registeredTools.values());
+    },
     async executeTool(name: string, input: unknown) {
       const tool = registeredTools.get(name);
       if (!tool) {

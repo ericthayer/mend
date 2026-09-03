@@ -12,19 +12,28 @@ import { PlanReview } from './components/PlanReview';
 import { seedFloodDemo } from './data/floodDemo';
 import { createRecoveryCommands } from './domain/commands';
 import {
+  selectAllowedActions,
   selectLatestApprovedPlan,
   selectPendingPlan,
 } from './domain/selectors';
-import { useRecoveryStore } from './state/recoveryStore';
+import { getCurrentDomainState, useRecoveryStore } from './state/recoveryStore';
 import type { WebMCPCapabilityStatus } from './components/WebMCPStatus';
 import type { TaskStatus } from './domain/types';
 import { registerRecoveryTools } from './webmcp/registerRecoveryTools';
+import {
+  createRecoveryImperativeTools,
+  selectStateAwareImperativeTools,
+} from './webmcp/toolDefinitions';
 
 function App() {
   const commands = useMemo(() => createRecoveryCommands(), []);
+  const imperativeTools = useMemo(() => createRecoveryImperativeTools(commands), [commands]);
   const caseData = useRecoveryStore((state) => state.case);
   const pendingPlan = useRecoveryStore(selectPendingPlan);
   const approvedPlan = useRecoveryStore(selectLatestApprovedPlan);
+  const webmcpRegistrationStateKey = useRecoveryStore((state) =>
+    selectAllowedActions(state).join('|')
+  );
   const records = useRecoveryStore((state) => state.records);
   const drafts = useRecoveryStore((state) => state.drafts);
   const activity = useRecoveryStore((state) => state.activity);
@@ -39,8 +48,11 @@ function App() {
   const [webmcpErrorMessage, setWebmcpErrorMessage] = useState<string | undefined>(undefined);
 
   useEffect(() => {
+    const state = getCurrentDomainState();
+    const tools = selectStateAwareImperativeTools(state, imperativeTools);
+
     const registration = registerRecoveryTools({
-      tools: [],
+      tools,
       onStatusChange: (status, errorMessage) => {
         setWebmcpStatus(status);
         setWebmcpErrorMessage(errorMessage);
@@ -56,7 +68,7 @@ function App() {
     return () => {
       registration.cleanup();
     };
-  }, []);
+  }, [imperativeTools, webmcpRegistrationStateKey]);
 
   const handleStartBlank = () => {
     setBusy(true);

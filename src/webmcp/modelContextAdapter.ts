@@ -64,6 +64,15 @@ export function registerToolSet(params: {
   tools: RecoveryToolDefinition[];
   signal: AbortSignal;
 }): () => void {
+  const seenToolNames = new Set<string>();
+  for (const tool of params.tools) {
+    if (seenToolNames.has(tool.name)) {
+      throw new Error(`Duplicate tool name in registration set: ${tool.name}`);
+    }
+
+    seenToolNames.add(tool.name);
+  }
+
   const unregisterCallbacks: Array<() => void> = [];
 
   for (const tool of params.tools) {

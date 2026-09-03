@@ -11,7 +11,7 @@
 | T1.3 | DONE | P0 | Plan review & next actions | Review card, manual review commands, priority lists |
 | T1.4 | DONE | P1 | Supporting case views | Record list, draft view, activity timeline, reset modal |
 | T2.1 | DONE | P0 | WebMCP platform adapter | Adapter, type augmentation, model-context mock |
-| T2.2 | READY | P0 | Imperative WebMCP tools | Snapshot, create case, add record, stage plan tools |
+| T2.2 | DONE | P0 | Imperative WebMCP tools | Snapshot, create case, add record, stage plan tools |
 | T2.3 | READY | P0 | Declarative review form | Semantic `<form toolname="start_plan_review">` |
 | T2.4 | BLOCKED | P1 | Safe outreach drafting tool | `stage_outreach_draft` tool & draft list wiring |
 | T3.1 | BLOCKED | P0 | Unit & integration tests | Test coverage for domain invariants & authority gates |
@@ -292,3 +292,46 @@
   * Mock tooling supports tool listing and execution tests.
   * Re-registration aborts/unregisters the prior registration set deterministically.
 * **Next eligible task:** `T2.2` (next in backlog order). `T2.3` remains `READY`.
+
+### Entry: T2.2 — Register Core Imperative Tools
+* **Status:** DONE
+* **Depends on:** T2.1 (DONE), T1.3 (DONE)
+* **Acceptance criteria (BUILD_SPEC.md §T2.2):**
+  * Tool names, descriptions, schemas, and annotations match specification.
+  * Available tools change correctly for no-case, unsafe, safe, and pending-plan states.
+  * Handlers read current state at execution time and reject stale operations.
+  * UI updates visibly after successful tool calls.
+  * Validation errors identify correctable fields without exposing internals.
+* **Planned Files:**
+  * `src/webmcp/toolDefinitions.ts` — define core imperative tools and state-aware filtering.
+  * `src/webmcp/toolResults.ts` — canonical structured tool-result envelope mappers.
+  * `src/webmcp/registerRecoveryTools.ts` — state-driven lifecycle integration for selected tools.
+  * `src/webmcp/modelContextAdapter.ts` — registration safety/duplicate handling.
+  * `src/App.tsx` — register and re-register selected tools as allowed actions change.
+  * `src/webmcp/registerRecoveryTools.test.ts` — integration coverage for state-aware registration behavior.
+  * `src/test/modelContextMock.ts` — richer model-context inspection helpers for tool contract assertions.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`
+* **Validation Results (all passed):**
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — `vitest run`: 8 test files passed, 30 tests passed total.
+    * Includes new WebMCP integration coverage for state-aware registration, contract/schema assertions, stale operation rejection, and visible UI updates after tool execution.
+  * `npm run build` — `tsc -b && vite build` exit 0.
+* **Changed Files:**
+  * `src/webmcp/toolResults.ts` (new) — canonical `ToolResult<T>` envelope + command-result mapping helpers.
+  * `src/webmcp/toolDefinitions.ts` (new) — core imperative tool contracts (`get_recovery_snapshot`, `create_recovery_case`, `add_case_record`, `stage_recovery_plan`) with exact descriptions/schemas/annotations and state-aware filtering.
+  * `src/App.tsx` — state-driven tool registration keyed to allowed-action changes and cleanup lifecycle.
+  * `src/webmcp/registerRecoveryTools.ts` — development-safe registration-name logging and lifecycle reuse.
+  * `src/webmcp/modelContextAdapter.ts` — duplicate tool-name guard in registration sets.
+  * `src/test/modelContextMock.ts` — registered-tool metadata inspection helper (`listRegisteredTools`).
+  * `src/webmcp/registerRecoveryTools.test.tsx` (new) — registration lifecycle + UI integration tests (replaces `.test.ts`).
+  * `src/webmcp/registerRecoveryTools.test.ts` (deleted) — superseded by `.tsx` test with UI integration.
+  * `src/webmcp/toolDefinitions.test.ts` (new) — exact contract checks, availability-by-state checks, stale-operation, and validation-error envelope tests.
+  * `src/vite-env.d.ts` (new) — Vite client type reference for test/runtime `import.meta` typing.
+* **Result:** T2.2 acceptance criteria met:
+  * Core tool names/descriptions/schemas/annotations match BUILD_SPEC Section 5.
+  * Registered tool availability transitions correctly for no-case, unsafe, safe, and pending-plan states.
+  * Handlers resolve current store state at execution time; stale add-record operations are rejected with `state_conflict`.
+  * Successful tool calls immediately update visible UI state via shared command-layer mutations.
+  * Validation failures return correctable field-level hints without stack traces or internal implementation details.
+* **Next eligible task:** `T2.3` (next in backlog order). `T2.4` remains blocked behind T2.2 plus core critical-path completion policy.
