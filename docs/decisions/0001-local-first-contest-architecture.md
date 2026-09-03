@@ -14,7 +14,7 @@ AI coding agents often attempt to scaffold cloud persistence, user auth, and ser
 
 For the contest MVP:
 1. **Client-Only Execution:** Mend runs entirely in the browser using React, TypeScript, and Vite. There is no backend, serverless function, or database service.
-2. **Local Persistence:** All domain state is validated via Zod and stored in `localStorage` under the key `crisis-recovery-planner:v1`.
+2. **Local Persistence:** All domain state is validated via Zod and stored in `localStorage` under the key `mend:recovery-planner:v1`.
 3. **No External Side Effects:** No external network requests, third-party messaging transports (SMS, email), analytics, or PII uploads are permitted.
 4. **Architectural Seam:** State commands interact with domain stores through clean functional boundaries so storage mechanisms can be swapped post-contest without modifying WebMCP tool signatures.
 

@@ -2,3 +2,7 @@
 node_modules
 dist
 build
+*.tsbuildinfo
+coverage
+playwright-report
+test-results

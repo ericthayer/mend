@@ -1,0 +1,20 @@
+{
+  "capturedAt": "2026-09-03T06:59:32.483Z",
+  "url": "https://mend-webmcp.netlify.app/",
+  "launchArgs": [
+    "--enable-webmcp-testing",
+    "--categoryWebMCP"
+  ],
+  "probe": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "hasModelContext": false,
+    "modelContextType": "undefined",
+    "visibleStatusText": "Agent tools: unavailable"
+  },
+  "consoleWarnings": [
+    {
+      "type": "warning",
+      "text": "Error with Permissions-Policy header: Origin trial controlled feature not enabled: 'tools'."
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+a {
+  text-underline-offset: 0.15em;
+}
+
+:focus-visible {
+  outline: 3px solid var(--mui-palette-primary-main);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+form[toolname='start_plan_review']:tool-form-active {
+  outline: 3px solid var(--mui-palette-primary-main);
+  outline-offset: 4px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 2px var(--mui-palette-background-paper);
+}
+
+form[toolname='start_plan_review'] button[type='submit']:tool-submit-active {
+  outline: 3px solid var(--mui-palette-primary-main);
+  outline-offset: 2px;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+form[toolname='start_plan_review'][data-tool-active='true'] {
+  outline: 3px solid var(--mui-palette-primary-main);
+  outline-offset: 4px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 2px var(--mui-palette-background-paper);
+}
+
+form[toolname='start_plan_review'][data-tool-active='true'] button[type='submit'] {
+  outline: 3px solid var(--mui-palette-primary-main);
+  outline-offset: 2px;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

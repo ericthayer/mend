@@ -7,7 +7,7 @@
 - Runtime input validation with Zod is mandatory for all boundary inputs.
 
 ## Strict Architectural Guardrails
-- **No Backend:** Do not add Supabase, Firebase, Express, database packages, or authentication. Local storage only (`crisis-recovery-planner:v1`).
+- **No Backend:** Do not add Supabase, Firebase, Express, database packages, or authentication. Local storage only (`mend:recovery-planner:v1`).
 - **No External Side Effects:** No external network requests, outbound SMS/email, webhooks, or file uploads. Message drafts are strictly local and copy-only.
 - **Human Authority Boundary:** 
   - Never implement an imperative approval tool.
