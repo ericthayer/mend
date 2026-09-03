@@ -1511,7 +1511,7 @@ Only these decisions require the project owner; implementation should proceed wi
 | OD-03 | Netlify account/site | **Resolved:** Netlify project ID `6074f418-73e0-4416-a297-f3cbf9f856bf`. Deployment is pending; use the exact ID and stop if authorization is unavailable. |
 | OD-04 | Optional outreach-draft beat | **Resolved:** Defer it unless the core demo and all contest-critical gates are complete. |
 
-## 18. Authoritative references
+## 17. Authoritative references
 
 - WebMCP Challenge rules and submission requirements: https://webmcp.devpost.com/rules
 - WebMCP Challenge resources and FAQ: https://webmcp.devpost.com/resources
