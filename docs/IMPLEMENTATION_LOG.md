@@ -17,8 +17,8 @@
 | T3.1 | DONE | P0 | Unit & integration tests | Test coverage for domain invariants & authority gates |
 | T3.2 | DONE | P0 | Hardened accessibility & states | Keyboard traversal, axe a11y checks, live regions |
 | T3.3 | DONE | P1 | End-to-end browser journeys | Playwright happy-path test suite |
-| T4.1 | BLOCKED | P0 | Production Netlify build | Headers, redirects, static build verification |
-| T4.2 | BLOCKED | P0 | Real WebMCP client smoke tests | Chrome DevTools & in-app browser evals |
+| T4.1 | DONE | P0 | Production Netlify build | Headers, redirects, static build verification |
+| T4.2 | READY | P0 | Real WebMCP client smoke tests | Chrome DevTools & in-app browser evals |
 | T5.1 | BLOCKED | P0 | Judge-ready documentation | README, screenshots, reproduction steps |
 | T5.2 | BLOCKED | P0 | Sub-three-minute demo video | Video recording and public link |
 | T5.3 | BLOCKED | P0 | Submission & repository freeze | Devpost copy verification and branch freeze |
@@ -485,7 +485,7 @@
 * **Next eligible task:** `T4.1` (next in backlog order; dependencies T3.1 + T3.2 are DONE).
 
 ### Entry: T4.1 — Deploy a Hardened Production Build
-* **Status:** BLOCKED
+* **Status:** DONE
 * **Depends on:** T3.1 (DONE), T3.2 (DONE)
 * **Acceptance criteria (BUILD_SPEC.md §T4.1):**
   * All preflight scripts pass against committed source.
@@ -498,7 +498,7 @@
   * `netlify.toml` (verify) — build/publish and SPA redirect config for static deployment.
   * `docs/IMPLEMENTATION_LOG.md` — deployment validation evidence, commit SHA, and status update.
 * **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run test:e2e`, `npm run build`
-* **Deployment Validation:** `curl -I <production-url>` header verification and production reload smoke check.
+* **Deployment Command:** `set -a; source .env; set +a; netlify deploy --prod --dir=dist --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message "T4.1 production verification"`
 * **Progress completed in this run:**
   * Added `public/_headers` with the required production security/permissions policy headers.
   * Verified `netlify.toml` contains SPA redirect + build/publish config.
@@ -509,13 +509,26 @@
     * `npm run test:e2e` — 5/5 Playwright tests passed.
     * `npm run build` — exit 0.
   * Verified build artifact includes `dist/_headers` with expected header set.
-* **Blocker:**
-  * Deployment authorization unavailable in this environment.
-  * `command -v netlify` returned `netlify cli not installed`.
-  * `NETLIFY_AUTH_TOKEN` is not set.
-  * Owner decision OD-03 requires using the exact Netlify project and stopping if authorization is unavailable.
-* **Fallback/Unblock path:**
-  * Provide deployment authorization (`NETLIFY_AUTH_TOKEN`) or perform owner-side Netlify deploy for project `6074f418-73e0-4416-a297-f3cbf9f856bf`.
-  * After deploy, run `curl -I <production-url>` to verify response headers and execute production smoke checks.
-* **Result:** Contest-critical preflight and hardening artifacts are complete, but T4.1 cannot be marked `DONE` until production deployment and header checks run against a live HTTPS URL.
-* **Next eligible task:** None. Backlog is blocked at `T4.1` until deployment authorization is available.
+* **Production Deployment Evidence:**
+  * Deployed source commit: `85861d5`.
+  * Netlify deploy ID: `6a9918c1ae91a7dc21e998fe`.
+  * Production URL: `https://mend-webmcp.netlify.app`.
+  * Unique deploy URL: `https://6a9918c1ae91a7dc21e998fe--mend-webmcp.netlify.app`.
+  * Build logs URL: `https://app.netlify.com/projects/mend-webmcp/deploys/6a9918c1ae91a7dc21e998fe`.
+* **Live Header Verification (`curl -sI` on both production and unique URLs):**
+  * `content-security-policy` present and matches required policy.
+  * `permissions-policy: tools=(self)` present.
+  * `referrer-policy: no-referrer` present.
+  * `x-content-type-options: nosniff` present.
+  * `origin-agent-cluster: ?1` present.
+  * HTTPS/HSTS confirmed via `strict-transport-security`.
+* **Production Smoke Verification (reload + console sanity):**
+  * Executed a Playwright production journey script (mobile `390×844` and desktop `1440×900`) against `https://mend-webmcp.netlify.app/`.
+  * Journey performed: load app → load flood demo → stage pending plan via WebMCP test harness → confirm decision → verify approved plan/next actions → reload → verify persisted approved state.
+  * Result: `consoleErrorCount = 0` for both mobile and desktop runs.
+* **Sensitive Exposure Verification:**
+  * Deployed JS asset inspected: `/assets/index-BH1868cN.js`.
+  * `SOURCEMAP_REF=absent`.
+  * `SECRET_PATTERN=absent` for `NETLIFY_AUTH_TOKEN|NETLIFY_AUTH_KEY|nfp_...` scans.
+* **Result:** All T4.1 acceptance criteria met and validated on the live HTTPS deployment.
+* **Next eligible task:** `T4.2` (now `READY`; dependency T4.1 is DONE).
