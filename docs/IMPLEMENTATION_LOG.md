@@ -947,6 +947,31 @@
   * `public/_headers` — explicit content type for `/llms.txt`.
   * `docs/IMPLEMENTATION_LOG.md` — scope and verification record.
 * **Result:** `/llms.txt` is served as a spec-compliant Markdown summary, clearing the Agent accessibility finding. The Lighthouse category score must be re-measured against the deployed build, since the audit fetches the file from the origin under test.
+
+### Entry: UX-8 — Deploy-preview CSP for the Netlify Drawer (user-directed, out-of-backlog)
+* **Status:** DONE
+* **Trigger:** operator reported a console error on https://deploy-preview-6--mend-webmcp.netlify.app/ — `Framing 'https://app.netlify.com/' violates the following Content Security Policy directive: "default-src 'self'"`. Console errors also count against the Lighthouse **Best Practices** category on the audited origin.
+* **Diagnosis:** Netlify injects `<script async src="/.netlify/scripts/cdp">` on non-production deploys. The script is same-origin (allowed by `script-src 'self'`) and its only external need is `document.createElement("iframe")` pointed at `https://app.netlify.com/`; it performs no `fetch`, `XMLHttpRequest`, or `WebSocket` calls. The production CSP omits `frame-src`, so framing falls back to `default-src 'self'` and is blocked. The drawer does not exist on production deploys, so the production policy is correct as written.
+* **Scope:** deploy configuration only. No application, command-layer, WebMCP, persistence, or approval-boundary changes, and no change to the production CSP.
+* **Planned Files:**
+  * `scripts/allow-netlify-drawer.mjs` (new) — post-build patch that inserts `frame-src 'self' https://app.netlify.com;` into `dist/_headers`.
+  * `netlify.toml` (edit) — `[context.deploy-preview]` and `[context.branch-deploy]` build commands that run the patch.
+  * `docs/IMPLEMENTATION_LOG.md` (edit) — scope and validation evidence.
+* **Validation Commands:** `npm run build` followed by `node scripts/allow-netlify-drawer.mjs` (patch, idempotency, and missing-anchor cases), then `npm run lint`, `npm run typecheck`, `npm run test:run`.
+* **Implementation:** Netlify header rules are global per deploy and cannot be scoped to a context, so the documented approach is a context-specific build command that rewrites the published headers file. `public/_headers` stays the single source of truth for the strict production policy; preview and branch deploys derive from it rather than duplicating it, which prevents the two policies from drifting apart. The script is idempotent and exits `1` if the expected `object-src` anchor is absent, so a future CSP edit fails the preview build instead of silently reintroducing the error. Production deploys never run the patch.
+* **Validation Results (all passed):**
+  * Patch — `dist/_headers` CSP became `… connect-src 'self'; frame-src 'self' https://app.netlify.com; object-src 'none'; …`.
+  * Idempotency — a second run reported "already declares frame-src" and exited `0`.
+  * Missing anchor — a truncated CSP produced the explanatory error and exit `1`.
+  * Production build — `npm run build` alone emits `dist/_headers` with no `frame-src`, unchanged from before.
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — 12 test files, 57 tests passed.
+* **Changed Files:**
+  * `scripts/allow-netlify-drawer.mjs` — preview-only CSP patch.
+  * `netlify.toml` — deploy-preview and branch-deploy build commands.
+  * `docs/IMPLEMENTATION_LOG.md` — scope and verification record.
+* **Result:** The drawer frame is permitted only on non-production deploys, clearing the preview console error while production keeps a CSP that blocks all framing. Confirm on the next deploy preview; alternatively, disabling the Netlify Drawer in project settings would remove the error without any header change.
 * **Implementation:**
   * Replaced the empty state's centered single-column panel at desktop widths with a responsive two-part `control and continuity` surface. Primary recovery copy and both action labels are unchanged and appear before the supporting reassurance content in the mobile reading order.
   * Added the semantic `You remain in control` complementary region with factual local-storage, no-account, and manual-review guarantees. This adds no new action or state change.
@@ -967,3 +992,28 @@
   * Dark desktop/mobile: page, sticky header, and inset-panel surfaces resolve to the correct active scheme tokens. At desktop the sticky header resolved to `rgba(17, 24, 32, 0.88)`; the inset panel resolved from the dark primary channel.
   * Reduced motion: the computed button transition duration resolved to `1e-05s`; no console warnings or errors occurred during the final reload.
 * **Result:** The start experience is materially more intentional while preserving the calm, direct, trust-first recovery workflow. Recovery commands, WebMCP registration, native review semantics, local persistence, and all existing action labels remain unchanged.
+
+### Entry: UX-7 — Visual system rework: stop reading as default MUI (user-directed, out-of-backlog)
+* **Status:** DONE
+* **Trigger:** operator feedback on 2026-09-03 that the UX-6 pass was insufficient: "still looks like MUI or every other Tailwind-styled AI generated site." Operator attached Cron, Google Workspace, Felt, Maze, Grok, Salesforce, and Aboard dashboard screenshots as aesthetic reference and asked for a genuinely distinctive look without disrupting functionality.
+* **Design read:** a trust-first recovery dashboard (not a landing page), for a stressed non-expert user. Direction: friendly "soft structuralism" SaaS-dashboard language (closest to the Aboard/Maze/Grok references), not generic flat-bordered Material panels. Dials: `DESIGN_VARIANCE 5` (bento-style hero promotion, not landing-page chaos), `MOTION_INTENSITY 3` (unchanged restraint — a safety tool should not gain new animation just to look "premium"), `VISUAL_DENSITY 4`.
+* **Constraint carried forward from repo rules:** no remote fonts, no new dependencies, no styling-framework change (BUILD_SPEC §7 locks system font stack only). The high-end-visual-design skill's font/icon library assumptions (Geist, Clash Display, Phosphor swap, etc.) do not apply here; distinctiveness comes from weight/scale/tracking/shadow/shape decisions on the existing system font stack and existing MUI/Emotion stack, not from new assets.
+* **Signature element:** `CaseSummary` ("What we know") is promoted to a full-width hero band above the two-column dashboard grid (previously stacked inside the secondary column) and given a hero-scale heading (`titleSx` override, ~2.25rem/800 weight) — the one deliberately bold moment, mutually exclusive with the empty-state hero headline (never shown together).
+* **Planned/Changed Files:**
+  * `src/styles/theme.ts` — bolder/tighter h1-h3 type scale (h1 800/-0.03em, h2 750/-0.015em, h3 700); `shape.borderRadius` 16→20; `MuiButton` root radius 10→999 (full pill) with wider horizontal padding; `MuiPaper` root gains a soft multi-layer ambient shadow in light mode and a subtle inset highlight in dark mode (`'html.dark &'` selector, matching this app's confirmed `class="dark"` root, since `colorSchemeSelector: 'class'` is configured) while keeping the existing hairline border in both modes; `MuiDialog` paper radius 20→24; new `MuiChip` `variants` array (`CHIP_TONAL_COLORS` + `createTonalChipVariant`, mirroring the existing `OUTLINED_ALERT_SEVERITIES` pattern) converts every `variant="outlined"` chip from a flat hairline badge into a tonal tinted badge using `rgb(var(--mui-palette-{color}-mainChannel) / alpha)`, plus a neutral `action.hover`-based treatment for `color="default"`.
+  * `src/styles/surfaces.ts` — `sectionSurfaceSx`/`reviewSurfaceSx` padding bumped `{xs:2,sm:3}` → `{xs:2.5,sm:3.5}` for airier dashboard cards.
+  * `src/components/SectionCard.tsx` — `IconTile` default size 40→44 with a proportional squircle radius (`Math.round(size*0.32)`) instead of a two-step hardcoded value; new optional `titleSx` prop (non-breaking) so one section can carry a hero-scale heading without a new component.
+  * `src/components/CaseSummary.tsx` — passes the hero `titleSx`.
+  * `src/App.tsx` — `CaseSummary` moved out of the secondary column to a full-width band above the two-column grid (same conditional, same props; purely a layout/JSX reorder, no state/command changes).
+  * `src/components/PlanReview.tsx`, `src/components/DraftList.tsx` — fixed nested-radius concentricity: the review-form wrapper and the draft-body block sit inside a now-20px-radius `SectionCard`, so their own radius was reduced (24px→16px) to stay smaller than their parent, per the standard nested-squircle rule.
+  * `src/components/EmptyState.tsx` — empty-state headline pushed further (2rem/2.75rem, weight 800, tracking -0.04em) to genuine hero scale.
+* **What was deliberately left alone:** no scroll/entry motion was added (the skill's motion-choreography section is largely landing-page oriented; a stressed-user safety tool should not gain new animation for its own sake — existing hover/press transforms from UX-6 are unchanged). `PlanReview`'s native `<select>`/`<textarea>` and their `NATIVE_FIELD_STYLE` (10px radius, correctly smaller than the new 16px form wrapper) were not touched, preserving the WebMCP declarative-form contract per repo memory. No fonts, icon libraries, or dependencies were added.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run test:e2e`, `npm run build`.
+* **Validation Results (all passed):**
+  * `npm run lint` — exit 0.
+  * `npm run typecheck` — exit 0.
+  * `npm run test:run` — 12 files, 57 tests passed (including axe scans for empty/active/pending-review states in `T3AccessibilityHardening.test.tsx`, and the declarative-review-form contract tests in `T2DeclarativeReview.test.tsx`).
+  * `npm run test:e2e` — 5 Playwright tests passed, including axe scans for empty, active dashboard, and pending-review states in a real browser — confirming the new shadows/pill buttons/tonal chips introduced no serious or critical accessibility violations in any state.
+  * `npm run build` — exit 0. Only the pre-existing non-blocking bundle-size advisory was emitted.
+* **Browser Evidence:** Verified in the shared browser session at 1440×900 and 390×844, in both light and dark color schemes: no horizontal overflow at any combination; the promoted "What we know" hero band, tonal chips, pill buttons, and soft-shadow cards render correctly; dark mode correctly shows the inset-highlight/hairline-border treatment (not the light-mode ambient shadow, which would be invisible on a near-black canvas). The browser session was reset to the clean empty state afterward (`localStorage.clear()` + reload) so no demo data was left behind as a side effect of visual QA.
+* **Result:** The dashboard now reads as a deliberate, distinctive product surface (bold display headline, tonal badges, pill controls, soft-elevated cards) rather than default MUI/Tailwind scaffolding, while every WebMCP tool contract, command-layer boundary, native review-form semantic, and piece of copy remains exactly as before.

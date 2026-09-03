@@ -15,6 +15,12 @@ export function CaseSummary({ caseData }: CaseSummaryProps) {
       tint="case"
       icon={<HouseIcon />}
       title="What we know"
+      titleSx={{
+        fontSize: { xs: '1.75rem', sm: '2.25rem' },
+        lineHeight: 1.15,
+        fontWeight: 800,
+        letterSpacing: '-0.03em',
+      }}
       meta={
         <>
           <Chip label={INCIDENT_LABELS[caseData.incidentType]} color="primary" variant="outlined" size="small" />

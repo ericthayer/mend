@@ -88,6 +88,21 @@ function createOutlinedAlertVariant(severity: (typeof OUTLINED_ALERT_SEVERITIES)
   };
 }
 
+// Tonal (tinted-fill) chip badges read as an intentional product language rather
+// than the hairline-outline default every MUI/Tailwind app ships with.
+const CHIP_TONAL_COLORS = ['primary', 'success', 'warning', 'error'] as const;
+
+function createTonalChipVariant(color: (typeof CHIP_TONAL_COLORS)[number]) {
+  return {
+    props: { variant: 'outlined' as const, color },
+    style: {
+      backgroundColor: `rgb(var(--mui-palette-${color}-mainChannel) / 0.12)`,
+      borderColor: `rgb(var(--mui-palette-${color}-mainChannel) / 0.32)`,
+      color: `var(--mui-palette-${color}-main)`,
+    },
+  };
+}
+
 export const mendTheme = createTheme({
   cssVariables: {
     colorSchemeSelector: 'class',
@@ -101,7 +116,7 @@ export const mendTheme = createTheme({
     },
   },
   shape: {
-    borderRadius: 16,
+    borderRadius: 20,
   },
   spacing: 8,
   typography: {
@@ -110,19 +125,19 @@ export const mendTheme = createTheme({
     h1: {
       fontSize: '1.25rem',
       lineHeight: 1.2,
-      fontWeight: 750,
-      letterSpacing: '-0.02em',
+      fontWeight: 800,
+      letterSpacing: '-0.03em',
     },
     h2: {
-      fontSize: '1.125rem',
+      fontSize: '1.1875rem',
       lineHeight: 1.3,
-      fontWeight: 700,
-      letterSpacing: '-0.01em',
+      fontWeight: 750,
+      letterSpacing: '-0.015em',
     },
     h3: {
       fontSize: '1rem',
       lineHeight: 1.4,
-      fontWeight: 650,
+      fontWeight: 700,
     },
     body1: {
       fontSize: '1rem',
@@ -146,9 +161,9 @@ export const mendTheme = createTheme({
       styleOverrides: {
         root: {
           minHeight: 44,
-          borderRadius: 10,
-          paddingLeft: 18,
-          paddingRight: 18,
+          borderRadius: 999,
+          paddingLeft: 24,
+          paddingRight: 24,
           transition:
             'transform 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1), background-color 180ms cubic-bezier(0.22, 1, 0.36, 1)',
           '&:active': {
@@ -180,11 +195,16 @@ export const mendTheme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
+          borderRadius: 20,
           border: '1px solid var(--mui-palette-divider)',
-          boxShadow: 'none',
+          boxShadow:
+            '0 1px 1px rgb(20 24 31 / 0.02), 0 10px 24px -8px rgb(20 24 31 / 0.10), 0 28px 56px -24px rgb(20 24 31 / 0.08)',
           backgroundImage: 'none',
           backgroundColor: 'var(--mui-palette-background-paper)',
+          'html.dark &': {
+            boxShadow:
+              'inset 0 1px 0 rgb(255 255 255 / 0.05), 0 20px 44px -24px rgb(0 0 0 / 0.55)',
+          },
         },
       },
     },
@@ -211,6 +231,17 @@ export const mendTheme = createTheme({
           backgroundColor: 'var(--mui-palette-background-paper)',
         },
       },
+      variants: [
+        ...CHIP_TONAL_COLORS.map(createTonalChipVariant),
+        {
+          props: { variant: 'outlined' as const, color: 'default' as const },
+          style: {
+            backgroundColor: 'var(--mui-palette-action-hover)',
+            borderColor: 'var(--mui-palette-divider)',
+            color: 'var(--mui-palette-text-secondary)',
+          },
+        },
+      ],
     },
     MuiAlert: {
       styleOverrides: {
@@ -231,7 +262,7 @@ export const mendTheme = createTheme({
     MuiDialog: {
       styleOverrides: {
         paper: {
-          borderRadius: 20,
+          borderRadius: 24,
           padding: 8,
         },
       },

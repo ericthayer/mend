@@ -7,7 +7,7 @@ import type { SxProps } from '@mui/material/styles';
  * dashboard grid in App.tsx, not by the card.
  */
 export const sectionSurfaceSx: SxProps<Theme> = {
-  p: { xs: 2, sm: 3 },
+  p: { xs: 2.5, sm: 3.5 },
 };
 
 /**
@@ -76,7 +76,7 @@ export function sectionTintSx(tint: SectionTintKey) {
  */
 export function reviewSurfaceSx(theme: Theme) {
   return {
-    p: { xs: 2, sm: 3 },
+    p: { xs: 2.5, sm: 3.5 },
     backgroundColor: alpha(theme.palette.warning.light, 0.07),
     borderColor: alpha(theme.palette.warning.main, 0.35),
   } as const;

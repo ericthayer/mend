@@ -244,7 +244,7 @@ export function PlanReview({
         spacing={2}
         sx={{
           p: { xs: 2, sm: 2.5 },
-          borderRadius: 3,
+          borderRadius: 2,
           bgcolor: 'background.paper',
           border: '1px solid',
           borderColor: 'divider',

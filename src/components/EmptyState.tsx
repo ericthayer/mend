@@ -49,9 +49,10 @@ export function EmptyState({ onStartBlank, onLoadDemo, busy = false }: EmptyStat
             variant="h2"
             id="empty-state-heading"
             sx={{
-              fontSize: { xs: '1.625rem', sm: '2rem' },
-              lineHeight: 1.1,
-              letterSpacing: '-0.035em',
+              fontSize: { xs: '2rem', sm: '2.75rem' },
+              lineHeight: 1.08,
+              fontWeight: 800,
+              letterSpacing: '-0.04em',
               textWrap: 'balance',
             }}
           >

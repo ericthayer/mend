@@ -205,37 +205,39 @@ function App() {
       onResetRequested={caseData ? () => setIsResetDialogOpen(true) : undefined}
     >
       {caseData ? (
-        <Box
-          sx={{
-            display: 'grid',
-            gap: 3,
-            gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 7fr) minmax(0, 5fr)' },
-            alignItems: 'start',
-          }}
-        >
-          <Stack spacing={3} sx={{ minWidth: 0 }}>
-            {pendingPlan ? (
-              <PlanReview
-                pendingPlan={pendingPlan}
+        <Stack spacing={3}>
+          <CaseSummary caseData={caseData} />
+          <Box
+            sx={{
+              display: 'grid',
+              gap: 3,
+              gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 7fr) minmax(0, 5fr)' },
+              alignItems: 'start',
+            }}
+          >
+            <Stack spacing={3} sx={{ minWidth: 0 }}>
+              {pendingPlan ? (
+                <PlanReview
+                  pendingPlan={pendingPlan}
+                  approvedPlan={approvedPlan}
+                  submitting={reviewSubmitting}
+                  onSubmit={handleReviewSubmit}
+                />
+              ) : null}
+              <NextActions
                 approvedPlan={approvedPlan}
-                submitting={reviewSubmitting}
-                onSubmit={handleReviewSubmit}
+                busyTaskId={updatingTaskId}
+                onUpdateTaskStatus={handleUpdateTaskStatus}
+                headingRef={nextActionsHeadingRef}
               />
-            ) : null}
-            <NextActions
-              approvedPlan={approvedPlan}
-              busyTaskId={updatingTaskId}
-              onUpdateTaskStatus={handleUpdateTaskStatus}
-              headingRef={nextActionsHeadingRef}
-            />
-            <DraftList drafts={drafts} />
-          </Stack>
-          <Stack spacing={3} sx={{ minWidth: 0 }}>
-            <CaseSummary caseData={caseData} />
-            <CaseRecordList records={records} />
-            <ActivityTimeline activity={activity} />
-          </Stack>
-        </Box>
+              <DraftList drafts={drafts} />
+            </Stack>
+            <Stack spacing={3} sx={{ minWidth: 0 }}>
+              <CaseRecordList records={records} />
+              <ActivityTimeline activity={activity} />
+            </Stack>
+          </Box>
+        </Stack>
       ) : (
         <EmptyState onStartBlank={handleStartBlank} onLoadDemo={handleLoadDemo} busy={busy} />
       )}

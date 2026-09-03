@@ -98,7 +98,7 @@ export function DraftList({ drafts }: DraftListProps) {
                   maxWidth: '65ch',
                   whiteSpace: 'pre-wrap',
                   p: 2,
-                  borderRadius: 3,
+                  borderRadius: 2,
                   bgcolor: 'background.default',
                 }}
               >

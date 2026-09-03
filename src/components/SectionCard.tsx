@@ -9,7 +9,7 @@ type IconTileProps = {
   size?: number;
 };
 
-export function IconTile({ tint, children, size = 40 }: IconTileProps) {
+export function IconTile({ tint, children, size = 44 }: IconTileProps) {
   return (
     <Box
       aria-hidden="true"
@@ -21,7 +21,7 @@ export function IconTile({ tint, children, size = 40 }: IconTileProps) {
           flex: '0 0 auto',
           display: 'grid',
           placeItems: 'center',
-          borderRadius: size >= 44 ? 14 : 12,
+          borderRadius: Math.round(size * 0.32),
         },
       ]}
     >
@@ -35,6 +35,7 @@ type SectionCardProps = {
   tint: SectionTintKey;
   icon: ReactNode;
   title: string;
+  titleSx?: SxProps<Theme>;
   meta?: ReactNode;
   headingRef?: Ref<HTMLHeadingElement>;
   sx?: SxProps<Theme>;
@@ -46,6 +47,7 @@ export function SectionCard({
   tint,
   icon,
   title,
+  titleSx,
   meta,
   headingRef,
   sx,
@@ -78,7 +80,10 @@ export function SectionCard({
             id={headingId}
             ref={headingRef}
             tabIndex={headingRef ? -1 : undefined}
-            sx={{ mr: 'auto', outlineOffset: 4 }}
+            sx={[
+              { mr: 'auto', outlineOffset: 4 },
+              ...(titleSx ? (Array.isArray(titleSx) ? titleSx : [titleSx]) : []),
+            ] as SxProps<Theme>}
           >
             {title}
           </Typography>
