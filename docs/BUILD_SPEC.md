@@ -1,11 +1,14 @@
 ---
 schema_version: "1.0"
 artifact_type: "agent_ready_build_spec"
-project_working_title: "Crisis Recovery Planner"
-project_slug: "crisis-recovery-planner"
+project_working_title: "Mend"
+project_slug: "mend"
+repository_url: "https://github.com/ericthayer/mend"
+netlify_project_id: "6074f418-73e0-4416-a297-f3cbf9f856bf"
+deployment_status: "not_deployed"
 status: "ready_for_implementation"
-version: "0.1.0"
-last_verified: "2026-09-02"
+version: "0.1.1"
+last_verified: "2026-09-03"
 submission_deadline: "2026-09-03T13:00:00-07:00"
 submission_deadline_mdt: "2026-09-03T14:00:00-06:00"
 primary_platform: "responsive_web"
@@ -13,7 +16,7 @@ execution_strategy: "thin_vertical_slices"
 source_of_truth: "docs/BUILD_SPEC.md after repository initialization"
 ---
 
-# Crisis Recovery Planner (Mend) — Agent-Ready Technical Build Specification
+# Mend — Agent-Ready Technical Build Specification
 
 ## 0. How an implementation agent must use this document
 
@@ -31,6 +34,18 @@ This specification is both the product contract and the ordered implementation b
 8. Mark a task `DONE` only when all acceptance criteria pass and the app remains buildable.
 9. If blocked for more than 15 minutes, use the documented fallback. If no fallback exists, record the blocker and stop rather than inventing a new architecture.
 10. Do not implement `DEFERRED` items before all contest-critical tasks are `DONE`.
+
+### Harness status at handoff
+
+The project owner has already created the following harnessing files manually:
+
+- `AGENTS.md`
+- `docs/BUILD_SPEC.md`
+- `docs/IMPLEMENTATION_LOG.md`
+- `docs/EVAL_RESULTS.md`
+- `docs/decisions/0001-local-first-contest-architecture.md`
+
+T0.2 must verify that these files exist, contain the required rules and structure, and match this specification where applicable. Do not overwrite owner-authored harness files without first comparing their contents and recording any reconciliation in the implementation log.
 
 ### Allowed task statuses
 
@@ -112,7 +127,8 @@ The submission is ready only when all of the following are true:
 
 - A judge can open the live URL without credentials and select the seeded flood scenario.
 - The app remains usable in a normal browser without WebMCP.
-- A WebMCP-capable agent can create or load a case, add a record, stage a plan, and stage an outreach draft.
+- A WebMCP-capable agent can create or load a case, add a record, stage a plan, and open the human review flow.
+- The optional outreach-draft feature is included only if the core demo is complete and all contest-critical gates pass.
 - Every tool call visibly changes or reads the same state shown in the human interface.
 - A staged plan cannot become approved through an imperative tool call or auto-submitted form.
 - The human can approve or request changes with a visible, keyboard-operable control.
@@ -188,9 +204,9 @@ The demonstration persona is a renter whose apartment flooded because of a burst
 9. Judge reviews and manually selects `Approve plan` or `Request changes`, optionally edits the note, and submits.
 10. The approved next actions move to the top of the dashboard. The agent calls `get_recovery_snapshot` and answers which action is next and why.
 
-### Secondary demonstration beat
+### Optional secondary demonstration beat
 
-The judge asks, “Draft a note to my landlord summarizing what I documented.” The agent calls `stage_outreach_draft`. The app displays a clearly labeled unsent draft. There is no send control in the contest build.
+Only after the core demo and all contest-critical gates pass, the judge may ask, “Draft a note to my landlord summarizing what I documented.” The agent calls `stage_outreach_draft`. The app displays a clearly labeled unsent draft. There is no send control in the contest build. If time is constrained, omit this beat and its implementation entirely.
 
 ### Information architecture
 
@@ -630,7 +646,7 @@ Enforce `reviewPlan` actor as `user`. `updateTaskStatus` is UI-only in the conte
 
 ### Persistence key and migration
 
-- Local-storage key: `crisis-recovery-planner:v1`.
+- Local-storage key: `mend:recovery-planner:v1`.
 - Persist only the sanitized domain state, not temporary UI state or raw tool inputs.
 - Include `schemaVersion: 1` and a migration function that can reset incompatible demo data safely.
 - Add a visible `Delete local case` action with a confirmation dialog.
@@ -930,7 +946,7 @@ Required: no safety/authority failure and at least 90% of all available points a
 ## 10. Repository blueprint
 
 ```text
-crisis-recovery-planner/
+mend/
 ├── AGENTS.md
 ├── README.md
 ├── LICENSE
@@ -1035,7 +1051,7 @@ The plan budgets approximately 11–13 focused build hours plus a 3-hour conting
 | ID | Priority | Initial status | Depends on | Deliverable |
 | --- | --- | --- | --- | --- |
 | T0.1 | P0 | READY | — | Repository, scripts, license, CI-safe skeleton. |
-| T0.2 | P0 | BLOCKED | T0.1 | Agent/project docs and implementation log. |
+| T0.2 | P0 | BLOCKED | T0.1 | Verify and adopt the owner-created agent/project harness files. |
 | T1.1 | P0 | BLOCKED | T0.1 | Domain schemas, commands, store, persistence, seed. |
 | T1.2 | P0 | BLOCKED | T1.1 | Responsive shell, safety/empty/case views. |
 | T1.3 | P0 | BLOCKED | T1.1, T1.2 | Pending-plan review and approved next actions. |
@@ -1043,7 +1059,7 @@ The plan budgets approximately 11–13 focused build hours plus a 3-hour conting
 | T2.1 | P0 | BLOCKED | T1.1 | WebMCP adapter, typings, mock, capability status. |
 | T2.2 | P0 | BLOCKED | T2.1, T1.3 | Imperative tools and state-driven registration. |
 | T2.3 | P0 | BLOCKED | T1.3 | Declarative review form and activation events. |
-| T2.4 | P1 | BLOCKED | T2.2, T1.4 | Outreach tool and compact structured outputs. |
+| T2.4 | P1 | DEFERRED | T2.2, T1.4 | Optional outreach tool and compact structured outputs, only after the core demo is complete. |
 | T3.1 | P0 | BLOCKED | T2.2, T2.3 | Unit/integration tests for invariants and authority. |
 | T3.2 | P0 | BLOCKED | T1.4, T3.1 | Accessibility, responsive, failure-state hardening. |
 | T3.3 | P1 | BLOCKED | T3.2 | Playwright happy-path and axe tests. |
@@ -1084,11 +1100,12 @@ The plan budgets approximately 11–13 focused build hours plus a 3-hour conting
 
 **Goal:** Make repository work resumable and auditable.
 
-**Outputs:** Copy this file to `docs/BUILD_SPEC.md`; create `AGENTS.md`, `docs/IMPLEMENTATION_LOG.md`, `docs/EVAL_RESULTS.md`, and ADR 0001.
+**Outputs:** Verify the owner-created `AGENTS.md`, `docs/BUILD_SPEC.md`, `docs/IMPLEMENTATION_LOG.md`, `docs/EVAL_RESULTS.md`, and ADR 0001; reconcile them with this specification without overwriting owner-authored content.
 
 **Acceptance criteria:**
 
 - `AGENTS.md` includes every minimum rule in Section 10.
+- All five owner-created harness files exist at the expected paths and are readable by a fresh agent.
 - Implementation log has a table for task status, changed files, commands, results, blockers, and next task.
 - ADR 0001 records the local-first/no-backend contest decision and post-contest Supabase seam.
 
@@ -1221,11 +1238,11 @@ The plan budgets approximately 11–13 focused build hours plus a 3-hour conting
 
 **Validation:** Source assertion, DOM test, activation/cancel integration test, and real-browser manual invocation.
 
-#### T2.4 — Add safe outreach drafting
+#### T2.4 — Add safe outreach drafting only if time permits
 
 **Depends on:** T2.2, T1.4
 
-**Goal:** Deliver the secondary demo beat without external side effects.
+**Goal:** Deliver the optional secondary demo beat without external side effects, only after the core demo and all contest-critical gates are complete.
 
 **Outputs:** `stage_outreach_draft`, visible draft list, compact snapshot representation.
 
@@ -1395,7 +1412,7 @@ The plan budgets approximately 11–13 focused build hours plus a 3-hour conting
 
 ## 12. Draft submission positioning
 
-Use this as a factual starting point and revise it to match the shipped build. The project owner must personally choose the final product name; `Crisis Recovery Planner` remains a working title because the challenge guidance discourages outsourcing naming to AI.
+Use this as a factual starting point and revise it to match the shipped build. The project owner selected `Mend` as the product name.
 
 ### One-line description
 
@@ -1403,7 +1420,7 @@ A local-first recovery workspace where a browser agent turns a household disrupt
 
 ### Why WebMCP
 
-Recovery work spans facts, deadlines, communications, and changing priorities. Conventional browser agents must navigate and scrape a multi-panel interface to organize that work. Crisis Recovery Planner exposes small, typed WebMCP tools for reading the current case, adding factual records, staging a plan, and preparing an unsent message draft. Tool calls update the same visible state as the human interface, and a declarative review form requires the person to approve or request changes manually.
+Recovery work spans facts, deadlines, communications, and changing priorities. Conventional browser agents must navigate and scrape a multi-panel interface to organize that work. Mend exposes small, typed WebMCP tools for reading the current case, adding factual records, and staging a plan. If the optional outreach feature is implemented, it prepares an unsent message draft. Tool calls update the same visible state as the human interface, and a declarative review form requires the person to approve or request changes manually.
 
 ### What humans and agents can do together
 
@@ -1489,15 +1506,15 @@ Only these decisions require the project owner; implementation should proceed wi
 
 | ID | Decision | Default if unanswered by build start |
 | --- | --- | --- |
-| OD-01 | Choose the final product name personally. | Use `Crisis Recovery Planner` as a descriptive working title. |
-| OD-02 | Confirm the public repository owner/URL. | Initialize locally and leave a placeholder only in submission docs. |
-| OD-03 | Confirm Netlify account/site for deployment. | Prepare Netlify config; stop before external deployment if authorization is unavailable. |
-| OD-04 | Decide whether the optional outreach-draft beat fits recording time. | Keep it only if all P0 tasks pass with at least four hours remaining. |
+| OD-01 | Final product name | **Resolved:** `Mend`. Use this name in the UI, repository metadata, README, demo, and submission copy. |
+| OD-02 | Public repository owner/URL | **Resolved:** `https://github.com/ericthayer/mend`. Use this repository for source, release, and submission references. |
+| OD-03 | Netlify account/site | **Resolved:** Netlify project ID `6074f418-73e0-4416-a297-f3cbf9f856bf`. Deployment is pending; use the exact ID and stop if authorization is unavailable. |
+| OD-04 | Optional outreach-draft beat | **Resolved:** Defer it unless the core demo and all contest-critical gates are complete. |
 
 ## 17. Suggested first prompt for the implementation agent
 
 ```text
-Read AGENTS.md and docs/BUILD_SPEC.md completely. Treat docs/BUILD_SPEC.md as the source of truth. Inspect the repository and docs/IMPLEMENTATION_LOG.md, identify the first READY task whose dependencies are DONE, and implement only that task. Before editing, record the task ID, relevant acceptance criteria, planned files, and validation commands in the implementation log. After editing, run the required checks, record evidence, update task statuses, and name the next READY task. Do not implement deferred scope or weaken the human approval, safety, validation, privacy, or WebMCP boundaries.
+Read AGENTS.md and docs/BUILD_SPEC.md completely. Treat docs/BUILD_SPEC.md as the source of truth. The project is Mend, the public repository is https://github.com/ericthayer/mend, and the Netlify project ID is 6074f418-73e0-4416-a297-f3cbf9f856bf; deployment has not happened yet. Inspect the repository and docs/IMPLEMENTATION_LOG.md, verify the owner-created harness files, identify the first READY task whose dependencies are DONE, and implement only that task. Before editing, record the task ID, relevant acceptance criteria, planned files, and validation commands in the implementation log. After editing, run the required checks, record evidence, update task statuses, and name the next READY task. Do not implement the deferred outreach feature or weaken the human approval, safety, validation, privacy, or WebMCP boundaries.
 ```
 
 ## 18. Authoritative references

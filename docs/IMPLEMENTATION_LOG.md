@@ -5,7 +5,7 @@
 | ID | Status | Phase | Description | Output Artifacts |
 | :--- | :--- | :--- | :--- | :--- |
 | T0.1 | READY | P0 | Initialize reproducible repository | Package configs, scripts, MIT license, app skeleton |
-| T0.2 | BLOCKED | P0 | Install agent execution harness | `docs/BUILD_SPEC.md`, `AGENTS.md`, ADR 0001 |
+| T0.2 | DONE | P0 | Install agent execution harness | `AGENTS.md`, `docs/BUILD_SPEC.md`, `docs/IMPLEMENTATION_LOG.md`, `docs/EVAL_RESULTS.md`, `docs/decisions/0001-local-first-contest-architecture.md` |
 | T1.1 | BLOCKED | P0 | Domain, schemas, commands, store | Domain logic, Zod schemas, Zustand store, fixtures |
 | T1.2 | BLOCKED | P0 | Responsive shell & base views | Tokens, header, safety banner, empty state |
 | T1.3 | BLOCKED | P0 | Plan review & next actions | Review card, manual review commands, priority lists |
