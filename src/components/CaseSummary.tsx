@@ -1,4 +1,5 @@
 import { Chip, Paper, Stack, Typography } from '@mui/material';
+import { sectionSurfaceSx } from '../styles/surfaces';
 import type { RecoveryCase } from '../domain/types';
 
 const INCIDENT_LABELS: Record<RecoveryCase['incidentType'], string> = {
@@ -15,7 +16,7 @@ type CaseSummaryProps = {
 
 export function CaseSummary({ caseData }: CaseSummaryProps) {
   return (
-    <Paper component="section" elevation={0} sx={{ p: { xs: 2.5, sm: 3.5 }, maxWidth: 860 }}>
+    <Paper component="section" elevation={0} sx={sectionSurfaceSx}>
       <Stack spacing={2}>
         <Stack
           direction={{ xs: 'column', sm: 'row' }}

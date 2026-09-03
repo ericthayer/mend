@@ -10,6 +10,12 @@ export const mendTheme = createTheme({
     secondary: {
       main: '#b27a16',
     },
+    warning: {
+      main: '#8f6210',
+      light: '#b27a16',
+      dark: '#6b4a0c',
+      contrastText: '#ffffff',
+    },
     error: {
       main: '#a13d3f',
     },
@@ -28,7 +34,7 @@ export const mendTheme = createTheme({
   spacing: 8,
   typography: {
     fontFamily:
-      'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
     fontSize: 16,
     h1: {
       fontSize: '2rem',
@@ -55,7 +61,7 @@ export const mendTheme = createTheme({
       styleOverrides: {
         root: {
           minHeight: 44,
-          borderRadius: 10,
+          borderRadius: 8,
           textTransform: 'none',
           fontWeight: 600,
         },

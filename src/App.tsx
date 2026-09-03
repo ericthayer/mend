@@ -183,7 +183,7 @@ function App() {
       onResetRequested={caseData ? () => setIsResetDialogOpen(true) : undefined}
     >
       {caseData ? (
-        <Stack spacing={2.5}>
+        <Stack spacing={3}>
           <CaseSummary caseData={caseData} />
           <NextActions
             approvedPlan={approvedPlan}

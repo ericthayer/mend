@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { getResourceById } from '../data/resources';
 import { selectDeterministicTasksForPlan } from '../domain/selectors';
+import { sectionSurfaceSx } from '../styles/surfaces';
 import type { RecoveryPlan, TaskStatus } from '../domain/types';
 
 type NextActionsProps = {
@@ -30,9 +31,9 @@ const STATUS_LABELS: Record<TaskStatus, string> = {
   blocked: 'Blocked',
 };
 
-const PRIORITY_COLORS: Record<'now' | 'next' | 'later', 'error' | 'warning' | 'default'> = {
-  now: 'error',
-  next: 'warning',
+const PRIORITY_COLORS: Record<'now' | 'next' | 'later', 'warning' | 'primary' | 'default'> = {
+  now: 'warning',
+  next: 'primary',
   later: 'default',
 };
 
@@ -43,7 +44,7 @@ export function NextActions({
 }: NextActionsProps) {
   if (!approvedPlan) {
     return (
-      <Paper component="section" elevation={0} sx={{ p: { xs: 2.5, sm: 3.5 }, maxWidth: 860 }}>
+      <Paper component="section" elevation={0} sx={sectionSurfaceSx}>
         <Stack spacing={1}>
           <Typography component="h2" variant="h2">
             Next actions
@@ -59,7 +60,7 @@ export function NextActions({
   const orderedTasks = selectDeterministicTasksForPlan(approvedPlan).slice(0, 3);
 
   return (
-    <Paper component="section" elevation={0} sx={{ p: { xs: 2.5, sm: 3.5 }, maxWidth: 860 }}>
+    <Paper component="section" elevation={0} sx={sectionSurfaceSx}>
       <Stack spacing={2}>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ alignItems: { sm: 'center' } }}>
           <Typography component="h2" variant="h2" sx={{ mr: 'auto' }}>
@@ -70,7 +71,7 @@ export function NextActions({
 
         <Stack component="ol" spacing={2} sx={{ m: 0, pl: 2.5 }} data-testid="next-actions-list">
           {orderedTasks.map((task) => (
-            <Stack component="li" key={task.id} spacing={1.2}>
+            <Stack component="li" key={task.id} spacing={1.5}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ alignItems: { sm: 'center' } }}>
                 <Typography component="h3" variant="body1" sx={{ fontWeight: 650, mr: 'auto' }}>
                   {task.title}

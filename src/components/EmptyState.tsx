@@ -11,7 +11,7 @@ export function EmptyState({ onStartBlank, onLoadDemo, busy = false }: EmptyStat
     <Paper
       component="section"
       elevation={0}
-      sx={{ p: { xs: 2.5, sm: 3.5 }, display: 'grid', gap: 2, maxWidth: 720 }}
+      sx={{ p: { xs: 2, sm: 3 }, display: 'grid', gap: 2, maxWidth: 720 }}
     >
       <Typography component="h2" variant="h2">
         Next useful step

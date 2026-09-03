@@ -8,6 +8,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { reviewSurfaceSx } from '../styles/surfaces';
 import type { CommandResult, RecoveryPlan } from '../domain/types';
 
 type ReviewDecision = 'approve' | 'request_changes';
@@ -149,7 +150,7 @@ export function PlanReview({
   }, []);
 
   return (
-    <Paper component="section" elevation={0} sx={{ p: { xs: 2.5, sm: 3.5 }, maxWidth: 860 }}>
+    <Paper component="section" elevation={0} sx={reviewSurfaceSx}>
       <Stack spacing={2}>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ alignItems: { sm: 'center' } }}>
           <Typography component="h2" variant="h2" sx={{ mr: 'auto' }}>
@@ -173,7 +174,7 @@ export function PlanReview({
           {pendingPlan.goal}
         </Typography>
 
-        <Stack component="ol" spacing={1.2} sx={{ m: 0, pl: 2.5 }}>
+        <Stack component="ol" spacing={1.5} sx={{ m: 0, pl: 2.5 }}>
           {pendingPlan.tasks.map((task) => (
             <Stack key={task.id} component="li" spacing={0.5}>
               <Typography component="p" variant="body1" sx={{ fontWeight: 600 }}>
@@ -253,12 +254,12 @@ export function PlanReview({
               style={{
                 minHeight: 44,
                 borderRadius: 8,
-                border: '1px solid #7d8790',
+                border: '1px solid rgba(31, 39, 51, 0.4)',
                 padding: '0 12px',
                 fontSize: '1rem',
                 fontFamily: 'inherit',
-                backgroundColor: '#fff',
-                color: '#1f2a33',
+                backgroundColor: '#fffdf8',
+                color: '#1f2733',
               }}
             >
               <option value="approve">Approve plan</option>
@@ -280,14 +281,14 @@ export function PlanReview({
                 width: '100%',
                 minHeight: 120,
                 borderRadius: 8,
-                border: '1px solid #7d8790',
+                border: '1px solid rgba(31, 39, 51, 0.4)',
                 padding: '10px 12px',
                 fontSize: '1rem',
                 fontFamily: 'inherit',
                 resize: 'vertical',
                 boxSizing: 'border-box',
-                backgroundColor: '#fff',
-                color: '#1f2a33',
+                backgroundColor: '#fffdf8',
+                color: '#1f2733',
               }}
             />
           </Stack>

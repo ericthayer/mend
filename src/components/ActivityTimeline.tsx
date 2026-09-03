@@ -1,4 +1,5 @@
 import { Paper, Stack, Typography } from '@mui/material';
+import { sectionSurfaceSx } from '../styles/surfaces';
 import type { ActivityEvent } from '../domain/types';
 
 type ActivityTimelineProps = {
@@ -20,7 +21,7 @@ export function ActivityTimeline({ activity }: ActivityTimelineProps) {
   );
 
   return (
-    <Paper component="section" elevation={0} sx={{ p: { xs: 2.5, sm: 3.5 }, maxWidth: 860 }}>
+    <Paper component="section" elevation={0} sx={sectionSurfaceSx}>
       <Stack spacing={1.5}>
         <Typography component="h2" variant="h2">
           Activity
@@ -31,9 +32,9 @@ export function ActivityTimeline({ activity }: ActivityTimelineProps) {
             No activity yet.
           </Typography>
         ) : (
-          <Stack component="ol" spacing={1.2} sx={{ m: 0, pl: 2.5 }}>
+          <Stack component="ol" spacing={1.5} sx={{ m: 0, pl: 2.5 }}>
             {sorted.map((event) => (
-              <Stack key={event.id} component="li" spacing={0.45}>
+              <Stack key={event.id} component="li" spacing={0.5}>
                 <Typography component="p" variant="body1" sx={{ fontWeight: 600 }}>
                   {event.summary}
                 </Typography>

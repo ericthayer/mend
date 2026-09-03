@@ -1,4 +1,5 @@
 import { Alert, Typography } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 
 export function SafetyBanner() {
   return (
@@ -6,14 +7,14 @@ export function SafetyBanner() {
       severity="warning"
       variant="outlined"
       role="note"
-      sx={{
+      sx={(theme) => ({
         borderRadius: 2,
-        bgcolor: '#fff8e6',
+        bgcolor: alpha(theme.palette.warning.light, 0.14),
         color: 'text.primary',
         '& .MuiAlert-icon': {
           color: 'warning.dark',
         },
-      }}
+      })}
     >
       <Typography component="p" variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
         For recovery after immediate danger.

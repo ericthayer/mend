@@ -36,8 +36,8 @@ export function AppShell({
   return (
     <Box component="div" sx={{ py: { xs: 2, sm: 4 } }}>
       <Container maxWidth="lg">
-        <Stack spacing={2.5}>
-          <Box component="header" sx={{ display: 'grid', gap: 1.25 }}>
+        <Stack spacing={3}>
+          <Box component="header" sx={{ display: 'grid', gap: 1 }}>
             <Stack
               direction={{ xs: 'column', sm: 'row' }}
               spacing={1.5}

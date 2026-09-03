@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Alert, Button, Chip, Paper, Stack, Typography } from '@mui/material';
+import { sectionSurfaceSx } from '../styles/surfaces';
 import type { OutreachDraft } from '../domain/types';
 
 type DraftListProps = {
@@ -53,7 +54,7 @@ export function DraftList({ drafts }: DraftListProps) {
   };
 
   return (
-    <Paper component="section" elevation={0} sx={{ p: { xs: 2.5, sm: 3.5 }, maxWidth: 860 }}>
+    <Paper component="section" elevation={0} sx={sectionSurfaceSx}>
       <Stack spacing={1.5}>
         <Typography component="h2" variant="h2">
           Drafts
@@ -69,7 +70,7 @@ export function DraftList({ drafts }: DraftListProps) {
         ) : (
           <Stack component="ol" spacing={1.5} sx={{ m: 0, pl: 2.5 }}>
             {sorted.map((draft) => (
-              <Stack key={draft.id} component="li" spacing={0.8}>
+              <Stack key={draft.id} component="li" spacing={1}>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ alignItems: { sm: 'center' } }}>
                   <Typography component="h3" variant="body1" sx={{ fontWeight: 650, mr: 'auto' }}>
                     {draft.subject}

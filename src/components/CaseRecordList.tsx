@@ -1,4 +1,5 @@
 import { Chip, Paper, Stack, Typography } from '@mui/material';
+import { sectionSurfaceSx } from '../styles/surfaces';
 import type { CaseRecord } from '../domain/types';
 
 type CaseRecordListProps = {
@@ -20,7 +21,7 @@ export function CaseRecordList({ records }: CaseRecordListProps) {
   );
 
   return (
-    <Paper component="section" elevation={0} sx={{ p: { xs: 2.5, sm: 3.5 }, maxWidth: 860 }}>
+    <Paper component="section" elevation={0} sx={sectionSurfaceSx}>
       <Stack spacing={1.5}>
         <Typography component="h2" variant="h2">
           Case records
@@ -33,7 +34,7 @@ export function CaseRecordList({ records }: CaseRecordListProps) {
         ) : (
           <Stack component="ol" spacing={1.5} sx={{ m: 0, pl: 2.5 }}>
             {sorted.map((record) => (
-              <Stack key={record.id} component="li" spacing={0.75}>
+              <Stack key={record.id} component="li" spacing={1}>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ alignItems: { sm: 'center' } }}>
                   <Typography component="h3" variant="body1" sx={{ fontWeight: 650, mr: 'auto' }}>
                     {record.title}
