@@ -8,6 +8,15 @@
   command = "npm run build"
   publish = "dist"
 
+# Non-production deploys inject the Netlify Drawer, which frames app.netlify.com.
+# Headers are global per deploy, so the preview CSP is patched after the build
+# instead of loosening the production policy in public/_headers.
+[context.deploy-preview]
+  command = "npm run build && node scripts/allow-netlify-drawer.mjs"
+
+[context.branch-deploy]
+  command = "npm run build && node scripts/allow-netlify-drawer.mjs"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

@@ -1,11 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ThemeProvider } from '@mui/material/styles';
 import { beforeEach, describe, expect, it } from 'vitest';
 import App from '../App';
 import { createEmptyDomainState } from '../domain/types';
 import { replaceDomainState } from '../state/recoveryStore';
-import { mendTheme } from '../styles/theme';
 import { WebMCPStatus } from './WebMCPStatus';
 
 describe('T1.2 shell behavior', () => {
@@ -59,23 +57,15 @@ describe('T1.2 shell behavior', () => {
     ).toBeInTheDocument();
   });
 
-  it('switches between light and dark modes from the header', async () => {
-    const user = userEvent.setup();
-    render(
-      <ThemeProvider theme={mendTheme} defaultMode="light" noSsr storageManager={null}>
-        <App />
-      </ThemeProvider>
-    );
+  it('explains how each start choice helps while keeping both ways to start available', () => {
+    render(<App />);
 
-    const lightModeButton = screen.getByRole('button', { name: 'Light mode' });
-    const darkModeButton = screen.getByRole('button', { name: 'Dark mode' });
-
-    expect(lightModeButton).toHaveAttribute('aria-pressed', 'true');
-    expect(darkModeButton).toHaveAttribute('aria-pressed', 'false');
-
-    await user.click(darkModeButton);
-
-    expect(darkModeButton).toHaveAttribute('aria-pressed', 'true');
-    expect(lightModeButton).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('heading', { name: 'Choose how to begin' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'What each choice does' })).toBeInTheDocument();
+    expect(screen.getByText('Creates a private space for your situation.')).toBeInTheDocument();
+    expect(screen.getByText('Opens a sample case so you can see the workflow.')).toBeInTheDocument();
+    expect(screen.getByText('You review every proposed plan before it becomes active.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Start a blank case' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Load flood demo' })).toBeInTheDocument();
   });
 });

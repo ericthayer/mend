@@ -30,6 +30,14 @@ export function WebMCPStatusChip({ status }: Pick<WebMCPStatusProps, 'status'>) 
       variant="outlined"
       size="small"
       label={chip.label}
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        pl: 1,
+        pr: 0.5,
+      }}
       icon={
         <Box
           component="span"

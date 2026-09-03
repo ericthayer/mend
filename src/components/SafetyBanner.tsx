@@ -20,7 +20,7 @@ export function SafetyBanner() {
       <IconTile tint="safety">
         <ShieldAlertIcon />
       </IconTile>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', columnGap: 1, rowGap: 0.25, alignSelf: 'center' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', columnGap: 1, rowGap: 0.25, alignSelf: 'center' }}>
         <Typography component="p" variant="body2" sx={{ fontWeight: 700 }}>
           For recovery after immediate danger.
         </Typography>

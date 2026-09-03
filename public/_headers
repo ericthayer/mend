@@ -4,3 +4,7 @@
   Referrer-Policy: no-referrer
   X-Content-Type-Options: nosniff
   Origin-Agent-Cluster: ?1
+
+# nosniff above means the agent-readable summary must declare its type explicitly.
+/llms.txt
+  Content-Type: text/plain; charset=utf-8

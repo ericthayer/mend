@@ -859,3 +859,316 @@
   * `src/app/AppShell.tsx` — safe `matchMedia` availability guard required to restore shared UI-test execution during the concurrent UX-2 color-mode task.
 * **Result:** T5.1 acceptance criteria met. A reader can understand the recovery problem, agent-assisted interaction, WebMCP implementation, human authority boundary, setup path, and contest-build limitation from `README.md` without needing to run the app or read the full build specification.
 * **Next eligible task:** None. T5.2 remains BLOCKED pending a manually recorded, public sub-three-minute demo video.
+
+### Entry: UX-4 — Dark-mode alert contrast hardening (user-directed, out-of-backlog)
+* **Status:** DONE
+* **Trigger:** operator report on 2026-09-03 that outlined alerts have unreadable text and close controls in dark mode.
+* **Acceptance criteria:** All outlined alert severities use active color-scheme surface and readable foreground tokens; severity icon/border affordances remain visible; no recovery, WebMCP, command-layer, or authority-boundary behavior changes.
+* **Planned Files:**
+  * `src/styles/theme.ts` — replace literal outlined-alert surface color with the active scheme token and apply readable foreground/action tokens across alert severities.
+  * `src/styles/theme.test.tsx` — add a regression assertion for outlined alert contrast token usage.
+  * `docs/IMPLEMENTATION_LOG.md` — record validation and completion evidence.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run test:e2e`, `npm run build`, plus dark-mode browser screenshot and console check.
+* **Implementation:** Replaced the literal white outlined-alert background with the active paper token. All `info`, `success`, `warning`, and `error` outlined alerts now share a readable primary-text foreground and secondary-text close control, with severity color retained for icon and border affordances.
+* **Regression coverage:** Added `src/styles/theme.test.tsx` assertions for scheme-aware surface/foreground/action tokens and for all four outlined severity variants. The test failed before the fix because the theme returned `backgroundColor: '#ffffff'`; it passes after the change.
+* **Browser verification:** Opened `http://127.0.0.1:5173/` in dark mode and captured the outlined WebMCP info notice. The notice rendered on the dark paper surface with readable message, setup-hint action, icon, and border contrast.
+* **Validation Results (all passed):**
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — 12 test files, 56 tests passed.
+  * `npm run test:e2e` — 5 Playwright tests passed, including three axe checks.
+  * `npm run build` — `tsc -b && vite build` exit 0. Only the existing non-blocking 500 kB chunk-size warning was emitted.
+* **Result:** Dark-mode outlined alerts are legible for every severity without changing recovery, WebMCP, persistence, or human-approval behavior.
+
+### Entry: UX-5 — Workspace UI/UX custom agent (user-directed, out-of-backlog)
+* **Status:** DONE
+* **Trigger:** operator request on 2026-09-03 to create a reusable `UI/UX` custom agent for specification-first product design, accessible frontend implementation, visual refinement, and UI/UX review.
+* **Planned Files:**
+  * `.github/agents/ui-ux.agent.md` (new) — user-invocable, workspace-shared UI/UX agent that applies the repository's frontend-design, design-taste-frontend, high-end-visual-design, and redesign-existing-projects skills while keeping product specifications, safety, accessibility, performance, existing stack, and repository constraints authoritative.
+  * `docs/IMPLEMENTATION_LOG.md` (edit) — record creation and validation evidence.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`
+* **Implementation:** Created the discoverable workspace agent with four modes (specification, design, implementation, review), proportional specification/approval rules, WCAG 2.2 AA and performance baselines, visual-design guidance, review severity reporting, and evidence-based completion criteria. The agent explicitly resolves conflicts in favor of project constraints and treats the four design skills as supporting guidance rather than permission to add disallowed external assets, dependencies, or framework changes.
+* **Validation Results (all passed):**
+  * `.github/agents/ui-ux.agent.md` — frontmatter inspected (`name`, keyword-rich `description`, `argument-hint`, `user-invocable`) and no editor diagnostics were reported.
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — `vitest run`: 12 test files and 56 tests passed.
+  * `npm run build` — `tsc -b && vite build` exit 0; existing non-blocking 500 kB bundle-size warning remains.
+* **Changed Files:**
+  * `.github/agents/ui-ux.agent.md` — user-invocable custom UI/UX agent.
+  * `docs/IMPLEMENTATION_LOG.md` — scope and verification record.
+* **Result:** The `UI/UX` agent is ready to select from the agent picker for specification-first, accessible frontend design and review work in this workspace.
+
+### Follow-up: UX-5 — Design-taste skill reference (user-directed)
+* **Status:** DONE
+* **Trigger:** operator installed `.agents/skills/design-taste-frontend/` and manually added its reference to the workspace `UI/UX` agent.
+* **Planned Files:**
+  * `.github/agents/ui-ux.agent.md` (edit) — constrain use of the skill to its stated landing-page, portfolio, and suitable-redesign scope.
+  * `docs/IMPLEMENTATION_LOG.md` (edit) — reconcile the UX-5 audit record from three to four design skills.
+* **Validation:** Markdown/frontmatter diagnostics and repository whitespace check; no runtime application behavior changes.
+* **Implementation:** Scoped `design-taste-frontend` to the landing-page, portfolio, and suitable-redesign work it supports. Its own exclusions prevent it from being treated as a mandatory pattern source for Mend's dashboard-like recovery workflow.
+* **Validation Results:** No diagnostics reported for the updated agent or log. `npm run lint`, `npm run typecheck`, `npm run test:run` (12 files, 56 tests), and `npm run build` all passed; the existing bundle-size warning remains non-blocking.
+* **Result:** The agent reference and UX-5 audit record now accurately cover all four installed design skills.
+
+### Entry: UX-6 — Start-surface visual refinement (user-directed, out-of-backlog)
+* **Status:** DONE
+* **Trigger:** operator request on 2026-09-03 for a more delightful, polished interface using the installed `design-taste-frontend` and `high-end-visual-design` guidance.
+* **Scope:** refine the empty/start screen, global interaction finish, and sticky header material treatment only. Preserve all existing recovery copy, action labels, command-layer behavior, WebMCP contracts, native declarative review form semantics, color-mode behavior, and local-only/no-network constraints.
+* **Design read:** trust-first recovery planner for overwhelmed households; calm soft structuralism with a low-variance, low-motion visual language appropriate for safety-sensitive work (`DESIGN_VARIANCE: 3`, `MOTION_INTENSITY: 2`, `VISUAL_DENSITY: 5`).
+* **Design direction:** replace the generic centered start card on desktop with an action-first two-part `control and continuity` surface. The existing two start actions remain primary; a supporting panel summarizes the supported local, review-first boundaries. It becomes a single action-first stack below the desktop breakpoint.
+* **Planned Files:**
+  * `src/components/EmptyState.tsx` — responsive action-first start surface and supporting trust panel.
+  * `src/styles/theme.ts` — tactile, color-scheme-safe button feedback.
+  * `src/styles/global.css` — restrained primary-color ambient canvas treatment and reduced-motion-safe interaction finish.
+  * `src/app/AppShell.tsx` — translucent, bounded sticky header material treatment.
+  * `src/components/T1Shell.test.tsx` — regression assertion for new visible trust-boundary content while retaining both startup actions.
+  * `docs/IMPLEMENTATION_LOG.md` — scope and validation evidence.
+* **Validation Commands:** focused `npm run test:run -- src/components/T1Shell.test.tsx`, then `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run test:e2e`, and `npm run build`; browser checks at 390 × 844 and 1440 × 900 in both color schemes with keyboard-focus verification.
+
+### Entry: UX-7 — Agent-readable `llms.txt` (user-directed, out-of-backlog)
+* **Status:** DONE
+* **Trigger:** operator request on 2026-09-03 to reach 4/4 on the Lighthouse **Agentic Browsing** category. The **Agent accessibility** audit reported "llms.txt does not follow recommendations" because the SPA rewrite answered `/llms.txt` with the application HTML shell instead of a machine-readable summary.
+* **Scope:** add a static, spec-compliant `llms.txt` summary and make its content type explicit. No application, command-layer, WebMCP, persistence, or approval-boundary behavior changes.
+* **Planned Files:**
+  * `public/llms.txt` (new) — [llmstxt.org](https://llmstxt.org/) structure: H1, blockquote summary, unheaded prose describing the single-page local-only scope, the six `document.modelContext` tools, and the agent boundaries, followed by curated link sections.
+  * `public/_headers` (edit) — explicit `Content-Type: text/plain; charset=utf-8` for `/llms.txt`, required because the site sends `X-Content-Type-Options: nosniff`.
+  * `docs/IMPLEMENTATION_LOG.md` (edit) — scope and validation evidence.
+* **Validation Commands:** `curl -D -` against the dev server for `/llms.txt`, `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`, plus reachability checks on every URL referenced by the file.
+* **Implementation:** Static assets in `public/` are resolved before the Netlify `/*` → `/index.html` rewrite, so the file now returns real Markdown in both dev and production. Every link points to an already-published resource — the live app, the public repository, and `raw.githubusercontent.com` Markdown for `README.md`, `PRODUCT.md`, `docs/BUILD_SPEC.md`, `docs/EVAL_RESULTS.md`, the T4.2 operator checklist, both ADRs, and this log. No URL was invented. The file restates the human-approval boundary, the absence of an imperative approval tool and of any send/upload capability, and instructs agents to treat stored case records as untrusted data rather than instructions.
+* **Validation Results (all passed):**
+  * `curl -D - http://localhost:5173/llms.txt` — `HTTP/1.1 200`, `Content-Type: text/plain`, 3801-byte Markdown body (previously the HTML shell).
+  * Link check — all nine referenced URLs returned `200`.
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — 12 test files, 57 tests passed.
+  * `npm run build` — exit 0; `dist/llms.txt` (3801 bytes) and `dist/_headers` emitted. Only the existing non-blocking 500 kB chunk-size warning remains.
+* **Changed Files:**
+  * `public/llms.txt` — agent-readable site summary.
+  * `public/_headers` — explicit content type for `/llms.txt`.
+  * `docs/IMPLEMENTATION_LOG.md` — scope and verification record.
+* **Result:** `/llms.txt` is served as a spec-compliant Markdown summary, clearing the Agent accessibility finding. The Lighthouse category score must be re-measured against the deployed build, since the audit fetches the file from the origin under test.
+
+### Entry: UX-8 — Deploy-preview CSP for the Netlify Drawer (user-directed, out-of-backlog)
+* **Status:** DONE
+* **Trigger:** operator reported a console error on https://deploy-preview-6--mend-webmcp.netlify.app/ — `Framing 'https://app.netlify.com/' violates the following Content Security Policy directive: "default-src 'self'"`. Console errors also count against the Lighthouse **Best Practices** category on the audited origin.
+* **Diagnosis:** Netlify injects `<script async src="/.netlify/scripts/cdp">` on non-production deploys. The script is same-origin (allowed by `script-src 'self'`) and its only external need is `document.createElement("iframe")` pointed at `https://app.netlify.com/`; it performs no `fetch`, `XMLHttpRequest`, or `WebSocket` calls. The production CSP omits `frame-src`, so framing falls back to `default-src 'self'` and is blocked. The drawer does not exist on production deploys, so the production policy is correct as written.
+* **Scope:** deploy configuration only. No application, command-layer, WebMCP, persistence, or approval-boundary changes, and no change to the production CSP.
+* **Planned Files:**
+  * `scripts/allow-netlify-drawer.mjs` (new) — post-build patch that inserts `frame-src 'self' https://app.netlify.com;` into `dist/_headers`.
+  * `netlify.toml` (edit) — `[context.deploy-preview]` and `[context.branch-deploy]` build commands that run the patch.
+  * `docs/IMPLEMENTATION_LOG.md` (edit) — scope and validation evidence.
+* **Validation Commands:** `npm run build` followed by `node scripts/allow-netlify-drawer.mjs` (patch, idempotency, and missing-anchor cases), then `npm run lint`, `npm run typecheck`, `npm run test:run`.
+* **Implementation:** Netlify header rules are global per deploy and cannot be scoped to a context, so the documented approach is a context-specific build command that rewrites the published headers file. `public/_headers` stays the single source of truth for the strict production policy; preview and branch deploys derive from it rather than duplicating it, which prevents the two policies from drifting apart. The script is idempotent and exits `1` if the expected `object-src` anchor is absent, so a future CSP edit fails the preview build instead of silently reintroducing the error. Production deploys never run the patch.
+* **Validation Results (all passed):**
+  * Patch — `dist/_headers` CSP became `… connect-src 'self'; frame-src 'self' https://app.netlify.com; object-src 'none'; …`.
+  * Idempotency — a second run reported "already declares frame-src" and exited `0`.
+  * Missing anchor — a truncated CSP produced the explanatory error and exit `1`.
+  * Production build — `npm run build` alone emits `dist/_headers` with no `frame-src`, unchanged from before.
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — 12 test files, 57 tests passed.
+* **Changed Files:**
+  * `scripts/allow-netlify-drawer.mjs` — preview-only CSP patch.
+  * `netlify.toml` — deploy-preview and branch-deploy build commands.
+  * `docs/IMPLEMENTATION_LOG.md` — scope and verification record.
+* **Result:** The drawer frame is permitted only on non-production deploys, clearing the preview console error while production keeps a CSP that blocks all framing. Confirm on the next deploy preview; alternatively, disabling the Netlify Drawer in project settings would remove the error without any header change.
+* **Implementation:**
+  * Replaced the empty state's centered single-column panel at desktop widths with a responsive two-part `control and continuity` surface. Primary recovery copy and both action labels are unchanged and appear before the supporting reassurance content in the mobile reading order.
+  * Added the semantic `You remain in control` complementary region with factual local-storage, no-account, and manual-review guarantees. This adds no new action or state change.
+  * Added a restrained primary-color ambient canvas treatment, a translucent sticky-header surface, and transform-only hover/press feedback for MUI buttons. The existing global reduced-motion rule disables those transitions.
+  * Used MUI CSS color channels rather than materialized `alpha(theme.palette...)` values for the new dynamic surfaces. This preserves correct light and dark values after a live color-mode change.
+  * Corrected an MUI `sx` radius multiplier discovered during browser review by declaring the inset-panel radius as `12px` explicitly.
+* **Regression Test:** Added `explains local review control while keeping both ways to start available` in `src/components/T1Shell.test.tsx`. It failed before implementation because the `You remain in control` heading was absent, then passed after the semantic supporting panel was added.
+* **Validation Results (all passed):**
+  * Focused shell test — 1 file, 5 tests passed.
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — 12 files, 57 tests passed.
+  * `npm run test:e2e` — 5 Playwright tests passed, including mobile/desktop journeys and empty/active/pending axe scans.
+  * `npm run build` — `tsc -b && vite build` exit 0. The existing Vite chunk-size advisory remains non-blocking.
+* **Browser Evidence:**
+  * Light desktop at 1440 × 900: no horizontal overflow; the start surface renders in a two-part grid and the 200 × 44px primary target remains visible.
+  * Light mobile at 390 × 844: no horizontal overflow; the primary action is visible at 329 × 44px, receives keyboard focus, and the reassurance panel follows both actions in reading order.
+  * Dark desktop/mobile: page, sticky header, and inset-panel surfaces resolve to the correct active scheme tokens. At desktop the sticky header resolved to `rgba(17, 24, 32, 0.88)`; the inset panel resolved from the dark primary channel.
+  * Reduced motion: the computed button transition duration resolved to `1e-05s`; no console warnings or errors occurred during the final reload.
+* **Result:** The start experience is materially more intentional while preserving the calm, direct, trust-first recovery workflow. Recovery commands, WebMCP registration, native review semantics, local persistence, and all existing action labels remain unchanged.
+
+### Entry: UX-7 — Visual system rework: stop reading as default MUI (user-directed, out-of-backlog)
+* **Status:** DONE
+* **Trigger:** operator feedback on 2026-09-03 that the UX-6 pass was insufficient: "still looks like MUI or every other Tailwind-styled AI generated site." Operator attached Cron, Google Workspace, Felt, Maze, Grok, Salesforce, and Aboard dashboard screenshots as aesthetic reference and asked for a genuinely distinctive look without disrupting functionality.
+* **Design read:** a trust-first recovery dashboard (not a landing page), for a stressed non-expert user. Direction: friendly "soft structuralism" SaaS-dashboard language (closest to the Aboard/Maze/Grok references), not generic flat-bordered Material panels. Dials: `DESIGN_VARIANCE 5` (bento-style hero promotion, not landing-page chaos), `MOTION_INTENSITY 3` (unchanged restraint — a safety tool should not gain new animation just to look "premium"), `VISUAL_DENSITY 4`.
+* **Constraint carried forward from repo rules:** no remote fonts, no new dependencies, no styling-framework change (BUILD_SPEC §7 locks system font stack only). The high-end-visual-design skill's font/icon library assumptions (Geist, Clash Display, Phosphor swap, etc.) do not apply here; distinctiveness comes from weight/scale/tracking/shadow/shape decisions on the existing system font stack and existing MUI/Emotion stack, not from new assets.
+* **Signature element:** `CaseSummary` ("What we know") is promoted to a full-width hero band above the two-column dashboard grid (previously stacked inside the secondary column) and given a hero-scale heading (`titleSx` override, ~2.25rem/800 weight) — the one deliberately bold moment, mutually exclusive with the empty-state hero headline (never shown together).
+* **Planned/Changed Files:**
+  * `src/styles/theme.ts` — bolder/tighter h1-h3 type scale (h1 800/-0.03em, h2 750/-0.015em, h3 700); `shape.borderRadius` 16→20; `MuiButton` root radius 10→999 (full pill) with wider horizontal padding; `MuiPaper` root gains a soft multi-layer ambient shadow in light mode and a subtle inset highlight in dark mode (`'html.dark &'` selector, matching this app's confirmed `class="dark"` root, since `colorSchemeSelector: 'class'` is configured) while keeping the existing hairline border in both modes; `MuiDialog` paper radius 20→24; new `MuiChip` `variants` array (`CHIP_TONAL_COLORS` + `createTonalChipVariant`, mirroring the existing `OUTLINED_ALERT_SEVERITIES` pattern) converts every `variant="outlined"` chip from a flat hairline badge into a tonal tinted badge using `rgb(var(--mui-palette-{color}-mainChannel) / alpha)`, plus a neutral `action.hover`-based treatment for `color="default"`.
+  * `src/styles/surfaces.ts` — `sectionSurfaceSx`/`reviewSurfaceSx` padding bumped `{xs:2,sm:3}` → `{xs:2.5,sm:3.5}` for airier dashboard cards.
+  * `src/components/SectionCard.tsx` — `IconTile` default size 40→44 with a proportional squircle radius (`Math.round(size*0.32)`) instead of a two-step hardcoded value; new optional `titleSx` prop (non-breaking) so one section can carry a hero-scale heading without a new component.
+  * `src/components/CaseSummary.tsx` — passes the hero `titleSx`.
+  * `src/App.tsx` — `CaseSummary` moved out of the secondary column to a full-width band above the two-column grid (same conditional, same props; purely a layout/JSX reorder, no state/command changes).
+  * `src/components/PlanReview.tsx`, `src/components/DraftList.tsx` — fixed nested-radius concentricity: the review-form wrapper and the draft-body block sit inside a now-20px-radius `SectionCard`, so their own radius was reduced (24px→16px) to stay smaller than their parent, per the standard nested-squircle rule.
+  * `src/components/EmptyState.tsx` — empty-state headline pushed further (2rem/2.75rem, weight 800, tracking -0.04em) to genuine hero scale.
+* **What was deliberately left alone:** no scroll/entry motion was added (the skill's motion-choreography section is largely landing-page oriented; a stressed-user safety tool should not gain new animation for its own sake — existing hover/press transforms from UX-6 are unchanged). `PlanReview`'s native `<select>`/`<textarea>` and their `NATIVE_FIELD_STYLE` (10px radius, correctly smaller than the new 16px form wrapper) were not touched, preserving the WebMCP declarative-form contract per repo memory. No fonts, icon libraries, or dependencies were added.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run test:e2e`, `npm run build`.
+* **Validation Results (all passed):**
+  * `npm run lint` — exit 0.
+  * `npm run typecheck` — exit 0.
+  * `npm run test:run` — 12 files, 57 tests passed (including axe scans for empty/active/pending-review states in `T3AccessibilityHardening.test.tsx`, and the declarative-review-form contract tests in `T2DeclarativeReview.test.tsx`).
+  * `npm run test:e2e` — 5 Playwright tests passed, including axe scans for empty, active dashboard, and pending-review states in a real browser — confirming the new shadows/pill buttons/tonal chips introduced no serious or critical accessibility violations in any state.
+  * `npm run build` — exit 0. Only the pre-existing non-blocking bundle-size advisory was emitted.
+* **Browser Evidence:** Verified in the shared browser session at 1440×900 and 390×844, in both light and dark color schemes: no horizontal overflow at any combination; the promoted "What we know" hero band, tonal chips, pill buttons, and soft-shadow cards render correctly; dark mode correctly shows the inset-highlight/hairline-border treatment (not the light-mode ambient shadow, which would be invisible on a near-black canvas). The browser session was reset to the clean empty state afterward (`localStorage.clear()` + reload) so no demo data was left behind as a side effect of visual QA.
+* **Result:** The dashboard now reads as a deliberate, distinctive product surface (bold display headline, tonal badges, pill controls, soft-elevated cards) rather than default MUI/Tailwind scaffolding, while every WebMCP tool contract, command-layer boundary, native review-form semantic, and piece of copy remains exactly as before.
+
+### Follow-up: T5.1 — Refresh README screenshots
+* **Status:** DONE
+* **Trigger:** operator request on 2026-09-03 to update the README evidence for the UX-7 visual rework.
+* **Scope:** replace only the three synthetic screenshot assets referenced by the existing `README.md` flow table. No README links, application behavior, WebMCP contracts, or state transitions changed.
+* **Capture states:** clean start surface; seeded flood case with a staged pending plan; the same deterministic case after visible human approval.
+* **Changed Files:**
+  * `docs/screenshots/empty-state.png` — refreshed start/safety surface.
+  * `docs/screenshots/pending-review.png` — refreshed case-summary hero and review gate.
+  * `docs/screenshots/approved-next-actions.png` — refreshed approved-plan actions and activity view.
+  * `docs/IMPLEMENTATION_LOG.md` — screenshot refresh evidence.
+* **Verification:** Captures were taken from the local app using the deterministic WebMCP test harness and contain no real personal data or fabricated agent evidence. Existing README paths remain valid. The browser was reset to an empty local state after capture.
+
+### Entry: UX-9 — Clarify the start decision (user-directed, out-of-backlog)
+* **Status:** IN PROGRESS
+* **Trigger:** operator requested a redesign of the start surface so people can more clearly understand what to do first.
+* **Design read:** trust-first recovery start screen for a stressed, non-expert household user; calm, directive, low-motion instructional hierarchy (`DESIGN_VARIANCE: 3`, `MOTION_INTENSITY: 2`, `VISUAL_DENSITY: 4`).
+* **Scope:** refine copy, information hierarchy, and responsive visual treatment in the empty/start surface; stabilize the supporting-card dashboard layout without changing its visual composition. Preserve the existing two startup actions, command-layer behavior, local-only data boundary, manual plan-review boundary, MUI theme, and no-network constraint.
+* **Planned Files:**
+  * `src/components/EmptyState.tsx` — replace ambiguous startup wording with clear first-action guidance and a compact explanation of what follows.
+  * `src/components/T1Shell.test.tsx` — assert the new user-facing guidance alongside the existing start controls and remove the obsolete mode-switch assertion for the intentionally hidden control.
+  * `src/App.tsx` — use fixed responsive grid tracks so card positions do not rebalance as content height changes; place `Drafts`/`Case records` in the left track and `Next actions`/`Activity` in the right track.
+  * `src/App.test.tsx` — retain dashboard composition coverage for the stable supporting workspace.
+  * `src/components/T1SupportingViews.test.tsx` — assert the intentional `Delete Case` header label while preserving destructive-action confirmation coverage.
+  * `docs/IMPLEMENTATION_LOG.md` — record implementation and verification evidence.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`, plus desktop/mobile browser review.
+* **Implementation:**
+  * Replaced the ambiguous `Next useful step` heading with `Choose how to begin` and gave the person a direct choice: start a private case for their situation or first inspect the sample flood case.
+  * Reframed the supporting panel as `What each choice does`, with concise, outcome-based descriptions for the blank case and demo plus an explicit manual-review reminder.
+  * Replaced the supporting layout's balancing CSS columns with deterministic CSS Grid tracks: `Drafts` and `Case records` stay in the left track, while `Next actions` and `Activity` stay in the right, matching the requested dashboard composition. This preserves the compact visual composition without cards being reassigned between columns when content height changes; below 900 px it remains one ordered track.
+  * Retained the browser-only, no-account, deletable-data assurance. No action labels, state transitions, command calls, tool contracts, or authority boundaries changed.
+* **Regression Coverage:** Updated the shell test to require the new heading, both choice descriptions, the manual-review explanation, and both existing action buttons. The targeted test passed: 1 test passed (4 intentionally filtered tests skipped).
+  * `src/App.test.tsx` confirms the stable supporting workspace contains all four supporting sections after a person starts a case. Focused run: 2 tests passed.
+* **Browser Evidence:**
+  * Desktop (`1440 × 900`): start surface rendered with no horizontal overflow (`scrollWidth = clientWidth = 1440`).
+  * Mobile (`390 × 844`): the surface collapsed to one column with no horizontal overflow (`scrollWidth = clientWidth = 390`); the primary action measured `308 × 44` CSS pixels.
+  * Screen-reader snapshot exposes the main instruction, both buttons, and the explanatory complementary region in that order.
+  * Stable-workspace review: desktop (`1280 × 900`) resolved to two fixed 564 px tracks, with `Drafts`/`Case records` on the left and `Next actions`/`Activity` on the right. Mobile (`390 × 844`) resolved to one 358 px track in the same left-track-first order. Neither viewport overflowed.
+* **Validation Results:**
+  * `npm run lint` — passed.
+  * `npm run typecheck` — passed.
+  * `npm run build` — passed (`vite build` completed in 836 ms).
+  * Stable-layout validation: `npm run test:run -- src/App.test.tsx`, `npm run lint`, `npm run typecheck`, and `npm run build` passed (`vite build` completed in 829 ms); the existing non-blocking 500 kB chunk-size advisory remained.
+  * Requested card-placement validation: `npm run test:run -- src/App.test.tsx`, `npm run lint`, and `npm run typecheck` passed; `npm run build` passed in 868 ms, with only the existing non-blocking 500 kB chunk-size advisory.
+  * Intentional interface test alignment: `npm run test:run -- src/components/T1Shell.test.tsx src/components/T1SupportingViews.test.tsx` — 2 files, 8 tests passed.
+  * Final full-suite validation: `npm run lint` and `npm run typecheck` passed; `npm run test:run` — 12 files, 58 tests passed; `npm run build` — passed (`vite build` completed in 827 ms), with only the existing non-blocking 500 kB chunk-size advisory.
+* **Changed Files:**
+  * `src/components/EmptyState.tsx` — clearer startup decision and outcome-based supporting guidance.
+  * `src/components/T1Shell.test.tsx` — regression coverage for the new user-facing instructions; removed the obsolete visible color-mode-control expectation.
+  * `src/App.tsx` — deterministic responsive grid tracks for stable supporting-card placement.
+  * `src/App.test.tsx` — stable supporting-workspace coverage.
+  * `src/components/T1SupportingViews.test.tsx` — reset-confirmation coverage aligned to the intentional `Delete Case` header action.
+  * `docs/IMPLEMENTATION_LOG.md` — UX-9 scope, results, and completion evidence.
+* **Status:** DONE — the intentional hidden mode control and `Delete Case` label are reflected in the test suite; all required validation gates pass.
+
+### Entry: UX-10 — Bound supporting-card growth (user-directed, out-of-backlog)
+* **Status:** IN PROGRESS
+* **Trigger:** operator requested viewport-bounded Drafts and Case records cards, with Activity using the remaining space in the stable dashboard track.
+* **Scope:** presentation-only layout refinement. Preserve the stable two-track composition, responsive one-track fallback, all component content, command-layer behavior, copy-only drafts, and the manual review boundary.
+* **Planned Files:**
+  * `src/App.tsx` — stretch the stable dashboard tracks and let Activity flex into remaining right-track space.
+  * `src/components/DraftList.tsx` — apply a `35dvh` maximum height and scrolling to the Drafts surface.
+  * `src/components/CaseRecordList.tsx` — expose a local surface-style input and apply a `35dvh` maximum height with scrolling.
+  * `src/components/ActivityTimeline.tsx` — expose a local surface-style input so Activity can flex within its assigned track.
+  * `src/components/SectionCard.tsx` — allow bounded scroll surfaces to become keyboard-focusable while retaining their existing semantic labels.
+  * `src/components/T1SupportingViews.test.tsx` — cover keyboard focus targets on the bounded supporting-card surfaces.
+  * `docs/IMPLEMENTATION_LOG.md` — record validation evidence.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`, plus desktop/mobile browser review.
+* **Implementation:**
+  * Applied `maxHeight: '35dvh'` and `overflow: 'auto'` to the Drafts and Case records section surfaces only. Their content now scrolls within the card rather than expanding the dashboard indefinitely.
+  * Changed the stable grid tracks to stretch and made Activity a flex-growing card in the right track. It fills available vertical space below Next actions whenever the bounded left track is taller, without changing the fixed card assignment or responsive one-track fallback.
+  * Made the two scrollable semantic regions keyboard-focusable through an opt-in `SectionCard` prop. Their existing headings remain the accessible names and the existing global `:focus-visible` treatment supplies the visible focus indicator.
+  * Added local `sx` inputs to Case records and Activity only, allowing parent layout composition without changes to data, state, command handlers, or the manual approval flow.
+* **Regression Coverage:**
+  * Added an assertion that the bounded Drafts and Case records regions have keyboard focus targets. Focused dashboard/supporting-view run: 2 test files, 7 tests passed.
+* **Browser Evidence:**
+  * Desktop (`1280 × 900`): both bounded cards computed `max-height: 315px` ($35dvh$) and `overflow-y: auto`; Drafts accepted keyboard focus. Activity retained the right track and stretches when the bounded left track determines the grid height. No horizontal overflow (`scrollWidth = clientWidth = 1280`).
+  * Mobile (`390 × 844`): both bounded cards computed `max-height: 295.4px` ($35dvh$) and `overflow-y: auto`; the stable layout remains one 358 px track with no horizontal overflow (`scrollWidth = clientWidth = 390`).
+* **Validation Results:**
+  * `npm run lint` — passed.
+  * `npm run typecheck` — passed.
+  * `npm run test:run` — passed: 12 test files and 59 tests passed.
+  * `npm run build` — passed (`vite build` completed in 844 ms); only the existing non-blocking 500 kB chunk-size advisory was reported.
+* **Changed Files:**
+  * `src/App.tsx` — stretch the stable dashboard tracks and compose Activity as the flex-growing surface.
+  * `src/components/DraftList.tsx` — bound Drafts height and enable internal scrolling.
+  * `src/components/CaseRecordList.tsx` — support and apply the bounded scroll surface style.
+  * `src/components/ActivityTimeline.tsx` — support flex layout composition.
+  * `src/components/SectionCard.tsx` — opt-in keyboard focus target for scrollable semantic regions.
+  * `src/components/T1SupportingViews.test.tsx` — regression coverage for bounded-card keyboard focus.
+  * `docs/IMPLEMENTATION_LOG.md` — implementation and validation evidence.
+* **Status:** DONE — viewport-bounded card growth, Activity fill behavior, responsive layout, keyboard access, and all required validation gates are complete.
+
+### Entry: UX-11 — Place the safety boundary after context (user-directed, out-of-backlog)
+* **Status:** IN PROGRESS
+* **Trigger:** operator requested that the existing SafetyBanner appear directly below CaseSummary.
+* **Scope:** relocate the existing safety-boundary component in the rendered content order. Preserve its copy, semantics, visual styling, visibility on the landing state, all state/command behavior, and responsive layout.
+* **Planned Files:**
+  * `src/App.tsx` — render SafetyBanner immediately after CaseSummary and after the landing empty state.
+  * `src/app/AppShell.tsx` — remove the shell-level SafetyBanner render and now-unused import.
+  * `src/App.test.tsx` — assert the safety boundary follows the case summary in DOM order.
+  * `docs/IMPLEMENTATION_LOG.md` — record implementation and validation evidence.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`, plus browser review.
+* **Implementation:**
+  * Moved the existing SafetyBanner from the shell-level stack into the application content flow. It now follows CaseSummary in an active case; the same unchanged banner follows the start surface on landing.
+  * Removed the now-unused AppShell import and render. Safety copy, `role="note"`, accessible name, visual treatment, state behavior, and all command-layer paths are unchanged.
+* **Regression Coverage:**
+  * Updated the app integration test to verify the semantic `Safety boundary` note follows the `What we know` region in DOM order after a person starts a case.
+* **Browser Evidence:**
+  * Active case at desktop (`1280 × 900`): CaseSummary ended at 248.6 px, SafetyBanner began at 272.6 px, and the supporting workspace began at 395.6 px—consistent 24 px spacing with no horizontal overflow (`scrollWidth = clientWidth = 1280`).
+  * Landing at mobile (`390 × 844`): the start surface ended at 958.6 px and SafetyBanner began at 982.6 px; the banner remains after the start content with no horizontal overflow (`scrollWidth = clientWidth = 390`).
+* **Validation Results:**
+  * `npm run lint` — passed.
+  * `npm run typecheck` — passed.
+  * `npm run test:run` — passed: 12 test files and 59 tests passed.
+  * `npm run build` — passed (`vite build` completed in 806 ms); only the existing non-blocking 500 kB chunk-size advisory was reported.
+* **Changed Files:**
+  * `src/App.tsx` — render the existing SafetyBanner below contextual case information and landing content.
+  * `src/app/AppShell.tsx` — remove the former shell-level SafetyBanner render.
+  * `src/App.test.tsx` — DOM-order coverage for the active-case safety boundary.
+  * `docs/IMPLEMENTATION_LOG.md` — implementation and validation evidence.
+* **Status:** DONE — requested placement is verified at desktop and mobile, and all required validation gates pass.
+
+### Entry: UX-12 — Fill balanced supporting dashboard tracks (user-directed, out-of-backlog)
+* **Status:** IN PROGRESS
+* **Trigger:** operator reversed the UX-10 Drafts/Case records `maxHeight` clamp and requested full available viewport height without uneven desktop columns.
+* **Scope:** presentation-only supporting-workspace adjustment. Remove internal scroll caps from Drafts and Case records; let both cards grow for their content and use remaining desktop track space. Preserve card assignment, responsive one-column behavior, content, command/state behavior, copy-only draft behavior, and the manual plan-review boundary.
+* **Planned Files:**
+  * `src/App.tsx` — establish a viewport-aware minimum workspace height at desktop; make both supporting stacks fill it and expose stable layout test targets.
+  * `src/components/DraftList.tsx` — accept parent layout composition styles instead of owning an internal height cap.
+  * `tests/e2e/primary-journey.spec.ts` — prove desktop cards are uncapped, column tracks are equal height, and workspace reaches the usable viewport area.
+  * `docs/IMPLEMENTATION_LOG.md` — record test, browser, and validation evidence.
+* **Validation Commands:** `npm run test:e2e -- --grep "balanced supporting dashboard"`, `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`, plus desktop/mobile browser review.
+* **Implementation:**
+  * Removed the `35dvh` / `overflow: auto` ownership from Drafts. Both Drafts and Case records now receive flexible parent-composition styles, so their content is visible and may grow past the workspace floor instead of being internally scrolled.
+  * Added a desktop-only `calc(100dvh - 28rem)` minimum to the existing stable grid. Its left and right stacks now fill that minimum height; the left cards flex into remaining space, while the existing Activity card continues to fill remaining space on the right. The stack/card assignment and single-column mobile fallback are unchanged.
+* **Regression Coverage:**
+  * Added a desktop Playwright layout check for uncapped Drafts/Case records (`max-height: none`, `overflow-y: visible`), aligned final card edges ($\leq 1$ px difference), and a supporting workspace bottom at or below the usable desktop viewport area (at least 836 px at `1440 × 900`).
+  * Corrected the pre-existing primary-journey header selector from `Delete local case` to the intentional visible label `Delete Case`. The destructive-confirmation dialog remains explicitly labeled `Delete local case`.
+* **Browser Evidence:**
+  * The focused desktop layout test passed at `1440 × 900`; both previously capped cards computed as uncapped, the Case records and Activity card bottoms aligned within one CSS pixel, and the workspace extended into the viewport's usable bottom area.
+  * The full mobile happy-path and accessibility suite passed at `390 × 844`; the shared empty-state mobile page also reported no horizontal overflow (`scrollWidth = clientWidth = 390`).
+* **Validation Results:**
+  * `npm run test:e2e -- --grep "desktop balanced supporting dashboard"` — passed: 1 test in 1.4 s.
+  * `npm run lint` — passed.
+  * `npm run typecheck` — passed.
+  * `npm run test:run` — passed: 12 test files and 59 tests passed.
+  * `npm run test:e2e` — passed: 6 Playwright tests passed in 3.2 s.
+  * `npm run build` — passed (`vite build` completed in 888 ms); only the existing non-blocking 500 kB chunk-size advisory was reported.
+* **Changed Files:**
+  * `src/App.tsx` — desktop workspace floor and flexible supporting-card stack composition.
+  * `src/components/DraftList.tsx` — accepts parent layout styles and removes its internal scroll cap.
+  * `tests/e2e/primary-journey.spec.ts` — layout regression coverage and corrected stale reset header selector.
+  * `docs/IMPLEMENTATION_LOG.md` — UX-12 scope, evidence, and results.
+* **Status:** DONE — Drafts and Case records are uncapped, both dashboard tracks fill the available desktop space evenly, and responsive/browser regression coverage passes.

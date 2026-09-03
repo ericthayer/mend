@@ -9,6 +9,7 @@ import { DraftList } from './components/DraftList';
 import { EmptyState } from './components/EmptyState';
 import { NextActions } from './components/NextActions';
 import { PlanReview } from './components/PlanReview';
+import { SafetyBanner } from './components/SafetyBanner';
 import { seedFloodDemo } from './data/floodDemo';
 import { createRecoveryCommands } from './domain/commands';
 import {
@@ -205,39 +206,47 @@ function App() {
       onResetRequested={caseData ? () => setIsResetDialogOpen(true) : undefined}
     >
       {caseData ? (
-        <Box
-          sx={{
-            display: 'grid',
-            gap: 3,
-            gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 7fr) minmax(0, 5fr)' },
-            alignItems: 'start',
-          }}
-        >
-          <Stack spacing={3} sx={{ minWidth: 0 }}>
-            {pendingPlan ? (
-              <PlanReview
-                pendingPlan={pendingPlan}
-                approvedPlan={approvedPlan}
-                submitting={reviewSubmitting}
-                onSubmit={handleReviewSubmit}
-              />
-            ) : null}
-            <NextActions
+        <Stack spacing={0} sx={{ gap: 3 }}>
+          <CaseSummary caseData={caseData} />
+          <SafetyBanner />
+          {pendingPlan ? (
+            <PlanReview
+              pendingPlan={pendingPlan}
               approvedPlan={approvedPlan}
-              busyTaskId={updatingTaskId}
-              onUpdateTaskStatus={handleUpdateTaskStatus}
-              headingRef={nextActionsHeadingRef}
+              submitting={reviewSubmitting}
+              onSubmit={handleReviewSubmit}
             />
-            <DraftList drafts={drafts} />
-          </Stack>
-          <Stack spacing={3} sx={{ minWidth: 0 }}>
-            <CaseSummary caseData={caseData} />
-            <CaseRecordList records={records} />
-            <ActivityTimeline activity={activity} />
-          </Stack>
-        </Box>
+          ) : null}
+          <Box
+            data-testid="supporting-workspace-masonry"
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'repeat(2, minmax(0, 1fr))' },
+              gap: 3,
+              alignItems: 'stretch',
+              minHeight: { md: 'calc(100dvh - 28rem)' },
+            }}
+          >
+            <Stack spacing={3} sx={{ minWidth: 0, height: '100%', minHeight: 0 }}>
+              <DraftList drafts={drafts} sx={{ flex: '1 1 auto', minHeight: 0 }} />
+              <CaseRecordList records={records} sx={{ flex: '1 1 auto', minHeight: 0 }} />
+            </Stack>
+            <Stack spacing={3} sx={{ minWidth: 0, height: '100%', minHeight: 0 }}>
+              <NextActions
+                approvedPlan={approvedPlan}
+                busyTaskId={updatingTaskId}
+                onUpdateTaskStatus={handleUpdateTaskStatus}
+                headingRef={nextActionsHeadingRef}
+              />
+              <ActivityTimeline activity={activity} sx={{ flex: 1, minHeight: 0 }} />
+            </Stack>
+          </Box>
+        </Stack>
       ) : (
-        <EmptyState onStartBlank={handleStartBlank} onLoadDemo={handleLoadDemo} busy={busy} />
+        <Stack spacing={3}>
+          <EmptyState onStartBlank={handleStartBlank} onLoadDemo={handleLoadDemo} busy={busy} />
+          <SafetyBanner />
+        </Stack>
       )}
 
       <ConfirmDialog

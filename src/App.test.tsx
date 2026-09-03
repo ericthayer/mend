@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import App from './App';
 import { createEmptyDomainState } from './domain/types';
@@ -15,5 +16,25 @@ describe('App', () => {
       screen.getByText(/This tool helps organize recovery tasks after immediate danger has passed/i)
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Start a blank case' })).toBeInTheDocument();
+  });
+
+  it('places supporting case surfaces in the stable workspace after a case begins', async () => {
+    window.localStorage.clear();
+    replaceDomainState(createEmptyDomainState());
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'Start a blank case' }));
+
+    expect(await screen.findByTestId('supporting-workspace-masonry')).toBeInTheDocument();
+    const caseSummary = screen.getByRole('region', { name: 'What we know' });
+    const safetyBanner = screen.getByRole('note', { name: 'Safety boundary' });
+
+    expect(caseSummary.compareDocumentPosition(safetyBanner) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Next actions' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Case records' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Drafts' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Activity' })).toBeInTheDocument();
   });
 });
