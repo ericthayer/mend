@@ -909,3 +909,61 @@
 * **Implementation:** Scoped `design-taste-frontend` to the landing-page, portfolio, and suitable-redesign work it supports. Its own exclusions prevent it from being treated as a mandatory pattern source for Mend's dashboard-like recovery workflow.
 * **Validation Results:** No diagnostics reported for the updated agent or log. `npm run lint`, `npm run typecheck`, `npm run test:run` (12 files, 56 tests), and `npm run build` all passed; the existing bundle-size warning remains non-blocking.
 * **Result:** The agent reference and UX-5 audit record now accurately cover all four installed design skills.
+
+### Entry: UX-6 — Start-surface visual refinement (user-directed, out-of-backlog)
+* **Status:** DONE
+* **Trigger:** operator request on 2026-09-03 for a more delightful, polished interface using the installed `design-taste-frontend` and `high-end-visual-design` guidance.
+* **Scope:** refine the empty/start screen, global interaction finish, and sticky header material treatment only. Preserve all existing recovery copy, action labels, command-layer behavior, WebMCP contracts, native declarative review form semantics, color-mode behavior, and local-only/no-network constraints.
+* **Design read:** trust-first recovery planner for overwhelmed households; calm soft structuralism with a low-variance, low-motion visual language appropriate for safety-sensitive work (`DESIGN_VARIANCE: 3`, `MOTION_INTENSITY: 2`, `VISUAL_DENSITY: 5`).
+* **Design direction:** replace the generic centered start card on desktop with an action-first two-part `control and continuity` surface. The existing two start actions remain primary; a supporting panel summarizes the supported local, review-first boundaries. It becomes a single action-first stack below the desktop breakpoint.
+* **Planned Files:**
+  * `src/components/EmptyState.tsx` — responsive action-first start surface and supporting trust panel.
+  * `src/styles/theme.ts` — tactile, color-scheme-safe button feedback.
+  * `src/styles/global.css` — restrained primary-color ambient canvas treatment and reduced-motion-safe interaction finish.
+  * `src/app/AppShell.tsx` — translucent, bounded sticky header material treatment.
+  * `src/components/T1Shell.test.tsx` — regression assertion for new visible trust-boundary content while retaining both startup actions.
+  * `docs/IMPLEMENTATION_LOG.md` — scope and validation evidence.
+* **Validation Commands:** focused `npm run test:run -- src/components/T1Shell.test.tsx`, then `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run test:e2e`, and `npm run build`; browser checks at 390 × 844 and 1440 × 900 in both color schemes with keyboard-focus verification.
+
+### Entry: UX-7 — Agent-readable `llms.txt` (user-directed, out-of-backlog)
+* **Status:** DONE
+* **Trigger:** operator request on 2026-09-03 to reach 4/4 on the Lighthouse **Agentic Browsing** category. The **Agent accessibility** audit reported "llms.txt does not follow recommendations" because the SPA rewrite answered `/llms.txt` with the application HTML shell instead of a machine-readable summary.
+* **Scope:** add a static, spec-compliant `llms.txt` summary and make its content type explicit. No application, command-layer, WebMCP, persistence, or approval-boundary behavior changes.
+* **Planned Files:**
+  * `public/llms.txt` (new) — [llmstxt.org](https://llmstxt.org/) structure: H1, blockquote summary, unheaded prose describing the single-page local-only scope, the six `document.modelContext` tools, and the agent boundaries, followed by curated link sections.
+  * `public/_headers` (edit) — explicit `Content-Type: text/plain; charset=utf-8` for `/llms.txt`, required because the site sends `X-Content-Type-Options: nosniff`.
+  * `docs/IMPLEMENTATION_LOG.md` (edit) — scope and validation evidence.
+* **Validation Commands:** `curl -D -` against the dev server for `/llms.txt`, `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`, plus reachability checks on every URL referenced by the file.
+* **Implementation:** Static assets in `public/` are resolved before the Netlify `/*` → `/index.html` rewrite, so the file now returns real Markdown in both dev and production. Every link points to an already-published resource — the live app, the public repository, and `raw.githubusercontent.com` Markdown for `README.md`, `PRODUCT.md`, `docs/BUILD_SPEC.md`, `docs/EVAL_RESULTS.md`, the T4.2 operator checklist, both ADRs, and this log. No URL was invented. The file restates the human-approval boundary, the absence of an imperative approval tool and of any send/upload capability, and instructs agents to treat stored case records as untrusted data rather than instructions.
+* **Validation Results (all passed):**
+  * `curl -D - http://localhost:5173/llms.txt` — `HTTP/1.1 200`, `Content-Type: text/plain`, 3801-byte Markdown body (previously the HTML shell).
+  * Link check — all nine referenced URLs returned `200`.
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — 12 test files, 57 tests passed.
+  * `npm run build` — exit 0; `dist/llms.txt` (3801 bytes) and `dist/_headers` emitted. Only the existing non-blocking 500 kB chunk-size warning remains.
+* **Changed Files:**
+  * `public/llms.txt` — agent-readable site summary.
+  * `public/_headers` — explicit content type for `/llms.txt`.
+  * `docs/IMPLEMENTATION_LOG.md` — scope and verification record.
+* **Result:** `/llms.txt` is served as a spec-compliant Markdown summary, clearing the Agent accessibility finding. The Lighthouse category score must be re-measured against the deployed build, since the audit fetches the file from the origin under test.
+* **Implementation:**
+  * Replaced the empty state's centered single-column panel at desktop widths with a responsive two-part `control and continuity` surface. Primary recovery copy and both action labels are unchanged and appear before the supporting reassurance content in the mobile reading order.
+  * Added the semantic `You remain in control` complementary region with factual local-storage, no-account, and manual-review guarantees. This adds no new action or state change.
+  * Added a restrained primary-color ambient canvas treatment, a translucent sticky-header surface, and transform-only hover/press feedback for MUI buttons. The existing global reduced-motion rule disables those transitions.
+  * Used MUI CSS color channels rather than materialized `alpha(theme.palette...)` values for the new dynamic surfaces. This preserves correct light and dark values after a live color-mode change.
+  * Corrected an MUI `sx` radius multiplier discovered during browser review by declaring the inset-panel radius as `12px` explicitly.
+* **Regression Test:** Added `explains local review control while keeping both ways to start available` in `src/components/T1Shell.test.tsx`. It failed before implementation because the `You remain in control` heading was absent, then passed after the semantic supporting panel was added.
+* **Validation Results (all passed):**
+  * Focused shell test — 1 file, 5 tests passed.
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — 12 files, 57 tests passed.
+  * `npm run test:e2e` — 5 Playwright tests passed, including mobile/desktop journeys and empty/active/pending axe scans.
+  * `npm run build` — `tsc -b && vite build` exit 0. The existing Vite chunk-size advisory remains non-blocking.
+* **Browser Evidence:**
+  * Light desktop at 1440 × 900: no horizontal overflow; the start surface renders in a two-part grid and the 200 × 44px primary target remains visible.
+  * Light mobile at 390 × 844: no horizontal overflow; the primary action is visible at 329 × 44px, receives keyboard focus, and the reassurance panel follows both actions in reading order.
+  * Dark desktop/mobile: page, sticky header, and inset-panel surfaces resolve to the correct active scheme tokens. At desktop the sticky header resolved to `rgba(17, 24, 32, 0.88)`; the inset panel resolved from the dark primary channel.
+  * Reduced motion: the computed button transition duration resolved to `1e-05s`; no console warnings or errors occurred during the final reload.
+* **Result:** The start experience is materially more intentional while preserving the calm, direct, trust-first recovery workflow. Recovery commands, WebMCP registration, native review semantics, local persistence, and all existing action labels remain unchanged.

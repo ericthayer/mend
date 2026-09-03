@@ -149,13 +149,30 @@ export const mendTheme = createTheme({
           borderRadius: 10,
           paddingLeft: 18,
           paddingRight: 18,
+          transition:
+            'transform 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1), background-color 180ms cubic-bezier(0.22, 1, 0.36, 1)',
+          '&:active': {
+            transform: 'scale(0.985)',
+          },
+        },
+        contained: {
+          boxShadow: '0 10px 24px rgb(var(--mui-palette-primary-darkChannel) / 0.2)',
+          '@media (hover: hover)': {
+            '&:hover': {
+              transform: 'translateY(-1px)',
+              boxShadow: '0 14px 30px rgb(var(--mui-palette-primary-darkChannel) / 0.26)',
+            },
+          },
         },
         outlined: {
           borderColor: 'var(--mui-palette-divider)',
           backgroundColor: 'var(--mui-palette-background-paper)',
-          '&:hover': {
-            borderColor: 'var(--mui-palette-text-secondary)',
-            backgroundColor: 'var(--mui-palette-action-hover)',
+          '@media (hover: hover)': {
+            '&:hover': {
+              transform: 'translateY(-1px)',
+              borderColor: 'var(--mui-palette-text-secondary)',
+              backgroundColor: 'var(--mui-palette-action-hover)',
+            },
           },
         },
       },
@@ -231,6 +248,9 @@ export const mendTheme = createTheme({
           caretColor: 'var(--mui-palette-primary-main)',
           scrollbarColor:
             'var(--mui-palette-text-secondary) var(--mui-palette-background-default)',
+          backgroundImage:
+            'radial-gradient(circle at 88% -12%, rgb(var(--mui-palette-primary-mainChannel) / 0.09), transparent min(54vw, 40rem))',
+          backgroundRepeat: 'no-repeat',
         },
         '::selection': {
           backgroundColor: 'rgb(var(--mui-palette-primary-mainChannel) / 0.24)',

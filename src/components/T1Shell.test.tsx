@@ -59,6 +59,14 @@ describe('T1.2 shell behavior', () => {
     ).toBeInTheDocument();
   });
 
+  it('explains local review control while keeping both ways to start available', () => {
+    render(<App />);
+
+    expect(screen.getByRole('heading', { name: 'You remain in control' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Start a blank case' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Load flood demo' })).toBeInTheDocument();
+  });
+
   it('switches between light and dark modes from the header', async () => {
     const user = userEvent.setup();
     render(

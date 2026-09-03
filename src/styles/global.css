@@ -15,6 +15,15 @@ a {
   text-underline-offset: 0.15em;
 }
 
+body {
+  background-image: radial-gradient(
+    circle at 88% -12%,
+    rgb(var(--mui-palette-primary-mainChannel) / 0.09),
+    transparent min(54vw, 40rem)
+  );
+  background-repeat: no-repeat;
+}
+
 :focus-visible {
   outline: 3px solid var(--mui-palette-primary-main);
   outline-offset: 2px;

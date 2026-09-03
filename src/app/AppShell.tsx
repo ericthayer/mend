@@ -73,8 +73,9 @@ export function AppShell({
           position: 'sticky',
           top: 0,
           zIndex: theme.zIndex.appBar,
-          bgcolor: 'background.default',
+          bgcolor: 'rgb(var(--mui-palette-background-defaultChannel) / 0.88)',
           backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
           borderBottom: '1px solid',
           borderColor: 'divider',
         })}
