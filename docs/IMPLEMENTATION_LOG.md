@@ -16,7 +16,7 @@
 | T2.4 | BLOCKED | P1 | Safe outreach drafting tool | `stage_outreach_draft` tool & draft list wiring |
 | T3.1 | DONE | P0 | Unit & integration tests | Test coverage for domain invariants & authority gates |
 | T3.2 | DONE | P0 | Hardened accessibility & states | Keyboard traversal, axe a11y checks, live regions |
-| T3.3 | READY | P1 | End-to-end browser journeys | Playwright happy-path test suite |
+| T3.3 | DONE | P1 | End-to-end browser journeys | Playwright happy-path test suite |
 | T4.1 | READY | P0 | Production Netlify build | Headers, redirects, static build verification |
 | T4.2 | BLOCKED | P0 | Real WebMCP client smoke tests | Chrome DevTools & in-app browser evals |
 | T5.1 | BLOCKED | P0 | Judge-ready documentation | README, screenshots, reproduction steps |
@@ -441,3 +441,45 @@
   * Unsupported-tool and storage-fallback states remain clear and usable.
   * Reflow validation confirms no horizontal overflow at zoom-equivalent constrained width.
 * **Next eligible task:** `T3.3` (next in backlog order). `T4.1` is also `READY` by dependency.
+
+### Entry: T3.3 — Add Browser Journey Tests
+* **Status:** DONE
+* **Depends on:** T3.2 (DONE)
+* **Acceptance criteria (BUILD_SPEC.md §T3.3):**
+  * Mobile and desktop happy paths pass from a clean state.
+  * Reload persistence and reset pass.
+  * Tests do not depend on external websites or AI output.
+* **Planned Files:**
+  * `playwright.config.ts` (new) — deterministic Chromium e2e runner + local web server config.
+  * `tests/e2e/helpers/webmcpMock.ts` (new) — in-page WebMCP mock harness for deterministic tool execution.
+  * `tests/e2e/primary-journey.spec.ts` (new) — mobile/desktop happy-path tests with pending-plan staging, approval, reload persistence, and reset.
+  * `tests/e2e/accessibility.spec.ts` (new) — browser-level axe scans for empty/active/review states.
+  * `docs/IMPLEMENTATION_LOG.md` — T3.3 evidence and status update.
+* **Validation Command:** `npm run test:e2e`
+* **Prerequisite Setup:** `npx playwright install chromium` (installed missing Playwright browser binaries in this environment).
+* **Validation Results (all passed):**
+  * `npm run test:e2e` — Playwright: 5/5 passed.
+    * `tests/e2e/primary-journey.spec.ts`
+      * mobile (`390 × 844`) happy path: demo load → tool-staged pending plan → human approval → reload persistence → reset.
+      * desktop (`1440 × 900`) same journey passed.
+    * `tests/e2e/accessibility.spec.ts`
+      * axe scans for empty, active, and pending-review states with no serious/critical violations.
+  * Full repository gate re-run after e2e integration:
+    * `npm run lint` — exit 0.
+    * `npm run typecheck` — exit 0.
+    * `npm run test:run` — 11 test files, 47 tests passed.
+    * `npm run test:e2e` — 5 e2e tests passed.
+    * `npm run build` — exit 0.
+* **Changed Files:**
+  * `playwright.config.ts` (new) — deterministic local e2e runner configuration and dev-server harness.
+  * `tests/e2e/helpers/webmcpMock.ts` (new) — browser-side WebMCP mock registry/execution harness.
+  * `tests/e2e/primary-journey.spec.ts` (new) — mobile/desktop primary journey persistence/reset coverage.
+  * `tests/e2e/accessibility.spec.ts` (new) — browser-level axe checks for target app states.
+  * `src/components/SafetyBanner.tsx` — contrast hardening for warning boundary text.
+  * `src/components/PlanReview.tsx` — pending-review chip contrast hardening.
+  * `docs/IMPLEMENTATION_LOG.md` — T3.3 status and validation evidence.
+* **Result:** T3.3 acceptance criteria met:
+  * End-to-end browser journeys run deterministically with no dependency on external websites or live AI outputs.
+  * Mobile and desktop happy paths pass with persisted reload behavior and reset confirmation.
+  * Browser-level accessibility scans pass for the required states.
+* **Next eligible task:** `T4.1` (next in backlog order; dependencies T3.1 + T3.2 are DONE).

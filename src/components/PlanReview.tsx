@@ -155,7 +155,12 @@ export function PlanReview({
           <Typography component="h2" variant="h2" sx={{ mr: 'auto' }}>
             Needs your review
           </Typography>
-          <Chip label={`Plan v${pendingPlan.version}`} color="warning" variant="outlined" />
+          <Chip
+            label={`Plan v${pendingPlan.version}`}
+            color="warning"
+            variant="outlined"
+            sx={{ color: 'text.primary', borderColor: 'warning.main', fontWeight: 600 }}
+          />
         </Stack>
 
         <Typography component="p" variant="body2" color="text.secondary">
