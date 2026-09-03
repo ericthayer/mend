@@ -15,9 +15,9 @@
 | T2.3 | DONE | P0 | Declarative review form | Semantic `<form toolname="start_plan_review">` |
 | T2.4 | BLOCKED | P1 | Safe outreach drafting tool | `stage_outreach_draft` tool & draft list wiring |
 | T3.1 | DONE | P0 | Unit & integration tests | Test coverage for domain invariants & authority gates |
-| T3.2 | READY | P0 | Hardened accessibility & states | Keyboard traversal, axe a11y checks, live regions |
-| T3.3 | BLOCKED | P1 | End-to-end browser journeys | Playwright happy-path test suite |
-| T4.1 | BLOCKED | P0 | Production Netlify build | Headers, redirects, static build verification |
+| T3.2 | DONE | P0 | Hardened accessibility & states | Keyboard traversal, axe a11y checks, live regions |
+| T3.3 | READY | P1 | End-to-end browser journeys | Playwright happy-path test suite |
+| T4.1 | READY | P0 | Production Netlify build | Headers, redirects, static build verification |
 | T4.2 | BLOCKED | P0 | Real WebMCP client smoke tests | Chrome DevTools & in-app browser evals |
 | T5.1 | BLOCKED | P0 | Judge-ready documentation | README, screenshots, reproduction steps |
 | T5.2 | BLOCKED | P0 | Sub-three-minute demo video | Video recording and public link |
@@ -405,3 +405,39 @@
   * Safety/authority and stale/grounding invariants are covered and passing.
   * WebMCP registration lifecycle tests and human-controlled review tests are integrated in the passing suite.
 * **Next eligible task:** `T3.2` (now `READY`; dependencies T1.4 + T3.1 are DONE).
+
+### Entry: T3.2 — Harden Accessibility and Failure States
+* **Status:** DONE
+* **Depends on:** T1.4 (DONE), T3.1 (DONE)
+* **Acceptance criteria (BUILD_SPEC.md §T3.2):**
+  * Complete primary UI journey by keyboard.
+  * No critical/serious axe violations on empty, active, or review screens.
+  * Unsupported WebMCP and unavailable storage states are understandable and non-fatal.
+  * At 200% zoom, content reflows without loss of function.
+* **Planned Files:**
+  * `src/components/T3AccessibilityHardening.test.tsx` (new) — keyboard-only journey, state resilience, and axe checks.
+  * `src/app/AppShell.tsx` — inline error focus management and live-region semantics for warning/error notices.
+  * `src/state/recoveryStore.ts` — storage warning copy aligned to explicit non-persistence guidance.
+  * `docs/IMPLEMENTATION_LOG.md` — T3.2 evidence and status.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`
+* **Additional Verification:**
+  * Manual reflow check at effective zoom-constrained width (equivalent to 200% zoom): built app opened at `640 × 900`; `documentElement.scrollWidth === clientWidth` and no horizontal overflow detected.
+* **Validation Results (all passed):**
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — `vitest run`: 11 test files passed, 47 tests passed total.
+    * Added T3.2 suite asserting no serious/critical axe violations for empty, active, and pending-review states.
+    * Added keyboard-only load-demo → pending review → approve journey verification.
+    * Added unsupported WebMCP + storage-warning non-fatal behavior assertions.
+  * `npm run build` — `tsc -b && vite build` exit 0.
+* **Changed Files:**
+  * `src/components/T3AccessibilityHardening.test.tsx` (new) — accessibility/failure-state hardening tests.
+  * `src/app/AppShell.tsx` — focus-on-error behavior and explicit live announcement semantics.
+  * `src/state/recoveryStore.ts` — storage fallback warning wording clarity.
+  * `docs/IMPLEMENTATION_LOG.md` — T3.2 status and evidence.
+* **Result:** T3.2 acceptance criteria met:
+  * Primary journey is keyboard-operable through approval.
+  * Automated accessibility checks show no serious/critical violations on target screens.
+  * Unsupported-tool and storage-fallback states remain clear and usable.
+  * Reflow validation confirms no horizontal overflow at zoom-equivalent constrained width.
+* **Next eligible task:** `T3.3` (next in backlog order). `T4.1` is also `READY` by dependency.

@@ -22,7 +22,7 @@ const initialMeta: StoreMeta = loaded.ok
       storageAvailable: loaded.storageAvailable,
       storageWarning: loaded.storageAvailable
         ? null
-        : 'Local storage is unavailable. This session will not persist after closing the tab.',
+        : 'Local storage is unavailable. This case will not persist after you close the tab.',
     }
   : {
       storageAvailable: false,

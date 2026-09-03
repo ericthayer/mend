@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { Alert, Box, Button, Container, Stack, Typography } from '@mui/material';
 import { SafetyBanner } from '../components/SafetyBanner';
 import {
@@ -23,6 +23,16 @@ export function AppShell({
   onResetRequested,
   children,
 }: AppShellProps) {
+  const inlineErrorRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!inlineError) {
+      return;
+    }
+
+    inlineErrorRef.current?.focus();
+  }, [inlineError]);
+
   return (
     <Box component="div" sx={{ py: { xs: 2, sm: 4 } }}>
       <Container maxWidth="lg">
@@ -51,13 +61,19 @@ export function AppShell({
           <SafetyBanner />
 
           {storageWarning ? (
-            <Alert severity="warning" variant="outlined">
+            <Alert severity="warning" variant="outlined" role="status" aria-live="polite">
               {storageWarning}
             </Alert>
           ) : null}
 
           {inlineError ? (
-            <Alert severity="error" variant="outlined">
+            <Alert
+              ref={inlineErrorRef}
+              severity="error"
+              variant="outlined"
+              tabIndex={-1}
+              aria-live="assertive"
+            >
               {inlineError}
             </Alert>
           ) : null}
