@@ -13,7 +13,7 @@ if (!container) {
 
 createRoot(container).render(
   <StrictMode>
-    <ThemeProvider theme={mendTheme}>
+    <ThemeProvider theme={mendTheme} defaultMode="system" noSsr storageManager={null}>
       <CssBaseline />
       <ErrorBoundary>
         <App />

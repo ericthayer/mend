@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { getResourceById } from '../data/resources';
 import { selectDeterministicTasksForPlan } from '../domain/selectors';
-import { SECTION_TINTS } from '../styles/surfaces';
+import { sectionTintSx } from '../styles/surfaces';
 import { ListChecksIcon } from './icons';
 import { SectionCard } from './SectionCard';
 import type { RecoveryPlan, TaskStatus } from '../domain/types';
@@ -85,18 +85,19 @@ export function NextActions({
             <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', columnGap: 1.5, rowGap: 1 }}>
               <Box
                 aria-hidden="true"
-                sx={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '50%',
-                  display: 'grid',
-                  placeItems: 'center',
-                  bgcolor: SECTION_TINTS.actions.bg,
-                  color: SECTION_TINTS.actions.fg,
-                  fontSize: '0.875rem',
-                  fontWeight: 700,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
+                sx={[
+                  ...sectionTintSx('actions'),
+                  {
+                    width: 28,
+                    height: 28,
+                    borderRadius: '50%',
+                    display: 'grid',
+                    placeItems: 'center',
+                    fontSize: '0.875rem',
+                    fontWeight: 700,
+                    fontVariantNumeric: 'tabular-nums',
+                  },
+                ]}
               >
                 {index + 1}
               </Box>

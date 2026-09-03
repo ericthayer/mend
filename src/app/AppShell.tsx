@@ -40,6 +40,11 @@ export function AppShell({
     inlineErrorRef.current?.focus();
   }, [inlineError]);
 
+  const isDarkMode =
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches;
+
   return (
     <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
       <Box
@@ -48,7 +53,7 @@ export function AppShell({
           position: 'sticky',
           top: 0,
           zIndex: theme.zIndex.appBar,
-          bgcolor: alpha(theme.palette.background.default, 0.88),
+          bgcolor: isDarkMode ? theme.palette.grey[900] : alpha(theme.palette.background.default, 0.88),
           backdropFilter: 'blur(14px)',
           borderBottom: '1px solid',
           borderColor: 'divider',

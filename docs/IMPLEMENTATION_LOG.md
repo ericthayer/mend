@@ -13,13 +13,13 @@
 | T2.1 | DONE | P0 | WebMCP platform adapter | Adapter, type augmentation, model-context mock |
 | T2.2 | DONE | P0 | Imperative WebMCP tools | Snapshot, create case, add record, stage plan tools |
 | T2.3 | DONE | P0 | Declarative review form | Semantic `<form toolname="start_plan_review">` |
-| T2.4 | BLOCKED | P1 | Safe outreach drafting tool | `stage_outreach_draft` tool & draft list wiring |
+| T2.4 | DONE | P1 | Safe outreach drafting tool | `stage_outreach_draft` tool, copy-only draft list, command/tool tests, E-04 evidence |
 | T3.1 | DONE | P0 | Unit & integration tests | Test coverage for domain invariants & authority gates |
 | T3.2 | DONE | P0 | Hardened accessibility & states | Keyboard traversal, axe a11y checks, live regions |
 | T3.3 | DONE | P1 | End-to-end browser journeys | Playwright happy-path test suite |
 | T4.1 | DONE | P0 | Production Netlify build | Headers, redirects, static build verification |
 | T4.2 | DONE | P0 | Real WebMCP client smoke tests | Chrome DevTools & in-app browser evals |
-| T5.1 | READY | P0 | Judge-ready documentation | README, screenshots, reproduction steps |
+| T5.1 | DONE | P0 | Judge-ready documentation | README, product brief, screenshots, reproduction steps |
 | T5.2 | BLOCKED | P0 | Sub-three-minute demo video | Video recording and public link |
 | T5.3 | BLOCKED | P0 | Submission & repository freeze | Devpost copy verification and branch freeze |
 
@@ -791,6 +791,13 @@
 * **Scope agreed with operator:** shell + layout + section surfaces; no sidebar rail; fix both critique P0s (spec §7 two-column layout at ≥900px; approval confirmation/focus loss when `PlanReview` unmounts). Copy/enum-label fixes explicitly out of scope. No changes to WebMCP contracts, commands, store, or the declarative review form's native `<select>`/`<textarea>`.
 * **Planned files:** `src/styles/theme.ts`, `src/styles/surfaces.ts`, `src/styles/global.css`, `src/app/AppShell.tsx`, `src/App.tsx`, `src/components/SectionCard.tsx` (new), `src/components/icons.tsx` (new), `src/components/{CaseSummary,NextActions,PlanReview,CaseRecordList,DraftList,ActivityTimeline,EmptyState,SafetyBanner,WebMCPStatus}.tsx`.
 * **Validation commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`.
+
+### Entry: UX-3 — Add header color-mode toggle (user-directed, out-of-backlog)
+* **Status:** IN_PROGRESS
+* **Trigger:** operator request on 2026-09-03 to add a Light/Dark MUI `ToggleButton` control next to the WebMCP support status chip in the app header.
+* **Scope:** add an exclusive, keyboard-accessible Light/Dark toggle wired to MUI `useColorScheme`; preserve system preference as the initial default and keep recovery/WebMCP state boundaries unchanged.
+* **Planned Files:** `src/app/AppShell.tsx`, `src/components/icons.tsx`, `src/components/T1Shell.test.tsx`, `docs/IMPLEMENTATION_LOG.md`.
+* **Validation commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`, `npm run test:e2e`.
 * **What changed:**
   * Theme: `#f4f4f1` canvas, white 16px-radius hairline `Paper`, 44px buttons, pill chips, softened `info` alert, system font stack retained.
   * New `SectionCard` (icon tile + h2 header + meta slot) and inline SVG `icons.tsx`; all six section components plus `SafetyBanner`/`EmptyState` restyled on top of it. `INCIDENT_LABELS` moved to `src/domain/labels.ts`.
@@ -798,3 +805,49 @@
   * P0 layout: `App.tsx` renders a `7fr/5fr` grid at `md+` (primary: review → next actions → drafts; secondary: what we know → records → activity), single column below.
   * P0 focus: on approval `App.tsx` sets a dismissible success status (`role="status"`, polite) and moves focus to the "Next actions" heading via new `NextActions.headingRef`; on request-changes it posts a status message only.
 * **Verification (2026-09-03):** `npm run lint` ✓ · `npm run typecheck` ✓ · `npm run test:run` ✓ (11 files, 52 tests) · `npm run build` ✓ (553 kB JS, pre-existing chunk-size warning). `impeccable detect` on changed targets → no findings. Browser check at 1280px and 390px: two-column/single-column behaviour confirmed; empty state and dashboard rendered as designed.
+
+### Entry: UX-2 — System color-mode detection (user-directed, out-of-backlog)
+* **Status:** DONE
+* **Trigger:** operator request on 2026-09-03 to analyze MUI color-mode setup and automatically detect the browser/OS `prefers-color-scheme: dark` preference.
+* **Scope:** preserve the existing Mend visual language while enabling MUI v9 built-in light/dark color schemes; do not add a manual mode toggle, domain state, or new persistence key. Keep the native WebMCP review form unchanged semantically.
+* **Planned Files:** `src/styles/theme.ts`, `src/styles/global.css`, `src/styles/surfaces.ts`, `src/main.tsx`, `src/components/{PlanReview,NextActions,SectionCard,ActivityTimeline}.tsx`, `src/styles/theme.test.tsx`, and this log.
+* **Validation commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`.
+* **What changed:**
+  * MUI v9 now uses custom `light` and `dark` `colorSchemes` with CSS variables; the root `ThemeProvider` uses `defaultMode="system"`, `noSsr`, and `storageManager={null}` so the browser/OS preference is detected automatically without adding a persistence key or manual toggle.
+  * Dark palette tokens preserve Mend's semantic primary, warning, safety, success, surface, and text contrast. Component overrides, native review fields, focus outlines, borders, scrollbar/selection tokens, and decorative section tints now follow the active scheme.
+  * Added `src/styles/theme.test.tsx` covering both custom palettes and live `prefers-color-scheme` changes from dark to light.
+  * Guarded the `AppShell` `matchMedia` read so test or non-browser environments that do not expose the API safely use the light-header fallback; browsers with the API retain system-preference detection.
+  * MUI v9.4.0 dark-mode, CSS theme-variable, and `useMediaQuery` guidance was consulted before implementation; custom section overrides use the documented `theme.applyStyles('dark', ...)` pattern.
+* **Verification (2026-09-03):** `npm run lint` ✓ · `npm run typecheck` ✓ · `npm run test:run` ✓ (12 files, 54 tests) · `npm run test:e2e` ✓ (5 tests: mobile/desktop journeys plus empty/active/review axe scans) · `npm run build` ✓ (977 modules; known 554.72 kB minified chunk warning only).
+* **Result:** System dark mode is detected and updated live through MUI's color-scheme provider; existing WebMCP, command-layer, persistence, responsive, and accessibility behavior remains covered by the passing regression suites.
+
+### Entry: T5.1 — Make the Repository Judge-Ready
+* **Status:** IN PROGRESS
+* **Depends on:** T4.2 (DONE)
+* **Acceptance criteria (BUILD_SPEC.md §T5.1):** A reader can understand the problem, interaction, WebMCP implementation, and limitations in two minutes.
+* **Planned Files:**
+  * `PRODUCT.md` (new) — durable product record for the confirmed primary user, jobs to be done, human-agent journeys, constraints, and evidence references; `docs/BUILD_SPEC.md` remains the authoritative build contract.
+  * `README.md` (rewrite) — judge-facing two-minute guide following the required T5.1 order: promise, visual proof, human-agent loop, tool/authority inventory, live demo prompt, setup, architecture/tests, privacy/safety/limitations, challenge scope, and license.
+  * `docs/screenshots/*.png` (new) — synthetic empty, pending-review, and approved-next-actions states for README evidence. Existing real-client evidence under `docs/evidence/t4.2/` will be linked rather than recreated.
+  * `docs/IMPLEMENTATION_LOG.md` (edit) — record task evidence/results and reconcile the stale T2.4 master-table status with its implemented, tested copy-only outreach tool.
+* **Scope Decisions:**
+  * Add `PRODUCT.md`, not `DESIGN.md`; the goal is durable user/job clarity, while the visual system is already represented by `src/styles/` and ADR 0002.
+  * No new ADR: this documentation organization does not change an architectural decision.
+  * Keep the contest-build limitation explicit: without WebMCP, the app supports demo loading, reviewing staged work, task-status updates, copying drafts, and reset; it does not expose complete manual fact-entry or plan-authoring flows.
+  * Do not modify application behavior, WebMCP contracts, or command/store layers. During validation, the separate UX-2 color-mode work required only a safe `matchMedia` availability guard to restore the shared test environment.
+  * Reconcile T2.4 as DONE: `stage_outreach_draft` is implemented in the shared command/tool layer, covered by command and WebMCP tests, visibly renders as copy-only `Draft — not sent`, and passed E-04 in `docs/EVAL_RESULTS.md`.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`
+* **Validation Results (all passed):**
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — 12 test files and 54 tests passed.
+  * `npm run build` — `tsc -b && vite build` exit 0; 977 modules transformed. Vite reported only the known non-blocking 500 kB chunk-size warning (`index` 554.87 kB minified).
+* **Visual Evidence:** Captured deterministic synthetic states through the local browser test harness: `docs/screenshots/empty-state.png`, `docs/screenshots/pending-review.png`, and `docs/screenshots/approved-next-actions.png`. Existing real-client WebMCP evidence remains linked from `docs/evidence/t4.2/` and `docs/EVAL_RESULTS.md`; no agent invocation evidence was recreated or fabricated.
+* **Changed Files:**
+  * `PRODUCT.md` — confirmed primary user, jobs to be done, two user journeys, product principles, boundaries, accessibility, and evidence references.
+  * `README.md` — two-minute, judge-facing guide in the required order, including visual proof, human-agent loop, tool/authority inventory, live prompt, Chrome path, setup, architecture, safety, limits, challenge scope, and MIT license.
+  * `docs/screenshots/*.png` — synthetic empty, pending-review, and approved-next-actions screenshots used by the README.
+  * `docs/IMPLEMENTATION_LOG.md` — T5.1 execution evidence and T2.4 status reconciliation.
+  * `src/app/AppShell.tsx` — safe `matchMedia` availability guard required to restore shared UI-test execution during the concurrent UX-2 color-mode task.
+* **Result:** T5.1 acceptance criteria met. A reader can understand the recovery problem, agent-assisted interaction, WebMCP implementation, human authority boundary, setup path, and contest-build limitation from `README.md` without needing to run the app or read the full build specification.
+* **Next eligible task:** None. T5.2 remains BLOCKED pending a manually recorded, public sub-three-minute demo video.

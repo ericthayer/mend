@@ -62,13 +62,29 @@ export function ActivityTimeline({ activity }: ActivityTimelineProps) {
                 }}
               >
                 <Box
-                  sx={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: '50%',
-                    bgcolor: event.actor === 'user' ? 'primary.main' : SECTION_TINTS.activity.fg,
-                    boxShadow: '0 0 0 3px #ffffff',
-                  }}
+                  sx={
+                    event.actor === 'user'
+                      ? {
+                          width: 12,
+                          height: 12,
+                          borderRadius: '50%',
+                          bgcolor: 'primary.main',
+                          boxShadow: '0 0 0 3px var(--mui-palette-background-paper)',
+                        }
+                      : [
+                          {
+                            width: 12,
+                            height: 12,
+                            borderRadius: '50%',
+                            bgcolor: SECTION_TINTS.activity.light.fg,
+                            boxShadow: '0 0 0 3px var(--mui-palette-background-paper)',
+                          },
+                          (theme) =>
+                            theme.applyStyles('dark', {
+                              bgcolor: SECTION_TINTS.activity.dark.fg,
+                            }),
+                        ]
+                  }
                 />
               </Box>
               <Stack spacing={0.25} sx={{ minWidth: 0 }}>

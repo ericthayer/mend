@@ -4,40 +4,84 @@ const INK = '#14181f';
 const INK_SOFT = '#5b6472';
 const HAIRLINE = 'rgba(20, 24, 31, 0.08)';
 
+const LIGHT_PALETTE = {
+  primary: {
+    main: '#174a84',
+    light: '#3d6ea8',
+    dark: '#0f3560',
+    contrastText: '#ffffff',
+  },
+  secondary: {
+    main: '#b27a16',
+  },
+  warning: {
+    main: '#8f6210',
+    light: '#b27a16',
+    dark: '#6b4a0c',
+    contrastText: '#ffffff',
+  },
+  error: {
+    main: '#a13d3f',
+  },
+  success: {
+    main: '#1f7a4d',
+    contrastText: '#ffffff',
+  },
+  background: {
+    default: '#f4f4f1',
+    paper: '#ffffff',
+  },
+  text: {
+    primary: INK,
+    secondary: INK_SOFT,
+  },
+  divider: HAIRLINE,
+};
+
+const DARK_PALETTE = {
+  primary: {
+    main: '#79b3f0',
+    light: '#a8cdf5',
+    dark: '#4f8dcc',
+    contrastText: '#10243b',
+  },
+  secondary: {
+    main: '#e4b85d',
+  },
+  warning: {
+    main: '#e0ad4a',
+    light: '#f0c66d',
+    dark: '#ac781f',
+    contrastText: '#241a07',
+  },
+  error: {
+    main: '#ef8d8f',
+    contrastText: '#2b0d0e',
+  },
+  success: {
+    main: '#70d3a0',
+    contrastText: '#092a1a',
+  },
+  background: {
+    default: '#111820',
+    paper: '#1c252f',
+  },
+  text: {
+    primary: '#eef3f8',
+    secondary: '#b8c4d1',
+  },
+  divider: 'rgba(238, 243, 248, 0.14)',
+};
+
 export const mendTheme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#174a84',
-      light: '#3d6ea8',
-      dark: '#0f3560',
-      contrastText: '#ffffff',
+  cssVariables: true,
+  colorSchemes: {
+    light: {
+      palette: LIGHT_PALETTE,
     },
-    secondary: {
-      main: '#b27a16',
+    dark: {
+      palette: DARK_PALETTE,
     },
-    warning: {
-      main: '#8f6210',
-      light: '#b27a16',
-      dark: '#6b4a0c',
-      contrastText: '#ffffff',
-    },
-    error: {
-      main: '#a13d3f',
-    },
-    success: {
-      main: '#1f7a4d',
-      contrastText: '#ffffff',
-    },
-    background: {
-      default: '#f4f4f1',
-      paper: '#ffffff',
-    },
-    text: {
-      primary: INK,
-      secondary: INK_SOFT,
-    },
-    divider: HAIRLINE,
   },
   shape: {
     borderRadius: 16,
@@ -90,11 +134,11 @@ export const mendTheme = createTheme({
           paddingRight: 18,
         },
         outlined: {
-          borderColor: 'rgba(20, 24, 31, 0.16)',
-          backgroundColor: '#ffffff',
+          borderColor: 'var(--mui-palette-divider)',
+          backgroundColor: 'var(--mui-palette-background-paper)',
           '&:hover': {
-            borderColor: 'rgba(20, 24, 31, 0.32)',
-            backgroundColor: '#fafaf8',
+            borderColor: 'var(--mui-palette-text-secondary)',
+            backgroundColor: 'var(--mui-palette-action-hover)',
           },
         },
       },
@@ -103,9 +147,10 @@ export const mendTheme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 16,
-          border: `1px solid ${HAIRLINE}`,
+          border: '1px solid var(--mui-palette-divider)',
           boxShadow: 'none',
           backgroundImage: 'none',
+          backgroundColor: 'var(--mui-palette-background-paper)',
         },
       },
     },
@@ -129,7 +174,7 @@ export const mendTheme = createTheme({
           paddingRight: 12,
         },
         outlined: {
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--mui-palette-background-paper)',
         },
       },
     },
@@ -147,10 +192,10 @@ export const mendTheme = createTheme({
         {
           props: { variant: 'outlined', severity: 'info' },
           style: {
-            borderColor: 'rgba(20, 24, 31, 0.12)',
-            color: '#14181f',
+            borderColor: 'var(--mui-palette-divider)',
+            color: 'var(--mui-palette-text-primary)',
             '& .MuiAlert-icon': {
-              color: '#5b6472',
+              color: 'var(--mui-palette-text-secondary)',
             },
           },
         },
@@ -167,27 +212,28 @@ export const mendTheme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         ':root': {
-          colorScheme: 'light',
+          colorScheme: 'light dark',
         },
         '*': {
           boxSizing: 'border-box',
         },
         'html, body': {
-          caretColor: '#174a84',
-          scrollbarColor: 'rgba(20, 24, 31, 0.28) transparent',
+          caretColor: 'var(--mui-palette-primary-main)',
+          scrollbarColor:
+            'var(--mui-palette-text-secondary) var(--mui-palette-background-default)',
         },
         '::selection': {
-          backgroundColor: 'rgba(23, 74, 132, 0.18)',
-          color: INK,
+          backgroundColor: 'rgb(var(--mui-palette-primary-mainChannel) / 0.24)',
+          color: 'var(--mui-palette-text-primary)',
         },
         '::-webkit-scrollbar': {
           width: 10,
           height: 10,
         },
         '::-webkit-scrollbar-thumb': {
-          backgroundColor: 'rgba(20, 24, 31, 0.22)',
+          backgroundColor: 'var(--mui-palette-text-secondary)',
           borderRadius: 999,
-          border: '2px solid #f4f4f1',
+          border: '2px solid var(--mui-palette-background-default)',
         },
       },
     },

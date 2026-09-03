@@ -17,15 +17,55 @@ export const sectionSurfaceSx: SxProps<Theme> = {
  */
 export type SectionTintKey = 'case' | 'review' | 'actions' | 'records' | 'drafts' | 'activity' | 'safety';
 
-export const SECTION_TINTS: Record<SectionTintKey, { bg: string; fg: string }> = {
-  case: { bg: '#e6eefa', fg: '#174a84' },
-  review: { bg: '#fbefd6', fg: '#8f6210' },
-  actions: { bg: '#e1f3e9', fg: '#1f7a4d' },
-  records: { bg: '#ebe7fb', fg: '#5a48b5' },
-  drafts: { bg: '#dcf2f3', fg: '#0f6d75' },
-  activity: { bg: '#ecece9', fg: '#4b5563' },
-  safety: { bg: '#fbe6e6', fg: '#a13d3f' },
+export const SECTION_TINTS: Record<
+  SectionTintKey,
+  { light: { bg: string; fg: string }; dark: { bg: string; fg: string } }
+> = {
+  case: {
+    light: { bg: '#e6eefa', fg: '#174a84' },
+    dark: { bg: '#243b55', fg: '#a8cdf5' },
+  },
+  review: {
+    light: { bg: '#fbefd6', fg: '#8f6210' },
+    dark: { bg: '#493a20', fg: '#f0c66d' },
+  },
+  actions: {
+    light: { bg: '#e1f3e9', fg: '#1f7a4d' },
+    dark: { bg: '#1e4434', fg: '#70d3a0' },
+  },
+  records: {
+    light: { bg: '#ebe7fb', fg: '#5a48b5' },
+    dark: { bg: '#393451', fg: '#c9c0f6' },
+  },
+  drafts: {
+    light: { bg: '#dcf2f3', fg: '#0f6d75' },
+    dark: { bg: '#1e4146', fg: '#8edce1' },
+  },
+  activity: {
+    light: { bg: '#ecece9', fg: '#4b5563' },
+    dark: { bg: '#303943', fg: '#c1ccd8' },
+  },
+  safety: {
+    light: { bg: '#fbe6e6', fg: '#a13d3f' },
+    dark: { bg: '#4a292d', fg: '#ef8d8f' },
+  },
 };
+
+export function sectionTintSx(tint: SectionTintKey) {
+  const colors = SECTION_TINTS[tint];
+
+  return [
+    {
+      bgcolor: colors.light.bg,
+      color: colors.light.fg,
+    },
+    (theme: Theme) =>
+      theme.applyStyles('dark', {
+        bgcolor: colors.dark.bg,
+        color: colors.dark.fg,
+      }),
+  ] as const;
+}
 
 /**
  * The "needs your review" surface is the one place in the app where the

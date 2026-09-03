@@ -8,7 +8,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { reviewSurfaceSx, SECTION_TINTS } from '../styles/surfaces';
+import { reviewSurfaceSx, sectionTintSx } from '../styles/surfaces';
 import { ClipboardCheckIcon } from './icons';
 import { SectionCard } from './SectionCard';
 import type { CommandResult, RecoveryPlan } from '../domain/types';
@@ -41,11 +41,11 @@ const NOTE_TOOL_PARAM_DESCRIPTION =
 
 const NATIVE_FIELD_STYLE = {
   borderRadius: 10,
-  border: '1px solid rgba(20, 24, 31, 0.24)',
+  border: '1px solid var(--mui-palette-divider)',
   fontSize: '1rem',
   fontFamily: 'inherit',
-  backgroundColor: '#ffffff',
-  color: '#14181f',
+  backgroundColor: 'var(--mui-palette-background-paper)',
+  color: 'var(--mui-palette-text-primary)',
 } as const;
 
 type PlanReviewProps = {
@@ -196,24 +196,25 @@ export function PlanReview({
             sx={{
               py: 1.5,
               borderTop: index === 0 ? 'none' : '1px solid',
-              borderColor: 'rgba(143, 98, 16, 0.18)',
+              borderColor: 'rgb(var(--mui-palette-warning-mainChannel) / 0.18)',
             }}
           >
             <Box
               aria-hidden="true"
-              sx={{
-                width: 28,
-                height: 28,
-                flex: '0 0 auto',
-                borderRadius: '50%',
-                display: 'grid',
-                placeItems: 'center',
-                bgcolor: SECTION_TINTS.review.bg,
-                color: SECTION_TINTS.review.fg,
-                fontSize: '0.875rem',
-                fontWeight: 700,
-                fontVariantNumeric: 'tabular-nums',
-              }}
+              sx={[
+                ...sectionTintSx('review'),
+                {
+                  width: 28,
+                  height: 28,
+                  flex: '0 0 auto',
+                  borderRadius: '50%',
+                  display: 'grid',
+                  placeItems: 'center',
+                  fontSize: '0.875rem',
+                  fontWeight: 700,
+                  fontVariantNumeric: 'tabular-nums',
+                },
+              ]}
             >
               {index + 1}
             </Box>

@@ -1,7 +1,7 @@
 import type { ReactNode, Ref } from 'react';
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
-import { SECTION_TINTS, sectionSurfaceSx, type SectionTintKey } from '../styles/surfaces';
+import { sectionSurfaceSx, sectionTintSx, type SectionTintKey } from '../styles/surfaces';
 
 type IconTileProps = {
   tint: SectionTintKey;
@@ -10,21 +10,20 @@ type IconTileProps = {
 };
 
 export function IconTile({ tint, children, size = 40 }: IconTileProps) {
-  const colors = SECTION_TINTS[tint];
-
   return (
     <Box
       aria-hidden="true"
-      sx={{
-        width: size,
-        height: size,
-        flex: '0 0 auto',
-        display: 'grid',
-        placeItems: 'center',
-        borderRadius: size >= 44 ? 14 : 12,
-        bgcolor: colors.bg,
-        color: colors.fg,
-      }}
+      sx={[
+        ...sectionTintSx(tint),
+        {
+          width: size,
+          height: size,
+          flex: '0 0 auto',
+          display: 'grid',
+          placeItems: 'center',
+          borderRadius: size >= 44 ? 14 : 12,
+        },
+      ]}
     >
       {children}
     </Box>
