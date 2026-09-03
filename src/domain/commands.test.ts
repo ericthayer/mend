@@ -209,6 +209,11 @@ describe('recovery commands invariants', () => {
       expect(agentReview.code).toBe('state_conflict');
     }
 
+    const pendingAfterAgentAttempt = getCurrentDomainState().plans.find(
+      (plan) => plan.id === staged.data.id
+    );
+    expect(pendingAfterAgentAttempt?.status).toBe('pending_review');
+
     const staleReview = commands.reviewPlan(
       {
         planId: crypto.randomUUID(),

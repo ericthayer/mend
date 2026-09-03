@@ -14,8 +14,8 @@
 | T2.2 | DONE | P0 | Imperative WebMCP tools | Snapshot, create case, add record, stage plan tools |
 | T2.3 | DONE | P0 | Declarative review form | Semantic `<form toolname="start_plan_review">` |
 | T2.4 | BLOCKED | P1 | Safe outreach drafting tool | `stage_outreach_draft` tool & draft list wiring |
-| T3.1 | READY | P0 | Unit & integration tests | Test coverage for domain invariants & authority gates |
-| T3.2 | BLOCKED | P0 | Hardened accessibility & states | Keyboard traversal, axe a11y checks, live regions |
+| T3.1 | DONE | P0 | Unit & integration tests | Test coverage for domain invariants & authority gates |
+| T3.2 | READY | P0 | Hardened accessibility & states | Keyboard traversal, axe a11y checks, live regions |
 | T3.3 | BLOCKED | P1 | End-to-end browser journeys | Playwright happy-path test suite |
 | T4.1 | BLOCKED | P0 | Production Netlify build | Headers, redirects, static build verification |
 | T4.2 | BLOCKED | P0 | Real WebMCP client smoke tests | Chrome DevTools & in-app browser evals |
@@ -372,3 +372,36 @@
   * Manual submit remains keyboard operable and routes through `reviewPlan(... actor: user)`.
   * Tool cancellation restores prior form values and announces the cancellation state.
 * **Next eligible task:** `T3.1` (now `READY`; dependencies T2.2 + T2.3 are DONE).
+
+### Entry: T3.1 — Prove Domain and Authority Invariants
+* **Status:** DONE
+* **Depends on:** T2.2 (DONE), T2.3 (DONE)
+* **Acceptance criteria (BUILD_SPEC.md §T3.1):**
+  * Every imperative schema has valid and invalid test fixtures.
+  * Safety block, ungrounded deadline, stale plan, duplicate task, and agent-approval tests pass.
+  * Tool registration and cleanup tests pass.
+  * Human review test proves no agent-only path can approve.
+* **Planned Files:**
+  * `src/domain/schemas.test.ts` (new) — valid/invalid fixture coverage for imperative input schemas and boundary checks.
+  * `src/domain/commands.test.ts` (update if needed) — reinforce authority/safety/stale-path invariants if any gap remains.
+  * `src/webmcp/registerRecoveryTools.test.tsx` (reference) — registration and cleanup behavior remains green under expanded suite.
+  * `src/components/T2DeclarativeReview.test.tsx` (reference) — human-controlled submit path continues to block agent-only approval.
+  * `docs/IMPLEMENTATION_LOG.md` — T3.1 validation evidence and status update.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`
+* **Validation Results (all passed):**
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — `vitest run`: 10 test files passed, 42 tests passed total.
+    * Added dedicated schema fixture coverage for canonical valid/invalid imperative and command inputs.
+    * Existing invariant/authority suites remain green (safety blocks, duplicate task titles, ungrounded due dates, stale plan IDs, and agent-approval rejection).
+    * Existing WebMCP registration cleanup tests and declarative human-review tests remain green.
+  * `npm run build` — `tsc -b && vite build` exit 0.
+* **Changed Files:**
+  * `src/domain/schemas.test.ts` (new) — schema fixture matrix for valid/invalid payloads across imperative and command boundary schemas.
+  * `src/domain/commands.test.ts` — strengthened authority assertion that agent review attempts do not mutate pending plan status.
+  * `docs/IMPLEMENTATION_LOG.md` — T3.1 status and verification evidence.
+* **Result:** T3.1 acceptance criteria met:
+  * Imperative schema fixtures now include explicit valid/invalid cases with strict-shape checks.
+  * Safety/authority and stale/grounding invariants are covered and passing.
+  * WebMCP registration lifecycle tests and human-controlled review tests are integrated in the passing suite.
+* **Next eligible task:** `T3.2` (now `READY`; dependencies T1.4 + T3.1 are DONE).
