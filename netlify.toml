@@ -1,0 +1,14 @@
+[build]
+  # Pinned to the repository root. The site's "Base directory" UI build setting
+  # is/was `dist`, which cannot exist in a fresh clone (`dist` is gitignored build
+  # output), so config resolution failed with "Base directory does not exist".
+  # netlify.toml takes precedence over UI build settings, so this pins the base back
+  # to the repository root. Keep this key until the UI field is cleared.
+  base = "."
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

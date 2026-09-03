@@ -76,3 +76,29 @@
 * **Changed Files:** None (verification-only task; this log entry is the only artifact produced).
 * **Result:** All T0.2 acceptance criteria met. A new agent reading only the Master Task Status table can identify T0.2 as the completed task and T1.1 as the next `READY` task without conversation context.
 * **Next eligible task:** T1.1 (dependency T0.1 is DONE; T1.1 does not depend on T0.2). Not implemented in this run.
+### Entry: INFRA-01 — Repair Netlify deploy configuration
+* **Status:** DONE
+* **Type:** Unplanned infrastructure fix (out-of-backlog). Requested directly by the repository owner after every Netlify deploy failed. This entry does **not** complete `T4.1`, which stays `BLOCKED` — response headers (`public/_headers`), production smoke tests, and the release commit/tag remain outstanding.
+* **Trigger:** Deploy `6a990c7447b3eb00098f3721` (branch `chore/semver-setup`, PR #4) failed during the `Reading and parsing configuration files` stage with `Base directory does not exist`, before dependency install or compilation. All six deploys of this project had failed the same way; the project has never produced a successful build.
+* **Root cause (confirmed by reproduction, not inference):**
+  1. The repository had no `netlify.toml`, despite BUILD_SPEC.md §8 "Netlify deployment configuration" requiring one at the root. With no config file, Netlify fell back entirely to the project's UI build settings.
+  2. The project's UI **Base directory** build setting was `dist` (confirmed via `netlify api getSite` → `build_settings.base == "dist"`). `dist` is Vite build *output* and is listed in `.gitignore`, so it cannot exist in a fresh clone. Netlify resolves and validates the base directory *before* install/build, so resolution aborted every time.
+  * Reproduced locally against the real resolver (`@netlify/config`): with no `netlify.toml` and `defaultConfig.build.base = "dist"`, `resolveConfig` throws `Base directory does not exist: /opt/build/repo/dist`. The deploy log truncated this path to `/opt/build`, which is why the failure initially read like an escaped-path (`..`) base. The `..` case was tested too and fails with a *different* message (`must be inside the repository root directory`), ruling it out.
+* **Planned Files:** `netlify.toml` (new), `docs/IMPLEMENTATION_LOG.md` (this entry).
+* **Fix:** Added the root `netlify.toml` prescribed by BUILD_SPEC.md §8 (`command = "npm run build"`, `publish = "dist"`, SPA catch-all redirect to `/index.html`), plus one documented deviation: an explicit `base = "."`.
+* **Why `base = "."` was added (deviation from the spec's verbatim minimal file):** `@netlify/config` looks for `netlify.toml` at the repository root even when the UI base directory points elsewhere (`getConfigPath` falls back to `searchConfigFile(repositoryRoot)`), and `netlify.toml` is merged with higher priority than UI build settings (`mergeConfigs([uiConfig, tomlConfig])`, last wins). Pinning `base` in the committed config therefore overrides the bad UI value and makes the repository self-healing without project-settings access. Verified: with `base = "."` present, resolution succeeds *while the UI setting is still `dist`*.
+* **Not fixed in the repository — requires owner action:** the UI **Base directory** field still reads `dist` and should be cleared (Project configuration → Build & deploy → Build settings). The committed `base = "."` makes deploys succeed regardless, but the stale field will keep misleading anyone reading the project settings. Clearing it by API was attempted and is not possible from the build environment: `netlify api updateSite` returns `Unauthorized` for every write (the build-time token is read-only; a no-op `name` write was probed to confirm the limit is permissions, not request shape). Remove the `base` key from `netlify.toml` once the field is cleared.
+* **Validation Commands:** `npm ci`, `npm run lint`, `npm run typecheck`, `npm run test:run`, plus direct `@netlify/config` resolution tests.
+* **Validation Results (all passed):**
+  * `npm ci` — exit 0, clean install from the committed lockfile.
+  * `npm run lint` — `eslint .` exit 0, no errors or warnings.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — `vitest run`: 1 test file, 1 test passed.
+  * `npx tsc -b --dry` — exit 0 (confirms stage 1 of `npm run build` is configured correctly; emits nothing).
+  * `@netlify/config` `resolveConfig` with the project's live `base = "dist"` UI setting — resolves to `buildDir=/opt/build/repo`, `publish=/opt/build/repo/dist`, `command=npm run build`, and the SPA redirect. Same result with the UI base cleared, so the fix is correct both before and after the owner clears the field.
+  * `npm run build` was **not** run: the deploy platform validates the build itself, and running it would write `dist/` artifacts into the working tree. `T0.1` already records `npm run build` passing (exit 0, `dist/` emitted).
+* **Changed Files:**
+  * `netlify.toml` — new; base pinned to repository root, build command, publish directory, SPA redirect.
+  * `docs/IMPLEMENTATION_LOG.md` — this entry.
+* **Result:** Netlify config resolution now succeeds against the project's current (still-misconfigured) UI settings, so deploys reach install and build instead of failing at configuration parsing. Direct-URL reloads are handled by the SPA redirect.
+* **Next eligible task:** `T1.1` (unchanged — `READY`, dependency `T0.1` is `DONE`). Not implemented in this run.
