@@ -9,6 +9,7 @@ import { DraftList } from './components/DraftList';
 import { EmptyState } from './components/EmptyState';
 import { NextActions } from './components/NextActions';
 import { PlanReview } from './components/PlanReview';
+import { SafetyBanner } from './components/SafetyBanner';
 import { seedFloodDemo } from './data/floodDemo';
 import { createRecoveryCommands } from './domain/commands';
 import {
@@ -207,6 +208,7 @@ function App() {
       {caseData ? (
         <Stack spacing={0} sx={{ gap: 3 }}>
           <CaseSummary caseData={caseData} />
+          <SafetyBanner />
           {pendingPlan ? (
             <PlanReview
               pendingPlan={pendingPlan}
@@ -221,26 +223,30 @@ function App() {
               display: 'grid',
               gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'repeat(2, minmax(0, 1fr))' },
               gap: 3,
-              alignItems: 'start',
+              alignItems: 'stretch',
+              minHeight: { md: 'calc(100dvh - 28rem)' },
             }}
           >
-            <Stack spacing={3} sx={{ minWidth: 0 }}>
+            <Stack spacing={3} sx={{ minWidth: 0, height: '100%', minHeight: 0 }}>
+              <DraftList drafts={drafts} sx={{ flex: '1 1 auto', minHeight: 0 }} />
+              <CaseRecordList records={records} sx={{ flex: '1 1 auto', minHeight: 0 }} />
+            </Stack>
+            <Stack spacing={3} sx={{ minWidth: 0, height: '100%', minHeight: 0 }}>
               <NextActions
                 approvedPlan={approvedPlan}
                 busyTaskId={updatingTaskId}
                 onUpdateTaskStatus={handleUpdateTaskStatus}
                 headingRef={nextActionsHeadingRef}
               />
-              <DraftList drafts={drafts} />
-            </Stack>
-            <Stack spacing={3} sx={{ minWidth: 0 }}>
-              <CaseRecordList records={records} />
-              <ActivityTimeline activity={activity} />
+              <ActivityTimeline activity={activity} sx={{ flex: 1, minHeight: 0 }} />
             </Stack>
           </Box>
         </Stack>
       ) : (
-        <EmptyState onStartBlank={handleStartBlank} onLoadDemo={handleLoadDemo} busy={busy} />
+        <Stack spacing={3}>
+          <EmptyState onStartBlank={handleStartBlank} onLoadDemo={handleLoadDemo} busy={busy} />
+          <SafetyBanner />
+        </Stack>
       )}
 
       <ConfirmDialog

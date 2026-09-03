@@ -26,7 +26,7 @@ async function runPrimaryJourney(page: Page, viewport: { width: number; height: 
   await expect(page.getByText('Approved plan v1', { exact: true })).toBeVisible();
   await expect(page.getByText(/Secure accessible temporary housing options/i)).toBeVisible();
 
-  await page.getByRole('button', { name: 'Delete local case' }).click();
+  await page.getByRole('button', { name: 'Delete Case' }).click();
   const dialog = page.getByRole('dialog');
   await expect(dialog).toBeVisible();
   await dialog.getByRole('button', { name: 'Delete local case' }).click();
@@ -45,4 +45,42 @@ test('mobile happy path persists on reload and supports reset', async ({ page })
 
 test('desktop happy path persists on reload and supports reset', async ({ page }) => {
   await runPrimaryJourney(page, { width: 1440, height: 900 });
+});
+
+test('desktop balanced supporting dashboard has uncapped, viewport-filling columns', async ({ page }) => {
+  await installWebMCPMock(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+
+  await page.getByRole('button', { name: 'Load flood demo' }).click();
+
+  const layout = await page.evaluate(() => {
+    const drafts = document.querySelector<HTMLElement>('#drafts');
+    const records = document.querySelector<HTMLElement>('#records');
+    const activity = document.querySelector<HTMLElement>('#activity');
+    const workspace = document.querySelector<HTMLElement>('[data-testid="supporting-workspace-masonry"]');
+
+    if (!drafts || !records || !activity || !workspace) {
+      throw new Error('Supporting workspace is incomplete.');
+    }
+
+    return {
+      drafts: {
+        maxHeight: getComputedStyle(drafts).maxHeight,
+        overflowY: getComputedStyle(drafts).overflowY,
+      },
+      records: {
+        maxHeight: getComputedStyle(records).maxHeight,
+        overflowY: getComputedStyle(records).overflowY,
+      },
+      recordBottom: records.getBoundingClientRect().bottom,
+      activityBottom: activity.getBoundingClientRect().bottom,
+      workspaceBottom: workspace.getBoundingClientRect().bottom,
+    };
+  });
+
+  expect(layout.drafts).toEqual({ maxHeight: 'none', overflowY: 'visible' });
+  expect(layout.records).toEqual({ maxHeight: 'none', overflowY: 'visible' });
+  expect(Math.abs(layout.recordBottom - layout.activityBottom)).toBeLessThanOrEqual(1);
+  expect(layout.workspaceBottom).toBeGreaterThanOrEqual(836);
 });

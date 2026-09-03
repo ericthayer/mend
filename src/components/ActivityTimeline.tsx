@@ -1,4 +1,5 @@
 import { Box, Stack, Typography } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material/styles';
 import { SECTION_TINTS } from '../styles/surfaces';
 import { ClockIcon } from './icons';
 import { SectionCard } from './SectionCard';
@@ -6,6 +7,7 @@ import type { ActivityEvent } from '../domain/types';
 
 type ActivityTimelineProps = {
   activity: ActivityEvent[];
+  sx?: SxProps<Theme>;
 };
 
 function formatTimestamp(value: string): string {
@@ -17,13 +19,13 @@ function formatTimestamp(value: string): string {
   return date.toLocaleString();
 }
 
-export function ActivityTimeline({ activity }: ActivityTimelineProps) {
+export function ActivityTimeline({ activity, sx }: ActivityTimelineProps) {
   const sorted = [...activity].sort((a, b) =>
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
   return (
-    <SectionCard id="activity" tint="activity" icon={<ClockIcon />} title="Activity">
+    <SectionCard id="activity" tint="activity" icon={<ClockIcon />} title="Activity" sx={sx}>
       {sorted.length === 0 ? (
         <Typography component="p" variant="body1" color="text.secondary">
           No activity yet.

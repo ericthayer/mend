@@ -1,10 +1,12 @@
 import { Box, Chip, Stack, Typography } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material/styles';
 import { FolderIcon } from './icons';
 import { SectionCard } from './SectionCard';
 import type { CaseRecord } from '../domain/types';
 
 type CaseRecordListProps = {
   records: CaseRecord[];
+  sx?: SxProps<Theme>;
 };
 
 function formatTimestamp(value: string): string {
@@ -16,7 +18,7 @@ function formatTimestamp(value: string): string {
   return date.toLocaleString();
 }
 
-export function CaseRecordList({ records }: CaseRecordListProps) {
+export function CaseRecordList({ records, sx }: CaseRecordListProps) {
   const sorted = [...records].sort((a, b) =>
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
@@ -28,6 +30,8 @@ export function CaseRecordList({ records }: CaseRecordListProps) {
       icon={<FolderIcon />}
       title="Case records"
       meta={sorted.length > 0 ? <Chip label={`${sorted.length}`} size="small" variant="outlined" /> : undefined}
+      tabIndex={0}
+      sx={sx}
     >
       {sorted.length === 0 ? (
         <Typography component="p" variant="body1" color="text.secondary">

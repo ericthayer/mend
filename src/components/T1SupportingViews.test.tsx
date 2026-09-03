@@ -5,6 +5,7 @@ import App from '../App';
 import { createRecoveryCommands } from '../domain/commands';
 import { createEmptyDomainState, type OutreachDraft } from '../domain/types';
 import { replaceDomainState } from '../state/recoveryStore';
+import { CaseRecordList } from './CaseRecordList';
 import { DraftList } from './DraftList';
 
 function setClipboardMock(writeTextImpl: (value: string) => Promise<void>) {
@@ -63,6 +64,18 @@ describe('T1.4 supporting views', () => {
     await user.click(screen.getByRole('button', { name: 'Copy draft text' }));
 
     expect(screen.getByText(/Could not copy draft/i)).toBeInTheDocument();
+  });
+
+  it('keeps bounded supporting-card surfaces keyboard-focusable', () => {
+    render(
+      <>
+        <DraftList drafts={[]} />
+        <CaseRecordList records={[]} />
+      </>
+    );
+
+    expect(screen.getByRole('region', { name: 'Drafts' })).toHaveAttribute('tabindex', '0');
+    expect(screen.getByRole('region', { name: 'Case records' })).toHaveAttribute('tabindex', '0');
   });
 
   it('renders actor labels, resource links, and unsent draft state in app views', async () => {

@@ -38,6 +38,7 @@ type SectionCardProps = {
   titleSx?: SxProps<Theme>;
   meta?: ReactNode;
   headingRef?: Ref<HTMLHeadingElement>;
+  tabIndex?: number;
   sx?: SxProps<Theme>;
   children: ReactNode;
 };
@@ -50,6 +51,7 @@ export function SectionCard({
   titleSx,
   meta,
   headingRef,
+  tabIndex,
   sx,
   children,
 }: SectionCardProps) {
@@ -61,6 +63,7 @@ export function SectionCard({
       id={id}
       elevation={0}
       aria-labelledby={headingId}
+      tabIndex={tabIndex}
       sx={[sectionSurfaceSx, ...(Array.isArray(sx) ? sx : [sx])] as SxProps<Theme>}
     >
       <Stack spacing={2}>

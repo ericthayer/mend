@@ -1038,7 +1038,7 @@
 * **Planned Files:**
   * `src/components/EmptyState.tsx` — replace ambiguous startup wording with clear first-action guidance and a compact explanation of what follows.
   * `src/components/T1Shell.test.tsx` — assert the new user-facing guidance alongside the existing start controls and remove the obsolete mode-switch assertion for the intentionally hidden control.
-  * `src/App.tsx` — replace balancing CSS columns with fixed responsive grid tracks so card positions do not rebalance as content height changes.
+  * `src/App.tsx` — use fixed responsive grid tracks so card positions do not rebalance as content height changes; place `Drafts`/`Case records` in the left track and `Next actions`/`Activity` in the right track.
   * `src/App.test.tsx` — retain dashboard composition coverage for the stable supporting workspace.
   * `src/components/T1SupportingViews.test.tsx` — assert the intentional `Delete Case` header label while preserving destructive-action confirmation coverage.
   * `docs/IMPLEMENTATION_LOG.md` — record implementation and verification evidence.
@@ -1046,7 +1046,7 @@
 * **Implementation:**
   * Replaced the ambiguous `Next useful step` heading with `Choose how to begin` and gave the person a direct choice: start a private case for their situation or first inspect the sample flood case.
   * Reframed the supporting panel as `What each choice does`, with concise, outcome-based descriptions for the blank case and demo plus an explicit manual-review reminder.
-  * Replaced the supporting layout's balancing CSS columns with deterministic CSS Grid tracks: `Next actions` and `Drafts` stay in the left track, while `Case records` and `Activity` stay in the right. This preserves the same compact visual composition without cards being reassigned between columns when content height changes; below 900 px it remains one ordered track.
+  * Replaced the supporting layout's balancing CSS columns with deterministic CSS Grid tracks: `Drafts` and `Case records` stay in the left track, while `Next actions` and `Activity` stay in the right, matching the requested dashboard composition. This preserves the compact visual composition without cards being reassigned between columns when content height changes; below 900 px it remains one ordered track.
   * Retained the browser-only, no-account, deletable-data assurance. No action labels, state transitions, command calls, tool contracts, or authority boundaries changed.
 * **Regression Coverage:** Updated the shell test to require the new heading, both choice descriptions, the manual-review explanation, and both existing action buttons. The targeted test passed: 1 test passed (4 intentionally filtered tests skipped).
   * `src/App.test.tsx` confirms the stable supporting workspace contains all four supporting sections after a person starts a case. Focused run: 2 tests passed.
@@ -1054,18 +1054,121 @@
   * Desktop (`1440 × 900`): start surface rendered with no horizontal overflow (`scrollWidth = clientWidth = 1440`).
   * Mobile (`390 × 844`): the surface collapsed to one column with no horizontal overflow (`scrollWidth = clientWidth = 390`); the primary action measured `308 × 44` CSS pixels.
   * Screen-reader snapshot exposes the main instruction, both buttons, and the explanatory complementary region in that order.
-  * Stable-workspace review: desktop (`1280 × 900`) resolved to two fixed 564 px tracks, with `Next actions`/`Drafts` on the left and `Case records`/`Activity` on the right. Mobile (`390 × 844`) resolved to one 358 px track in that source order. Neither viewport overflowed.
+  * Stable-workspace review: desktop (`1280 × 900`) resolved to two fixed 564 px tracks, with `Drafts`/`Case records` on the left and `Next actions`/`Activity` on the right. Mobile (`390 × 844`) resolved to one 358 px track in the same left-track-first order. Neither viewport overflowed.
 * **Validation Results:**
   * `npm run lint` — passed.
   * `npm run typecheck` — passed.
   * `npm run build` — passed (`vite build` completed in 836 ms).
   * Stable-layout validation: `npm run test:run -- src/App.test.tsx`, `npm run lint`, `npm run typecheck`, and `npm run build` passed (`vite build` completed in 829 ms); the existing non-blocking 500 kB chunk-size advisory remained.
-  * Final full-suite validation is pending alignment of the obsolete header mode-switch and reset-label test expectations with the intentional interface decisions.
+  * Requested card-placement validation: `npm run test:run -- src/App.test.tsx`, `npm run lint`, and `npm run typecheck` passed; `npm run build` passed in 868 ms, with only the existing non-blocking 500 kB chunk-size advisory.
+  * Intentional interface test alignment: `npm run test:run -- src/components/T1Shell.test.tsx src/components/T1SupportingViews.test.tsx` — 2 files, 8 tests passed.
+  * Final full-suite validation: `npm run lint` and `npm run typecheck` passed; `npm run test:run` — 12 files, 58 tests passed; `npm run build` — passed (`vite build` completed in 827 ms), with only the existing non-blocking 500 kB chunk-size advisory.
 * **Changed Files:**
   * `src/components/EmptyState.tsx` — clearer startup decision and outcome-based supporting guidance.
-  * `src/components/T1Shell.test.tsx` — regression coverage for the new user-facing instructions.
+  * `src/components/T1Shell.test.tsx` — regression coverage for the new user-facing instructions; removed the obsolete visible color-mode-control expectation.
   * `src/App.tsx` — deterministic responsive grid tracks for stable supporting-card placement.
   * `src/App.test.tsx` — stable supporting-workspace coverage.
-  * `src/components/T1SupportingViews.test.tsx` — intentional header reset-label coverage.
-  * `docs/IMPLEMENTATION_LOG.md` — UX-9 scope, results, and scoped validation blocker.
-* **Status:** IN PROGRESS — implementation and direct UX evidence are complete; final validation follows the intentional interface test alignment.
+  * `src/components/T1SupportingViews.test.tsx` — reset-confirmation coverage aligned to the intentional `Delete Case` header action.
+  * `docs/IMPLEMENTATION_LOG.md` — UX-9 scope, results, and completion evidence.
+* **Status:** DONE — the intentional hidden mode control and `Delete Case` label are reflected in the test suite; all required validation gates pass.
+
+### Entry: UX-10 — Bound supporting-card growth (user-directed, out-of-backlog)
+* **Status:** IN PROGRESS
+* **Trigger:** operator requested viewport-bounded Drafts and Case records cards, with Activity using the remaining space in the stable dashboard track.
+* **Scope:** presentation-only layout refinement. Preserve the stable two-track composition, responsive one-track fallback, all component content, command-layer behavior, copy-only drafts, and the manual review boundary.
+* **Planned Files:**
+  * `src/App.tsx` — stretch the stable dashboard tracks and let Activity flex into remaining right-track space.
+  * `src/components/DraftList.tsx` — apply a `35dvh` maximum height and scrolling to the Drafts surface.
+  * `src/components/CaseRecordList.tsx` — expose a local surface-style input and apply a `35dvh` maximum height with scrolling.
+  * `src/components/ActivityTimeline.tsx` — expose a local surface-style input so Activity can flex within its assigned track.
+  * `src/components/SectionCard.tsx` — allow bounded scroll surfaces to become keyboard-focusable while retaining their existing semantic labels.
+  * `src/components/T1SupportingViews.test.tsx` — cover keyboard focus targets on the bounded supporting-card surfaces.
+  * `docs/IMPLEMENTATION_LOG.md` — record validation evidence.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`, plus desktop/mobile browser review.
+* **Implementation:**
+  * Applied `maxHeight: '35dvh'` and `overflow: 'auto'` to the Drafts and Case records section surfaces only. Their content now scrolls within the card rather than expanding the dashboard indefinitely.
+  * Changed the stable grid tracks to stretch and made Activity a flex-growing card in the right track. It fills available vertical space below Next actions whenever the bounded left track is taller, without changing the fixed card assignment or responsive one-track fallback.
+  * Made the two scrollable semantic regions keyboard-focusable through an opt-in `SectionCard` prop. Their existing headings remain the accessible names and the existing global `:focus-visible` treatment supplies the visible focus indicator.
+  * Added local `sx` inputs to Case records and Activity only, allowing parent layout composition without changes to data, state, command handlers, or the manual approval flow.
+* **Regression Coverage:**
+  * Added an assertion that the bounded Drafts and Case records regions have keyboard focus targets. Focused dashboard/supporting-view run: 2 test files, 7 tests passed.
+* **Browser Evidence:**
+  * Desktop (`1280 × 900`): both bounded cards computed `max-height: 315px` ($35dvh$) and `overflow-y: auto`; Drafts accepted keyboard focus. Activity retained the right track and stretches when the bounded left track determines the grid height. No horizontal overflow (`scrollWidth = clientWidth = 1280`).
+  * Mobile (`390 × 844`): both bounded cards computed `max-height: 295.4px` ($35dvh$) and `overflow-y: auto`; the stable layout remains one 358 px track with no horizontal overflow (`scrollWidth = clientWidth = 390`).
+* **Validation Results:**
+  * `npm run lint` — passed.
+  * `npm run typecheck` — passed.
+  * `npm run test:run` — passed: 12 test files and 59 tests passed.
+  * `npm run build` — passed (`vite build` completed in 844 ms); only the existing non-blocking 500 kB chunk-size advisory was reported.
+* **Changed Files:**
+  * `src/App.tsx` — stretch the stable dashboard tracks and compose Activity as the flex-growing surface.
+  * `src/components/DraftList.tsx` — bound Drafts height and enable internal scrolling.
+  * `src/components/CaseRecordList.tsx` — support and apply the bounded scroll surface style.
+  * `src/components/ActivityTimeline.tsx` — support flex layout composition.
+  * `src/components/SectionCard.tsx` — opt-in keyboard focus target for scrollable semantic regions.
+  * `src/components/T1SupportingViews.test.tsx` — regression coverage for bounded-card keyboard focus.
+  * `docs/IMPLEMENTATION_LOG.md` — implementation and validation evidence.
+* **Status:** DONE — viewport-bounded card growth, Activity fill behavior, responsive layout, keyboard access, and all required validation gates are complete.
+
+### Entry: UX-11 — Place the safety boundary after context (user-directed, out-of-backlog)
+* **Status:** IN PROGRESS
+* **Trigger:** operator requested that the existing SafetyBanner appear directly below CaseSummary.
+* **Scope:** relocate the existing safety-boundary component in the rendered content order. Preserve its copy, semantics, visual styling, visibility on the landing state, all state/command behavior, and responsive layout.
+* **Planned Files:**
+  * `src/App.tsx` — render SafetyBanner immediately after CaseSummary and after the landing empty state.
+  * `src/app/AppShell.tsx` — remove the shell-level SafetyBanner render and now-unused import.
+  * `src/App.test.tsx` — assert the safety boundary follows the case summary in DOM order.
+  * `docs/IMPLEMENTATION_LOG.md` — record implementation and validation evidence.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`, plus browser review.
+* **Implementation:**
+  * Moved the existing SafetyBanner from the shell-level stack into the application content flow. It now follows CaseSummary in an active case; the same unchanged banner follows the start surface on landing.
+  * Removed the now-unused AppShell import and render. Safety copy, `role="note"`, accessible name, visual treatment, state behavior, and all command-layer paths are unchanged.
+* **Regression Coverage:**
+  * Updated the app integration test to verify the semantic `Safety boundary` note follows the `What we know` region in DOM order after a person starts a case.
+* **Browser Evidence:**
+  * Active case at desktop (`1280 × 900`): CaseSummary ended at 248.6 px, SafetyBanner began at 272.6 px, and the supporting workspace began at 395.6 px—consistent 24 px spacing with no horizontal overflow (`scrollWidth = clientWidth = 1280`).
+  * Landing at mobile (`390 × 844`): the start surface ended at 958.6 px and SafetyBanner began at 982.6 px; the banner remains after the start content with no horizontal overflow (`scrollWidth = clientWidth = 390`).
+* **Validation Results:**
+  * `npm run lint` — passed.
+  * `npm run typecheck` — passed.
+  * `npm run test:run` — passed: 12 test files and 59 tests passed.
+  * `npm run build` — passed (`vite build` completed in 806 ms); only the existing non-blocking 500 kB chunk-size advisory was reported.
+* **Changed Files:**
+  * `src/App.tsx` — render the existing SafetyBanner below contextual case information and landing content.
+  * `src/app/AppShell.tsx` — remove the former shell-level SafetyBanner render.
+  * `src/App.test.tsx` — DOM-order coverage for the active-case safety boundary.
+  * `docs/IMPLEMENTATION_LOG.md` — implementation and validation evidence.
+* **Status:** DONE — requested placement is verified at desktop and mobile, and all required validation gates pass.
+
+### Entry: UX-12 — Fill balanced supporting dashboard tracks (user-directed, out-of-backlog)
+* **Status:** IN PROGRESS
+* **Trigger:** operator reversed the UX-10 Drafts/Case records `maxHeight` clamp and requested full available viewport height without uneven desktop columns.
+* **Scope:** presentation-only supporting-workspace adjustment. Remove internal scroll caps from Drafts and Case records; let both cards grow for their content and use remaining desktop track space. Preserve card assignment, responsive one-column behavior, content, command/state behavior, copy-only draft behavior, and the manual plan-review boundary.
+* **Planned Files:**
+  * `src/App.tsx` — establish a viewport-aware minimum workspace height at desktop; make both supporting stacks fill it and expose stable layout test targets.
+  * `src/components/DraftList.tsx` — accept parent layout composition styles instead of owning an internal height cap.
+  * `tests/e2e/primary-journey.spec.ts` — prove desktop cards are uncapped, column tracks are equal height, and workspace reaches the usable viewport area.
+  * `docs/IMPLEMENTATION_LOG.md` — record test, browser, and validation evidence.
+* **Validation Commands:** `npm run test:e2e -- --grep "balanced supporting dashboard"`, `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`, plus desktop/mobile browser review.
+* **Implementation:**
+  * Removed the `35dvh` / `overflow: auto` ownership from Drafts. Both Drafts and Case records now receive flexible parent-composition styles, so their content is visible and may grow past the workspace floor instead of being internally scrolled.
+  * Added a desktop-only `calc(100dvh - 28rem)` minimum to the existing stable grid. Its left and right stacks now fill that minimum height; the left cards flex into remaining space, while the existing Activity card continues to fill remaining space on the right. The stack/card assignment and single-column mobile fallback are unchanged.
+* **Regression Coverage:**
+  * Added a desktop Playwright layout check for uncapped Drafts/Case records (`max-height: none`, `overflow-y: visible`), aligned final card edges ($\leq 1$ px difference), and a supporting workspace bottom at or below the usable desktop viewport area (at least 836 px at `1440 × 900`).
+  * Corrected the pre-existing primary-journey header selector from `Delete local case` to the intentional visible label `Delete Case`. The destructive-confirmation dialog remains explicitly labeled `Delete local case`.
+* **Browser Evidence:**
+  * The focused desktop layout test passed at `1440 × 900`; both previously capped cards computed as uncapped, the Case records and Activity card bottoms aligned within one CSS pixel, and the workspace extended into the viewport's usable bottom area.
+  * The full mobile happy-path and accessibility suite passed at `390 × 844`; the shared empty-state mobile page also reported no horizontal overflow (`scrollWidth = clientWidth = 390`).
+* **Validation Results:**
+  * `npm run test:e2e -- --grep "desktop balanced supporting dashboard"` — passed: 1 test in 1.4 s.
+  * `npm run lint` — passed.
+  * `npm run typecheck` — passed.
+  * `npm run test:run` — passed: 12 test files and 59 tests passed.
+  * `npm run test:e2e` — passed: 6 Playwright tests passed in 3.2 s.
+  * `npm run build` — passed (`vite build` completed in 888 ms); only the existing non-blocking 500 kB chunk-size advisory was reported.
+* **Changed Files:**
+  * `src/App.tsx` — desktop workspace floor and flexible supporting-card stack composition.
+  * `src/components/DraftList.tsx` — accepts parent layout styles and removes its internal scroll cap.
+  * `tests/e2e/primary-journey.spec.ts` — layout regression coverage and corrected stale reset header selector.
+  * `docs/IMPLEMENTATION_LOG.md` — UX-12 scope, evidence, and results.
+* **Status:** DONE — Drafts and Case records are uncapped, both dashboard tracks fill the available desktop space evenly, and responsive/browser regression coverage passes.

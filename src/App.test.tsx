@@ -28,6 +28,10 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: 'Start a blank case' }));
 
     expect(await screen.findByTestId('supporting-workspace-masonry')).toBeInTheDocument();
+    const caseSummary = screen.getByRole('region', { name: 'What we know' });
+    const safetyBanner = screen.getByRole('note', { name: 'Safety boundary' });
+
+    expect(caseSummary.compareDocumentPosition(safetyBanner) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Next actions' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Case records' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Drafts' })).toBeInTheDocument();

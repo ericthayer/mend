@@ -1,11 +1,13 @@
 import { useState } from "react"
 import { Alert, Box, Button, Chip, Stack, Typography } from "@mui/material"
+import type { SxProps, Theme } from "@mui/material/styles"
 import { MailIcon } from "./icons"
 import { SectionCard } from "./SectionCard"
 import type { OutreachDraft } from "../domain/types"
 
 type DraftListProps = {
   drafts: OutreachDraft[]
+  sx?: SxProps<Theme>
 }
 
 type CopyState =
@@ -26,7 +28,7 @@ function formatDraftForClipboard(draft: OutreachDraft): string {
   return `${draft.subject}\n\n${draft.body}`
 }
 
-export function DraftList({ drafts }: DraftListProps) {
+export function DraftList({ drafts, sx }: DraftListProps) {
   const [copyState, setCopyState] = useState<CopyState>({ kind: "idle" })
 
   const sorted = [...drafts].sort(
@@ -69,7 +71,8 @@ export function DraftList({ drafts }: DraftListProps) {
           />
         ) : undefined
       }
-      sx={{ flex: 1 }}
+      tabIndex={0}
+      sx={sx}
     >
       {copyState.kind === "success" ? (
         <Alert severity="success">{copyState.message}</Alert>

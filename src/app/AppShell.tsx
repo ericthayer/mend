@@ -11,7 +11,6 @@ import {
 } from "@mui/material"
 import { useColorScheme } from "@mui/material/styles"
 import { MendMark, MoonIcon, SunIcon } from "../components/icons"
-import { SafetyBanner } from "../components/SafetyBanner"
 import {
   WebMCPStatusChip,
   WebMCPStatusNotice,
@@ -150,7 +149,7 @@ export function AppShell({
 
       <Container
         maxWidth="lg"
-        sx={{ flex: 1, pt: { xs: 3, md: 5 }, pb: { xs: 5, md: 8 } }}
+        sx={{ display: 'flex', alignItems: "center", flex: 1, pt: { xs: 3, md: 5 }, pb: { xs: 5, md: 8 } }}
       >
         <Stack sx={{ gap: { xs: 3, md: 4 } }}>
           {webmcpStatus === "error" ? (
@@ -201,9 +200,10 @@ export function AppShell({
 
           <Box component="main">{children}</Box>
 
-          <SafetyBanner />
-
-          <Box component="footer" sx={{ display: 'none' }}>
+          <Box
+            component="footer"
+            sx={{ display: "none" }}
+          >
             <ToggleButtonGroup
               value={selectedMode}
               exclusive
