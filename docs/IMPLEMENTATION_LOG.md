@@ -7,9 +7,9 @@
 | T0.1 | DONE | P0 | Initialize reproducible repository | Package configs, scripts, MIT license, app skeleton |
 | T0.2 | DONE | P0 | Install agent execution harness (pre-created) | `AGENTS.md`, `docs/BUILD_SPEC.md`, `docs/IMPLEMENTATION_LOG.md`, `docs/EVAL_RESULTS.md`, `docs/decisions/0001-local-first-contest-architecture.md` |
 | T1.1 | DONE | P0 | Domain, schemas, commands, store | Domain logic, Zod schemas, Zustand store, fixtures |
-| T1.2 | READY | P0 | Responsive shell & base views | Tokens, header, safety banner, empty state |
-| T1.3 | BLOCKED | P0 | Plan review & next actions | Review card, manual review commands, priority lists |
-| T1.4 | BLOCKED | P1 | Supporting case views | Record list, draft view, activity timeline, reset modal |
+| T1.2 | DONE | P0 | Responsive shell & base views | Tokens, header, safety banner, empty state |
+| T1.3 | READY | P0 | Plan review & next actions | Review card, manual review commands, priority lists |
+| T1.4 | READY | P1 | Supporting case views | Record list, draft view, activity timeline, reset modal |
 | T2.1 | READY | P0 | WebMCP platform adapter | Adapter, type augmentation, model-context mock |
 | T2.2 | BLOCKED | P0 | Imperative WebMCP tools | Snapshot, create case, add record, stage plan tools |
 | T2.3 | BLOCKED | P0 | Declarative review form | Semantic `<form toolname="start_plan_review">` |
@@ -127,3 +127,56 @@
   * Ungrounded due dates and stale plan IDs are rejected with corrective validation/state-conflict errors.
   * Persisted reload succeeds and reset clears local data state.
 * **Next eligible task:** `T1.2` (selected next in backlog order). `T2.1` is also now `READY` because `T1.1` is `DONE`.
+
+### Entry: T1.2 — Build the Calm Responsive Shell
+* **Status:** DONE
+* **Depends on:** T1.1 (DONE)
+* **Acceptance criteria (BUILD_SPEC.md §T1.2):**
+  * The purpose and safety boundary are clear within the initial viewport at 390 × 844.
+  * Blank and demo flows create visible cases.
+  * WebMCP status has supported, unsupported, registering, and error states.
+  * Page works from 320 px through desktop without horizontal scrolling.
+  * All core controls have visible focus and 44 px targets.
+* **Planned Files:**
+  * `src/styles/theme.ts` (new) — MUI theme tokens per BUILD_SPEC design constraints.
+  * `src/styles/global.css` (new) — global baseline + focus/target/overflow guardrails.
+  * `src/components/WebMCPStatus.tsx` (new) — status badge + unsupported guidance states.
+  * `src/components/SafetyBanner.tsx` (new) — explicit recovery-after-danger boundary.
+  * `src/components/EmptyState.tsx` (new) — blank/demo start controls and local-only copy.
+  * `src/components/CaseSummary.tsx` (new) — key case facts for early comprehension.
+  * `src/app/AppShell.tsx` (new) — responsive shell composition and primary viewport hierarchy.
+  * `src/app/ErrorBoundary.tsx` (new) — resilient app wrapper for non-fatal shell errors.
+  * `src/App.tsx` (edit) — hook up command layer-driven blank/demo actions and shell state.
+  * `src/main.tsx` (edit) — mount ThemeProvider + CssBaseline + global styles.
+  * `src/components/T1Shell.test.tsx` (new) — component tests for status states, start flows, and safety visibility.
+  * `src/App.test.tsx` (edit) — adapt baseline test to new shell assertions.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`
+* **Validation Results (all passed):**
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — `vitest run`: 4 test files passed, 15 tests passed total (includes new shell tests).
+  * `npm run build` — `tsc -b && vite build` exit 0; emitted CSS + JS bundles and `dist/index.html`.
+* **Manual QA (required by task packet):**
+  * Loaded app in browser at `390 × 844` and verified no horizontal overflow (`scrollWidth === innerWidth === 390`).
+  * Keyboard tab traversal reached interactive controls including `Start a blank case` and `Load flood demo`.
+  * Clicked `Load flood demo` and verified immediate visible `What we know` summary with seeded flood context.
+* **Changed Files:**
+  * `src/styles/theme.ts` — MUI token theme (palette, typography, radius, button size/focus baseline).
+  * `src/styles/global.css` — global overflow/focus/reduced-motion rules.
+  * `src/components/WebMCPStatus.tsx` — supported/unsupported/registering/error capability states and unsupported guidance.
+  * `src/components/SafetyBanner.tsx` — explicit recovery boundary and emergency disclaimer copy.
+  * `src/components/EmptyState.tsx` — blank/demo starts with local-only data statement.
+  * `src/components/CaseSummary.tsx` — concise case facts panel for immediate comprehension.
+  * `src/app/AppShell.tsx` — responsive shell composition and status/error placements.
+  * `src/app/ErrorBoundary.tsx` — local-safe render fallback (no remote logging).
+  * `src/App.tsx` — command-layer-driven blank/demo actions and shell state orchestration.
+  * `src/main.tsx` — `ThemeProvider`, `CssBaseline`, global styles, and error boundary wiring.
+  * `src/components/T1Shell.test.tsx` — start-flow + capability-state component tests.
+  * `src/App.test.tsx` — shell baseline assertions updated to safety-boundary-first UI.
+* **Result:** T1.2 acceptance criteria met:
+  * Purpose/safety boundary and startup actions are visible in initial mobile viewport.
+  * Blank/demo controls create visible case state through command-layer transitions.
+  * WebMCP capability status includes supported/unsupported/registering/error representations.
+  * Layout remains responsive from small mobile to desktop widths without horizontal scrolling.
+  * Core controls are keyboard reachable and satisfy 44 px target floor via shared button theming.
+* **Next eligible task:** `T1.3` (next in backlog order). `T1.4` and `T2.1` are also `READY`.
