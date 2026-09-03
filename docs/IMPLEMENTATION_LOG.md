@@ -17,7 +17,7 @@
 | T3.1 | DONE | P0 | Unit & integration tests | Test coverage for domain invariants & authority gates |
 | T3.2 | DONE | P0 | Hardened accessibility & states | Keyboard traversal, axe a11y checks, live regions |
 | T3.3 | DONE | P1 | End-to-end browser journeys | Playwright happy-path test suite |
-| T4.1 | READY | P0 | Production Netlify build | Headers, redirects, static build verification |
+| T4.1 | BLOCKED | P0 | Production Netlify build | Headers, redirects, static build verification |
 | T4.2 | BLOCKED | P0 | Real WebMCP client smoke tests | Chrome DevTools & in-app browser evals |
 | T5.1 | BLOCKED | P0 | Judge-ready documentation | README, screenshots, reproduction steps |
 | T5.2 | BLOCKED | P0 | Sub-three-minute demo video | Video recording and public link |
@@ -483,3 +483,39 @@
   * Mobile and desktop happy paths pass with persisted reload behavior and reset confirmation.
   * Browser-level accessibility scans pass for the required states.
 * **Next eligible task:** `T4.1` (next in backlog order; dependencies T3.1 + T3.2 are DONE).
+
+### Entry: T4.1 — Deploy a Hardened Production Build
+* **Status:** BLOCKED
+* **Depends on:** T3.1 (DONE), T3.2 (DONE)
+* **Acceptance criteria (BUILD_SPEC.md §T4.1):**
+  * All preflight scripts pass against committed source.
+  * HTTPS URL loads without authentication.
+  * Required security/permission headers are present.
+  * Direct reload works; no console error occurs in the primary journey.
+  * No source map, environment variable, or secret exposes sensitive information.
+* **Planned Files:**
+  * `public/_headers` (new) — production response security and permissions policy headers.
+  * `netlify.toml` (verify) — build/publish and SPA redirect config for static deployment.
+  * `docs/IMPLEMENTATION_LOG.md` — deployment validation evidence, commit SHA, and status update.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run test:e2e`, `npm run build`
+* **Deployment Validation:** `curl -I <production-url>` header verification and production reload smoke check.
+* **Progress completed in this run:**
+  * Added `public/_headers` with the required production security/permissions policy headers.
+  * Verified `netlify.toml` contains SPA redirect + build/publish config.
+  * Preflight gate passed:
+    * `npm run lint` — exit 0.
+    * `npm run typecheck` — exit 0.
+    * `npm run test:run` — 11 test files, 47 tests passed.
+    * `npm run test:e2e` — 5/5 Playwright tests passed.
+    * `npm run build` — exit 0.
+  * Verified build artifact includes `dist/_headers` with expected header set.
+* **Blocker:**
+  * Deployment authorization unavailable in this environment.
+  * `command -v netlify` returned `netlify cli not installed`.
+  * `NETLIFY_AUTH_TOKEN` is not set.
+  * Owner decision OD-03 requires using the exact Netlify project and stopping if authorization is unavailable.
+* **Fallback/Unblock path:**
+  * Provide deployment authorization (`NETLIFY_AUTH_TOKEN`) or perform owner-side Netlify deploy for project `6074f418-73e0-4416-a297-f3cbf9f856bf`.
+  * After deploy, run `curl -I <production-url>` to verify response headers and execute production smoke checks.
+* **Result:** Contest-critical preflight and hardening artifacts are complete, but T4.1 cannot be marked `DONE` until production deployment and header checks run against a live HTTPS URL.
+* **Next eligible task:** None. Backlog is blocked at `T4.1` until deployment authorization is available.
