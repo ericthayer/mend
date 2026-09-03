@@ -6,11 +6,11 @@
 | :--- | :--- | :--- | :--- | :--- |
 | T0.1 | DONE | P0 | Initialize reproducible repository | Package configs, scripts, MIT license, app skeleton |
 | T0.2 | DONE | P0 | Install agent execution harness (pre-created) | `AGENTS.md`, `docs/BUILD_SPEC.md`, `docs/IMPLEMENTATION_LOG.md`, `docs/EVAL_RESULTS.md`, `docs/decisions/0001-local-first-contest-architecture.md` |
-| T1.1 | READY | P0 | Domain, schemas, commands, store | Domain logic, Zod schemas, Zustand store, fixtures |
-| T1.2 | BLOCKED | P0 | Responsive shell & base views | Tokens, header, safety banner, empty state |
+| T1.1 | DONE | P0 | Domain, schemas, commands, store | Domain logic, Zod schemas, Zustand store, fixtures |
+| T1.2 | READY | P0 | Responsive shell & base views | Tokens, header, safety banner, empty state |
 | T1.3 | BLOCKED | P0 | Plan review & next actions | Review card, manual review commands, priority lists |
 | T1.4 | BLOCKED | P1 | Supporting case views | Record list, draft view, activity timeline, reset modal |
-| T2.1 | BLOCKED | P0 | WebMCP platform adapter | Adapter, type augmentation, model-context mock |
+| T2.1 | READY | P0 | WebMCP platform adapter | Adapter, type augmentation, model-context mock |
 | T2.2 | BLOCKED | P0 | Imperative WebMCP tools | Snapshot, create case, add record, stage plan tools |
 | T2.3 | BLOCKED | P0 | Declarative review form | Semantic `<form toolname="start_plan_review">` |
 | T2.4 | BLOCKED | P1 | Safe outreach drafting tool | `stage_outreach_draft` tool & draft list wiring |
@@ -76,3 +76,54 @@
 * **Changed Files:** None (verification-only task; this log entry is the only artifact produced).
 * **Result:** All T0.2 acceptance criteria met. A new agent reading only the Master Task Status table can identify T0.2 as the completed task and T1.1 as the next `READY` task without conversation context.
 * **Next eligible task:** T1.1 (dependency T0.1 is DONE; T1.1 does not depend on T0.2). Not implemented in this run.
+
+### Entry: T1.1 — Build the Domain and Local State
+* **Status:** DONE
+* **Depends on:** T0.1 (DONE)
+* **Acceptance criteria (BUILD_SPEC.md §T1.1):**
+  * All commands return typed success/error results and make atomic changes.
+  * Commands append sanitized activity events.
+  * Agent cannot review plans or update task status.
+  * Unsafe cases cannot stage plans or drafts.
+  * Ungrounded deadlines and stale plan IDs are rejected.
+  * Reload preserves state; reset removes it.
+* **Planned Files:**
+  * `src/domain/types.ts` (new) — canonical domain entities, command context/types, and result envelope.
+  * `src/domain/schemas.ts` (new) — strict Zod schemas for command inputs, persisted state, and seed payloads.
+  * `src/domain/invariants.ts` (new) — safety, deadline grounding, duplicate task, stale plan, and authority checks.
+  * `src/domain/selectors.ts` (new) — derived selectors for approved/pending plans and allowed actions.
+  * `src/domain/commands.ts` (new) — command service implementing atomic validated state transitions and activity append.
+  * `src/state/persistence.ts` (new) — local-storage key contract, safe load/save/reset utilities.
+  * `src/state/migrations.ts` (new) — `schemaVersion: 1` migration/reset behavior.
+  * `src/state/recoveryStore.ts` (new) — Zustand store wiring with persisted sanitized domain state.
+  * `src/data/resources.ts` (new) — curated static resource catalog with owned URLs.
+  * `src/data/floodDemo.ts` (new) — deterministic seeded flood scenario with synthetic content.
+  * `src/domain/commands.test.ts` (new) — unit tests for Section 9 invariants and authority boundaries.
+  * `src/state/recoveryStore.test.ts` (new) — persistence/reset/migration determinism checks.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`
+* **Validation Results (all passed):**
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — `vitest run`: 3 test files passed (`src/App.test.tsx`, `src/domain/commands.test.ts`, `src/state/recoveryStore.test.ts`), 12 tests passed total.
+  * `npm run build` — `tsc -b && vite build` exit 0; emitted `dist/index.html` and `dist/assets/index-*.js`.
+* **Changed Files:**
+  * `src/domain/types.ts` — canonical domain entities, command result envelope, command interfaces, and base empty-state factory.
+  * `src/domain/schemas.ts` — strict Zod schemas for command inputs, persisted state shape, and ISO date/date-time validation.
+  * `src/domain/invariants.ts` — safety/authority/stale-plan checks, duplicate-title detection, deadline grounding, activity sanitization/capping, and allowed-action derivation.
+  * `src/domain/selectors.ts` — compact snapshot selectors (`latestApprovedPlan`, `pendingPlan`, capped records/drafts/activity, allowed actions).
+  * `src/domain/commands.ts` — atomic command implementations for case/record/plan/review/draft/task-status/reset with typed success/error results.
+  * `src/state/persistence.ts` — localStorage load/save/clear helpers and key contract `mend:recovery-planner:v1`.
+  * `src/state/migrations.ts` — schemaVersion migration path with safe fallback to empty state.
+  * `src/state/recoveryStore.ts` — Zustand-backed domain store with transactional update helpers and persistence wiring.
+  * `src/data/resources.ts` — curated, catalog-owned resource definitions and ID guard.
+  * `src/data/floodDemo.ts` — deterministic flood seed workflow with synthetic records only.
+  * `src/domain/commands.test.ts` — invariant/authority unit tests: safety block, duplicate tasks, ungrounded deadlines, stale plan IDs, agent review rejection, UI-only task-status updates, immutable approved plan behavior, outreach draft semantics.
+  * `src/state/recoveryStore.test.ts` — persistence/reset/migration determinism checks.
+* **Result:** All T1.1 acceptance criteria are satisfied:
+  * Commands are typed and atomic with success/error envelopes.
+  * Commands append sanitized activity for stateful actions.
+  * Agent review and WebMCP task-status updates are rejected by command-level authority checks.
+  * Unsafe cases cannot stage plans/drafts.
+  * Ungrounded due dates and stale plan IDs are rejected with corrective validation/state-conflict errors.
+  * Persisted reload succeeds and reset clears local data state.
+* **Next eligible task:** `T1.2` (selected next in backlog order). `T2.1` is also now `READY` because `T1.1` is `DONE`.
