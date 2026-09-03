@@ -2,12 +2,14 @@ import {
   Chip,
   FormControl,
   InputLabel,
+  Link,
   MenuItem,
   Paper,
   Select,
   Stack,
   Typography,
 } from '@mui/material';
+import { getResourceById } from '../data/resources';
 import { selectDeterministicTasksForPlan } from '../domain/selectors';
 import type { RecoveryPlan, TaskStatus } from '../domain/types';
 
@@ -84,6 +86,31 @@ export function NextActions({
               <Typography component="p" variant="body2" color="text.secondary">
                 {task.rationale}
               </Typography>
+
+              {task.sourceIds.length > 0 ? (
+                <Stack spacing={0.5}>
+                  <Typography component="p" variant="body2" color="text.secondary">
+                    Official resources
+                  </Typography>
+                  <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
+                    {task.sourceIds
+                      .map((sourceId) => getResourceById(sourceId))
+                      .filter((resource): resource is NonNullable<typeof resource> => resource !== null)
+                      .map((resource) => (
+                        <Link
+                          key={resource.id}
+                          href={resource.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          variant="body2"
+                          underline="hover"
+                        >
+                          {resource.badge}: {resource.publisher} ({resource.verifiedAt})
+                        </Link>
+                      ))}
+                  </Stack>
+                </Stack>
+              ) : null}
 
               <FormControl size="small" sx={{ maxWidth: 220 }}>
                 <InputLabel id={`task-status-label-${task.id}`}>Status</InputLabel>

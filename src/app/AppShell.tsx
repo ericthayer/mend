@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Alert, Box, Container, Stack, Typography } from '@mui/material';
+import { Alert, Box, Button, Container, Stack, Typography } from '@mui/material';
 import { SafetyBanner } from '../components/SafetyBanner';
 import {
   WebMCPStatus,
@@ -11,6 +11,7 @@ type AppShellProps = {
   webmcpErrorMessage?: string;
   storageWarning?: string | null;
   inlineError?: string | null;
+  onResetRequested?: () => void;
   children: ReactNode;
 };
 
@@ -19,6 +20,7 @@ export function AppShell({
   webmcpErrorMessage,
   storageWarning,
   inlineError,
+  onResetRequested,
   children,
 }: AppShellProps) {
   return (
@@ -37,6 +39,11 @@ export function AppShell({
               <Typography component="p" variant="body2" color="text.secondary">
                 Local-only contest build
               </Typography>
+              {onResetRequested ? (
+                <Button type="button" variant="outlined" color="error" onClick={onResetRequested}>
+                  Delete local case
+                </Button>
+              ) : null}
             </Stack>
             <WebMCPStatus status={webmcpStatus} errorMessage={webmcpErrorMessage} />
           </Box>

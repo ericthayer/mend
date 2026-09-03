@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Stack } from '@mui/material';
 import { AppShell } from './app/AppShell';
+import { ActivityTimeline } from './components/ActivityTimeline';
 import { CaseSummary } from './components/CaseSummary';
+import { CaseRecordList } from './components/CaseRecordList';
+import { ConfirmDialog } from './components/ConfirmDialog';
+import { DraftList } from './components/DraftList';
 import { EmptyState } from './components/EmptyState';
 import { NextActions } from './components/NextActions';
 import { PlanReview } from './components/PlanReview';
@@ -20,11 +24,15 @@ function App() {
   const caseData = useRecoveryStore((state) => state.case);
   const pendingPlan = useRecoveryStore(selectPendingPlan);
   const approvedPlan = useRecoveryStore(selectLatestApprovedPlan);
+  const records = useRecoveryStore((state) => state.records);
+  const drafts = useRecoveryStore((state) => state.drafts);
+  const activity = useRecoveryStore((state) => state.activity);
   const storageWarning = useRecoveryStore((state) => state.storageWarning);
 
   const [busy, setBusy] = useState(false);
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [inlineError, setInlineError] = useState<string | null>(null);
   const [webmcpStatus, setWebmcpStatus] = useState<WebMCPCapabilityStatus>('registering');
   const [webmcpErrorMessage, setWebmcpErrorMessage] = useState<string | undefined>(undefined);
@@ -131,12 +139,27 @@ function App() {
     setUpdatingTaskId(null);
   };
 
+  const handleConfirmReset = () => {
+    setInlineError(null);
+    const result = commands.resetLocalData({
+      actor: 'user',
+      source: 'ui',
+    });
+
+    if (!result.ok) {
+      setInlineError(result.message);
+    }
+
+    setIsResetDialogOpen(false);
+  };
+
   return (
     <AppShell
       webmcpStatus={webmcpStatus}
       webmcpErrorMessage={webmcpErrorMessage}
       storageWarning={storageWarning}
       inlineError={inlineError}
+      onResetRequested={caseData ? () => setIsResetDialogOpen(true) : undefined}
     >
       {caseData ? (
         <Stack spacing={2.5}>
@@ -154,10 +177,22 @@ function App() {
               onSubmit={handleReviewSubmit}
             />
           ) : null}
+          <CaseRecordList records={records} />
+          <DraftList drafts={drafts} />
+          <ActivityTimeline activity={activity} />
         </Stack>
       ) : (
         <EmptyState onStartBlank={handleStartBlank} onLoadDemo={handleLoadDemo} busy={busy} />
       )}
+
+      <ConfirmDialog
+        open={isResetDialogOpen}
+        title="Delete local case?"
+        message="This removes all local case records, plans, drafts, and activity from this browser."
+        confirmLabel="Delete local case"
+        onCancel={() => setIsResetDialogOpen(false)}
+        onConfirm={handleConfirmReset}
+      />
     </AppShell>
   );
 }

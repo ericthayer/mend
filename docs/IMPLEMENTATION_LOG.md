@@ -9,7 +9,7 @@
 | T1.1 | DONE | P0 | Domain, schemas, commands, store | Domain logic, Zod schemas, Zustand store, fixtures |
 | T1.2 | DONE | P0 | Responsive shell & base views | Tokens, header, safety banner, empty state |
 | T1.3 | DONE | P0 | Plan review & next actions | Review card, manual review commands, priority lists |
-| T1.4 | READY | P1 | Supporting case views | Record list, draft view, activity timeline, reset modal |
+| T1.4 | DONE | P1 | Supporting case views | Record list, draft view, activity timeline, reset modal |
 | T2.1 | READY | P0 | WebMCP platform adapter | Adapter, type augmentation, model-context mock |
 | T2.2 | BLOCKED | P0 | Imperative WebMCP tools | Snapshot, create case, add record, stage plan tools |
 | T2.3 | READY | P0 | Declarative review form | Semantic `<form toolname="start_plan_review">` |
@@ -216,3 +216,44 @@
   * Approval promotes tasks to next-actions immediately (no reload required).
   * Task order is deterministic by `now` → `next` → `later`, then stable lexical/id tie-breaks.
 * **Next eligible task:** `T1.4` (next in backlog order). `T2.1` and `T2.3` are also `READY`.
+
+### Entry: T1.4 — Complete Supporting Case Views
+* **Status:** DONE
+* **Depends on:** T1.2 (DONE)
+* **Acceptance criteria (BUILD_SPEC.md §T1.4):**
+  * Every record/draft/activity entry includes type, author/actor, and timestamp as applicable.
+  * Drafts visibly say `Draft — not sent`; no send control exists.
+  * Resource badges link only to catalog-owned HTTPS URLs after a user click.
+  * Reset requires confirmation and returns to the empty state.
+* **Planned Files:**
+  * `src/components/CaseRecordList.tsx` (new) — record list with type/author/time metadata.
+  * `src/components/DraftList.tsx` (new) — unsent draft list with copy-only action and clear draft state label.
+  * `src/components/ActivityTimeline.tsx` (new) — newest-first activity entries with actor/time context.
+  * `src/components/ConfirmDialog.tsx` (new) — reusable confirmation dialog for destructive actions.
+  * `src/components/NextActions.tsx` (edit) — resource badges sourced only from catalog IDs.
+  * `src/data/resources.ts` (edit) — helper accessors for ID-to-resource lookups.
+  * `src/app/AppShell.tsx` (edit) — reset entry point in global header.
+  * `src/App.tsx` (edit) — wire records/drafts/activity views and reset confirmation flow through commands.
+  * `src/components/T1SupportingViews.test.tsx` (new) — coverage for copy success/failure, actor labels, reset confirmation, and resource links.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`
+* **Validation Results (all passed):**
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — `vitest run`: 6 test files passed, 21 tests passed total (includes supporting-view coverage).
+  * `npm run build` — `tsc -b && vite build` exit 0.
+* **Changed Files:**
+  * `src/components/CaseRecordList.tsx` — record timeline with type/author/timestamp metadata.
+  * `src/components/DraftList.tsx` — copy-only unsent drafts with explicit `Draft — not sent` labeling and copy success/failure feedback.
+  * `src/components/ActivityTimeline.tsx` — newest-first activity events including actor/source/time.
+  * `src/components/ConfirmDialog.tsx` — reusable confirmation dialog for destructive actions.
+  * `src/components/NextActions.tsx` — official resource links rendered from catalog IDs only.
+  * `src/data/resources.ts` — resource lookup helper for safe ID-to-URL resolution.
+  * `src/app/AppShell.tsx` — header reset trigger (`Delete local case`).
+  * `src/App.tsx` — reset confirmation flow + records/drafts/activity composition through command-layer state changes.
+  * `src/components/T1SupportingViews.test.tsx` — copy success/failure, actor labels, resource link ownership, and reset confirmation assertions.
+* **Result:** T1.4 acceptance criteria met:
+  * Record, draft, and activity entries show required metadata (type + actor/author + timestamps).
+  * Drafts are visibly unsent and expose copy-only behavior (no send control).
+  * Resource links are drawn exclusively from the owned static catalog URLs.
+  * Reset uses explicit confirmation and returns the app to the empty startup state.
+* **Next eligible task:** `T2.1` (next in backlog order). `T2.3` is also `READY`.

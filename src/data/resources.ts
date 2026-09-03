@@ -48,6 +48,12 @@ export const RESOURCE_CATALOG: ReadonlyArray<ResourceEntry> = [
 
 export const RESOURCE_IDS = RESOURCE_CATALOG.map((resource) => resource.id);
 
+const RESOURCE_LOOKUP = new Map(RESOURCE_CATALOG.map((resource) => [resource.id, resource]));
+
 export function isKnownResourceId(value: string): value is ResourceEntry['id'] {
   return RESOURCE_IDS.includes(value as ResourceEntry['id']);
+}
+
+export function getResourceById(id: string): ResourceEntry | null {
+  return RESOURCE_LOOKUP.get(id as ResourceEntry['id']) ?? null;
 }
