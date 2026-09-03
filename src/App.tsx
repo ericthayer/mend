@@ -207,36 +207,41 @@ function App() {
       {caseData ? (
         <Stack spacing={0} sx={{ gap: 3 }}>
           <CaseSummary caseData={caseData} />
+          {pendingPlan ? (
+            <PlanReview
+              pendingPlan={pendingPlan}
+              approvedPlan={approvedPlan}
+              submitting={reviewSubmitting}
+              onSubmit={handleReviewSubmit}
+            />
+          ) : null}
           <Box
+            data-testid="supporting-workspace-masonry"
             sx={{
-              display: 'grid',
-              gap: 3,
-              gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 7fr) minmax(0, 5fr)' },
+              columnCount: { xs: 1, md: 2 },
+              columnGap: 3,
+              columnFill: 'balance',
+              // Each masonry item supplies the inter-card gutter; offset the final one.
+              mb: -3,
             }}
           >
-            <Stack spacing={0} sx={{ gap: 3, minWidth: 0 }}>
-              {pendingPlan ? (
-                <PlanReview
-                  pendingPlan={pendingPlan}
-                  approvedPlan={approvedPlan}
-                  submitting={reviewSubmitting}
-                  onSubmit={handleReviewSubmit}
-                />
-              ) : null}
+            <Box sx={{ breakInside: 'avoid', mb: 3, minWidth: 0 }}>
               <NextActions
                 approvedPlan={approvedPlan}
                 busyTaskId={updatingTaskId}
                 onUpdateTaskStatus={handleUpdateTaskStatus}
                 headingRef={nextActionsHeadingRef}
               />
+            </Box>
+            <Box sx={{ breakInside: 'avoid', mb: 3, minWidth: 0 }}>
               <DraftList drafts={drafts} />
-            </Stack>
-            <Stack spacing={0} sx={{ gap: 3, minWidth: 0 }}>
+            </Box>
+            <Box sx={{ breakInside: 'avoid', mb: 3, minWidth: 0 }}>
               <CaseRecordList records={records} />
-            </Stack>
-            <Stack spacing={0} sx={{ gap: 3, minWidth: 0, gridColumn: 'span 2' }}>
+            </Box>
+            <Box sx={{ breakInside: 'avoid', mb: 3, minWidth: 0 }}>
               <ActivityTimeline activity={activity} />
-            </Stack>
+            </Box>
           </Box>
         </Stack>
       ) : (

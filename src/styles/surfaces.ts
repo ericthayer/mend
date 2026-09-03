@@ -73,11 +73,18 @@ export function sectionTintSx(tint: SectionTintKey) {
  * review-state token as a warm tint so it reads as distinct from the white
  * reference sections around it. Elevation is declared once (border), so no
  * shadow.
+ *
+ * An opaque layered background prevents body canvas textures from bleeding through
+ * the translucent amber tint.
  */
 export function reviewSurfaceSx(theme: Theme) {
   return {
     p: { xs: 2.5, sm: 3.5 },
-    backgroundColor: alpha(theme.palette.warning.light, 0.07),
+    backgroundColor: 'var(--mui-palette-background-paper)',
+    backgroundImage: `linear-gradient(${alpha(theme.palette.warning.light, 0.08)}, ${alpha(
+      theme.palette.warning.light,
+      0.08
+    )})`,
     borderColor: alpha(theme.palette.warning.main, 0.35),
   } as const;
 }

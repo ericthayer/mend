@@ -279,9 +279,12 @@ export const mendTheme = createTheme({
           caretColor: 'var(--mui-palette-primary-main)',
           scrollbarColor:
             'var(--mui-palette-text-secondary) var(--mui-palette-background-default)',
+          backgroundColor: 'var(--mui-palette-background-default)',
           backgroundImage:
-            'radial-gradient(circle at 88% -12%, rgb(var(--mui-palette-primary-mainChannel) / 0.09), transparent min(54vw, 40rem))',
-          backgroundRepeat: 'no-repeat',
+            'radial-gradient(ellipse 64% 42% at -12% 44%, transparent 58%, rgb(var(--mui-palette-primary-mainChannel) / 0.09) 58.35%, transparent 58.8%), radial-gradient(ellipse 54% 36% at 112% 20%, transparent 58%, rgb(var(--mui-palette-primary-mainChannel) / 0.08) 58.35%, transparent 58.8%), radial-gradient(circle at 1px 1px, rgb(var(--mui-palette-primary-mainChannel) / 0.11) 1px, transparent 1.25px), radial-gradient(circle at 86% -8%, rgb(var(--mui-palette-primary-mainChannel) / 0.13), transparent min(56vw, 42rem))',
+          backgroundPosition: 'center, center, 18px 18px, center',
+          backgroundRepeat: 'no-repeat, no-repeat, repeat, no-repeat',
+          backgroundSize: 'auto, auto, 112px 112px, auto',
         },
         '::selection': {
           backgroundColor: 'rgb(var(--mui-palette-primary-mainChannel) / 0.24)',

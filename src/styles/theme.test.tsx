@@ -119,6 +119,25 @@ describe('Mend color schemes', () => {
     }
   });
 
+  it('keeps a quiet recovery-route field behind application surfaces', () => {
+    const baseline = mendTheme.components?.MuiCssBaseline?.styleOverrides as {
+      'html, body'?: Record<string, string>;
+    };
+
+    expect(baseline['html, body']).toMatchObject({
+      backgroundColor: 'var(--mui-palette-background-default)',
+      backgroundPosition: 'center, center, 18px 18px, center',
+      backgroundRepeat: 'no-repeat, no-repeat, repeat, no-repeat',
+      backgroundSize: 'auto, auto, 112px 112px, auto',
+    });
+    expect(baseline['html, body']?.backgroundImage).toContain(
+      'radial-gradient(ellipse 64% 42% at -12% 44%'
+    );
+    expect(baseline['html, body']?.backgroundImage).toContain(
+      'radial-gradient(circle at 86% -8%'
+    );
+  });
+
   it('follows prefers-color-scheme and responds to changes', async () => {
     const controller = createMatchMediaController(true);
     Object.defineProperty(window, 'matchMedia', {
