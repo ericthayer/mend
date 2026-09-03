@@ -74,7 +74,9 @@ const DARK_PALETTE = {
 };
 
 export const mendTheme = createTheme({
-  cssVariables: true,
+  cssVariables: {
+    colorSchemeSelector: 'class',
+  },
   colorSchemes: {
     light: {
       palette: LIGHT_PALETTE,

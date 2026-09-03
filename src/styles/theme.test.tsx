@@ -86,6 +86,7 @@ describe('Mend color schemes', () => {
   });
 
   it('defines a readable custom palette for both system color modes', () => {
+    expect(mendTheme).toHaveProperty('colorSchemeSelector', 'class');
     expect(mendTheme).toHaveProperty('colorSchemes.light.palette.background.default', '#f4f4f1');
     expect(mendTheme).toHaveProperty('colorSchemes.dark.palette.background.default', '#111820');
     expect(mendTheme).toHaveProperty('colorSchemes.dark.palette.text.primary', '#eef3f8');

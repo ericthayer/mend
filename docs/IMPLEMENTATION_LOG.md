@@ -793,11 +793,19 @@
 * **Validation commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`.
 
 ### Entry: UX-3 — Add header color-mode toggle (user-directed, out-of-backlog)
-* **Status:** IN_PROGRESS
+* **Status:** DONE
 * **Trigger:** operator request on 2026-09-03 to add a Light/Dark MUI `ToggleButton` control next to the WebMCP support status chip in the app header.
 * **Scope:** add an exclusive, keyboard-accessible Light/Dark toggle wired to MUI `useColorScheme`; preserve system preference as the initial default and keep recovery/WebMCP state boundaries unchanged.
-* **Planned Files:** `src/app/AppShell.tsx`, `src/components/icons.tsx`, `src/components/T1Shell.test.tsx`, `docs/IMPLEMENTATION_LOG.md`.
+* **Planned Files:** `src/app/AppShell.tsx`, `src/components/icons.tsx`, `src/components/T1Shell.test.tsx`, `src/styles/theme.ts`, `src/styles/theme.test.tsx`, `docs/IMPLEMENTATION_LOG.md`.
 * **Validation commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`, `npm run test:e2e`.
+* **Toggle implementation:**
+  * Added adjacent Light/Dark `ToggleButton` controls with icons, accessible labels, `aria-pressed` state, keyboard support, responsive text labels, and 44px minimum targets.
+  * Replaced the header's one-time `matchMedia` read with reactive `useColorScheme()` state; system preference remains the initial default and explicit user selections update MUI immediately.
+  * Configured MUI CSS variables with `colorSchemeSelector: 'class'`, which enables manual `setMode()` changes without adding domain state or persistence.
+  * Added regression coverage for Light/Dark selection and the theme selector configuration.
+  * Visually hid the Light/Dark label text without removing it from the accessibility tree; the visible controls remain the Sun/Moon icons.
+* **Verification:** `npm run lint` ✓ · `npm run typecheck` ✓ · `npm run test:run` ✓ (12 files, 55 tests) · `npm run build` ✓ (known non-blocking chunk-size warning) · `npm run test:e2e` ✓ (5 tests).
+* **Result:** Header color-mode toggle is complete; WebMCP status, recovery commands, persistence, and the manual approval boundary remain unchanged.
 * **What changed:**
   * Theme: `#f4f4f1` canvas, white 16px-radius hairline `Paper`, 44px buttons, pill chips, softened `info` alert, system font stack retained.
   * New `SectionCard` (icon tile + h2 header + meta slot) and inline SVG `icons.tsx`; all six section components plus `SafetyBanner`/`EmptyState` restyled on top of it. `INCIDENT_LABELS` moved to `src/domain/labels.ts`.

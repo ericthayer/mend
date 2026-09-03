@@ -1,7 +1,16 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { Alert, Box, Button, Container, Stack, Typography } from '@mui/material';
-import { alpha } from '@mui/material/styles';
-import { MendMark } from '../components/icons';
+import {
+  Alert,
+  Box,
+  Button,
+  Container,
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from '@mui/material';
+import { useColorScheme } from '@mui/material/styles';
+import { MendMark, MoonIcon, SunIcon } from '../components/icons';
 import { SafetyBanner } from '../components/SafetyBanner';
 import {
   WebMCPStatusChip,
@@ -20,6 +29,18 @@ type AppShellProps = {
   children: ReactNode;
 };
 
+const visuallyHiddenLabel = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+  whiteSpace: 'nowrap',
+  border: 0,
+};
+
 export function AppShell({
   webmcpStatus,
   webmcpErrorMessage,
@@ -31,6 +52,7 @@ export function AppShell({
   children,
 }: AppShellProps) {
   const inlineErrorRef = useRef<HTMLDivElement | null>(null);
+  const { mode, systemMode, setMode } = useColorScheme();
 
   useEffect(() => {
     if (!inlineError) {
@@ -40,10 +62,8 @@ export function AppShell({
     inlineErrorRef.current?.focus();
   }, [inlineError]);
 
-  const isDarkMode =
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const selectedMode: 'light' | 'dark' =
+    mode === 'dark' || (mode !== 'light' && systemMode === 'dark') ? 'dark' : 'light';
 
   return (
     <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
@@ -53,7 +73,7 @@ export function AppShell({
           position: 'sticky',
           top: 0,
           zIndex: theme.zIndex.appBar,
-          bgcolor: isDarkMode ? theme.palette.grey[900] : alpha(theme.palette.background.default, 0.88),
+          bgcolor: 'background.default',
           backdropFilter: 'blur(14px)',
           borderBottom: '1px solid',
           borderColor: 'divider',
@@ -80,6 +100,48 @@ export function AppShell({
 
           <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
             <WebMCPStatusChip status={webmcpStatus} />
+            <ToggleButtonGroup
+              value={selectedMode}
+              exclusive
+              size="small"
+              color="primary"
+              aria-label="Color mode"
+              onChange={(_, nextMode: 'light' | 'dark' | null) => {
+                if (nextMode) {
+                  setMode(nextMode);
+                }
+              }}
+              sx={{
+                '& .MuiToggleButton-root': {
+                  minHeight: 44,
+                  minWidth: { xs: 44, sm: 78 },
+                  px: { xs: 1, sm: 1.25 },
+                  gap: 0.75,
+                  borderColor: 'divider',
+                  color: 'text.secondary',
+                },
+                '& .MuiToggleButton-root.Mui-selected': {
+                  color: 'text.primary',
+                  bgcolor: 'action.selected',
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                },
+              }}
+            >
+              <ToggleButton value="light" aria-label="Light mode">
+                <SunIcon />
+                <Box component="span" sx={visuallyHiddenLabel}>
+                  Light
+                </Box>
+              </ToggleButton>
+              <ToggleButton value="dark" aria-label="Dark mode">
+                <MoonIcon />
+                <Box component="span" sx={visuallyHiddenLabel}>
+                  Dark
+                </Box>
+              </ToggleButton>
+            </ToggleButtonGroup>
             {onResetRequested ? (
               <Button
                 type="button"
