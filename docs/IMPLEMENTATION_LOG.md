@@ -5,8 +5,8 @@
 | ID | Status | Phase | Description | Output Artifacts |
 | :--- | :--- | :--- | :--- | :--- |
 | T0.1 | DONE | P0 | Initialize reproducible repository | Package configs, scripts, MIT license, app skeleton |
-| T0.2 | READY | P0 | Install agent execution harness (pre-created) | `AGENTS.md`, `docs/BUILD_SPEC.md`, `docs/IMPLEMENTATION_LOG.md`, `docs/EVAL_RESULTS.md`, `docs/decisions/0001-local-first-contest-architecture.md` |
-| T1.1 | BLOCKED | P0 | Domain, schemas, commands, store | Domain logic, Zod schemas, Zustand store, fixtures |
+| T0.2 | DONE | P0 | Install agent execution harness (pre-created) | `AGENTS.md`, `docs/BUILD_SPEC.md`, `docs/IMPLEMENTATION_LOG.md`, `docs/EVAL_RESULTS.md`, `docs/decisions/0001-local-first-contest-architecture.md` |
+| T1.1 | READY | P0 | Domain, schemas, commands, store | Domain logic, Zod schemas, Zustand store, fixtures |
 | T1.2 | BLOCKED | P0 | Responsive shell & base views | Tokens, header, safety banner, empty state |
 | T1.3 | BLOCKED | P0 | Plan review & next actions | Review card, manual review commands, priority lists |
 | T1.4 | BLOCKED | P1 | Supporting case views | Record list, draft view, activity timeline, reset modal |
@@ -56,3 +56,23 @@
 * **Result:** All T0.1 acceptance criteria met: `npm ci` succeeds from a clean checkout; lint/typecheck/test:run/build all pass; MIT `LICENSE` is present at repo root.
 * **Next eligible task:** T0.2 (dependency T0.1 is now DONE). Not implemented in this run per instructions.
 * **Notes:** Setting up Vite + React + TypeScript + Vitest + Testing Library + Zod + Zustand.
+
+### Entry: T0.2 — Install the Agent Execution Harness
+* **Status:** DONE
+* **Depends on:** T0.1 (DONE)
+* **Acceptance criteria (BUILD_SPEC.md §T0.2):**
+  * `AGENTS.md` includes every minimum rule in Section 10.
+  * All five owner-created harness files exist at the expected paths and are readable.
+  * Implementation log has a table for task status, changed files, commands, results, blockers, and next task.
+  * ADR 0001 records the local-first/no-backend contest decision and the post-contest Supabase seam.
+* **Verification performed (no file edits required beyond this log entry; harness files are owner-authored):**
+  * `AGENTS.md` checked line-by-line against BUILD_SPEC.md §10 "AGENTS.md minimum content": source-of-truth pointer ✓, one-task-at-a-time rule ✓, Zod runtime validation requirement ✓, `src/domain/commands.ts` write boundary ✓, authority-boundary prohibitions (imperative approval tool, `toolautosubmit`, outbound messaging/remote PII/third-party APIs) ✓, hallucinated-URL/raw-HTML prohibition ✓, required validation commands before DONE ✓, requirement to record evidence in the implementation log ✓. No gaps found.
+  * Confirmed all five harness files exist and are readable: `AGENTS.md`, `docs/BUILD_SPEC.md`, `docs/IMPLEMENTATION_LOG.md`, `docs/EVAL_RESULTS.md`, `docs/decisions/0001-local-first-contest-architecture.md`.
+  * Also confirmed `docs/decisions/0002-adopt-mui-for-styling.md` exists, is a well-formed ADR (context/decision/consequences/rollback), and is cross-referenced from BUILD_SPEC.md's styling row (§ around line 599) and token section (§ around line 774) — the MUI dependency addition is reconciled with the spec, not a silent scope change.
+  * `docs/EVAL_RESULTS.md` contains the canonical eval matrix (E-01–E-07) with columns for tools called, authority-kept, and pass/fail, ready to be filled during T3.1/T4.2.
+  * ADR 0001 confirmed to record: client-only execution, `localStorage` persistence key `mend:recovery-planner:v1`, no external side effects, and an explicit post-contest Supabase (`RecoveryRepository`) seam — matches BUILD_SPEC.md's architecture decision.
+  * `docs/IMPLEMENTATION_LOG.md` confirmed to carry a Master Task Status table (task/status/phase/description/artifacts) plus per-task Execution Entries recording planned files, validation commands, validation results, changed files, and next eligible task — sufficient for a new agent to resume without conversation context.
+* **Reconciliation:** No discrepancies found between owner-authored harness files and BUILD_SPEC.md. No content was overwritten.
+* **Changed Files:** None (verification-only task; this log entry is the only artifact produced).
+* **Result:** All T0.2 acceptance criteria met. A new agent reading only the Master Task Status table can identify T0.2 as the completed task and T1.1 as the next `READY` task without conversation context.
+* **Next eligible task:** T1.1 (dependency T0.1 is DONE; T1.1 does not depend on T0.2). Not implemented in this run.
