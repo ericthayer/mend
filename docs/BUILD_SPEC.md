@@ -7,8 +7,8 @@ repository_url: "https://github.com/ericthayer/mend"
 netlify_project_id: "6074f418-73e0-4416-a297-f3cbf9f856bf"
 deployment_status: "not_deployed"
 status: "ready_for_implementation"
-version: "0.1.1"
-last_verified: "2026-09-03"
+version: "0.1.2"
+last_verified: "2026-09-02"
 submission_deadline: "2026-09-03T13:00:00-07:00"
 submission_deadline_mdt: "2026-09-03T14:00:00-06:00"
 primary_platform: "responsive_web"
@@ -596,7 +596,7 @@ Implement `src/webmcp/registerRecoveryTools.ts` as a state-driven registry:
 | Concern | Decision | Reason |
 | --- | --- | --- |
 | Application | React + TypeScript + Vite single-page app | Fast setup, small deployment surface, easy native WebMCP registration. |
-| Styling | CSS custom properties plus small component stylesheet; optional utility classes already in starter | Avoid spending deadline time on a design-system dependency while retaining tokens. |
+| Styling | MUI (`@mui/material` + Emotion) with a custom theme (`src/styles/theme.ts`) | Faster accessible component/form/dialog construction; see ADR 0002. |
 | Runtime validation | Zod schemas shared by UI and tool handlers | One source for validation and TypeScript inference. |
 | Client state | Zustand store with versioned local-storage persistence | Fast reactive state, deterministic reset, no account or backend dependency. |
 | IDs | `crypto.randomUUID()` | Browser-native and collision-resistant for local records. |
@@ -771,7 +771,7 @@ Use calm, direct, non-judgmental language. Prefer `Next useful step` over `Urgen
 
 ### Design tokens
 
-Define all tokens in `src/styles/tokens.css`:
+Define all tokens as a custom MUI theme in `src/styles/theme.ts` (see ADR 0002), applied via `ThemeProvider` and `CssBaseline` at the app root:
 
 - Neutral warm page background; white or near-white surfaces.
 - Dark slate text with at least WCAG AA contrast.
@@ -1006,7 +1006,7 @@ mend/
 │   │   ├── resources.ts
 │   │   └── floodDemo.ts
 │   ├── styles/
-│   │   ├── tokens.css
+│   │   ├── theme.ts
 │   │   └── global.css
 │   └── test/
 │       ├── setup.ts
