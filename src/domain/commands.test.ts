@@ -377,4 +377,77 @@ describe('recovery commands invariants', () => {
     expect(result.data.status).toBe('draft');
     expect(result.message).toContain('Draft');
   });
+
+  it('rejects outreach draft attachment claims without grounded related record evidence', () => {
+    const commands = createRecoveryCommands();
+
+    commands.createCase(
+      {
+        incidentType: 'home_flood',
+        summary: 'A burst pipe flooded the apartment and danger has passed.',
+        safetyStatus: 'confirmed_safe',
+      },
+      context()
+    );
+
+    const result = commands.stageOutreachDraft(
+      {
+        audience: 'insurer',
+        subject: 'Flood update',
+        body: 'I attached photos of the damage for your review.',
+      },
+      context({ actor: 'agent', source: 'webmcp', toolName: 'stage_outreach_draft' })
+    );
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.code).toBe('validation_error');
+      expect(result.fieldErrors?.body).toContain('Attachment claims require supporting record evidence.');
+    }
+  });
+
+  it('allows outreach draft attachment claims when related evidence records are linked', () => {
+    const commands = createRecoveryCommands();
+
+    commands.createCase(
+      {
+        incidentType: 'home_flood',
+        summary: 'A burst pipe flooded the apartment and danger has passed.',
+        safetyStatus: 'confirmed_safe',
+      },
+      context()
+    );
+
+    const recordResult = commands.addRecord(
+      {
+        category: 'communication',
+        title: 'Photo package shared',
+        note: 'The landlord requested photos and confirmed the attached images were received.',
+      },
+      context({ actor: 'user', source: 'ui' })
+    );
+
+    expect(recordResult.ok).toBe(true);
+    if (!recordResult.ok) {
+      return;
+    }
+
+    const draftResult = commands.stageOutreachDraft(
+      {
+        audience: 'insurer',
+        subject: 'Flood update',
+        body: 'I attached photos documenting the current damage conditions.',
+        relatedRecordIds: [recordResult.data.id],
+      },
+      context({ actor: 'agent', source: 'webmcp', toolName: 'stage_outreach_draft' })
+    );
+
+    expect(draftResult.ok).toBe(true);
+    if (!draftResult.ok) {
+      return;
+    }
+
+    expect(draftResult.data.relatedRecordIds).toEqual([recordResult.data.id]);
+    expect(draftResult.data.status).toBe('draft');
+  });
 });

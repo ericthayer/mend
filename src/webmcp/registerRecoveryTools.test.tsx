@@ -1,5 +1,5 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../App';
 import { createRecoveryCommands } from '../domain/commands';
 import { createEmptyDomainState } from '../domain/types';
@@ -129,6 +129,7 @@ describe('registerRecoveryTools', () => {
       'get_recovery_snapshot',
       'add_case_record',
       'stage_recovery_plan',
+      'stage_outreach_draft',
     ]);
 
     commands.stagePlan(
@@ -156,6 +157,7 @@ describe('registerRecoveryTools', () => {
       'get_recovery_snapshot',
       'add_case_record',
       'stage_recovery_plan',
+      'stage_outreach_draft',
     ]);
 
     registration.cleanup();
@@ -204,6 +206,70 @@ describe('registerRecoveryTools', () => {
     mock.uninstall();
   });
 
+  it('supports async registerTool return values and race-safe cleanup behavior', async () => {
+    const unregister = vi.fn();
+
+    Object.defineProperty(document, 'modelContext', {
+      configurable: true,
+      writable: true,
+      value: {
+        registerTool: async () => ({ unregister }),
+      },
+    });
+
+    const registration = registerRecoveryTools({
+      tools: [
+        {
+          name: 'async_tool',
+          description: 'Async registration tool',
+          inputSchema: { type: 'object' },
+          execute: async () => ({ ok: true }),
+        },
+      ],
+      documentRef: document,
+    });
+
+    expect(registration.status).toBe('supported');
+
+    registration.cleanup();
+
+    await Promise.resolve();
+    await Promise.resolve();
+
+    // If cleanup runs before async registration resolves, we avoid late unregister
+    // calls that can race and remove newer registrations.
+    expect(unregister).toHaveBeenCalledTimes(0);
+
+    const unregisterAfterResolve = vi.fn();
+    Object.defineProperty(document, 'modelContext', {
+      configurable: true,
+      writable: true,
+      value: {
+        registerTool: async () => ({ unregister: unregisterAfterResolve }),
+      },
+    });
+
+    const registrationAfterResolve = registerRecoveryTools({
+      tools: [
+        {
+          name: 'async_tool_after_resolve',
+          description: 'Async registration tool (resolved before cleanup)',
+          inputSchema: { type: 'object' },
+          execute: async () => ({ ok: true }),
+        },
+      ],
+      documentRef: document,
+    });
+
+    await Promise.resolve();
+    await Promise.resolve();
+
+    registrationAfterResolve.cleanup();
+
+    expect(unregister).toHaveBeenCalledTimes(0);
+    expect(unregisterAfterResolve).toHaveBeenCalledTimes(1);
+  });
+
   it('updates visible UI after successful tool calls', async () => {
     const mock = installModelContextMock(document);
     render(<App />);
@@ -233,6 +299,7 @@ describe('registerRecoveryTools', () => {
         'get_recovery_snapshot',
         'add_case_record',
         'stage_recovery_plan',
+        'stage_outreach_draft',
       ]);
     });
 
@@ -251,6 +318,24 @@ describe('registerRecoveryTools', () => {
       name: 'Landlord requested photos',
     });
     expect(recordHeadings.length).toBeGreaterThan(0);
+
+    let stageDraftResult: unknown;
+    await act(async () => {
+      stageDraftResult = await mock.executeTool('stage_outreach_draft', {
+        audience: 'insurer',
+        subject: 'Insurer update draft',
+        body: 'I documented the flood damage and can share a factual summary of what we observed.',
+      });
+    });
+
+    expect((stageDraftResult as { ok: boolean }).ok).toBe(true);
+    expect(
+      await screen.findByRole('heading', {
+        level: 3,
+        name: 'Insurer update draft',
+      })
+    ).toBeInTheDocument();
+    expect(screen.getByText('Draft — not sent')).toBeInTheDocument();
 
     let stagePlanResult: unknown;
     await act(async () => {

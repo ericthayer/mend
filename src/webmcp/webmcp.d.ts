@@ -1,6 +1,10 @@
 // src/webmcp/webmcp.d.ts
 
 declare global {
+  interface ModelContextToolRegistration {
+    unregister: () => void;
+  }
+
   interface ModelContextTool {
     name: string;
     description: string;
@@ -13,7 +17,19 @@ declare global {
   }
 
   interface ModelContext {
-    registerTool: (tool: ModelContextTool) => { unregister: () => void };
+    registerTool: (
+      tool: ModelContextTool,
+      options?: {
+        signal?: AbortSignal;
+        exposedTo?: string[];
+      }
+    ) => ModelContextToolRegistration | Promise<ModelContextToolRegistration>;
+    getTools?: (options?: { fromOrigins?: string[] }) => Promise<ModelContextTool[]>;
+    executeTool?: (
+      tool: ModelContextTool,
+      inputJson: string,
+      options?: { signal?: AbortSignal }
+    ) => Promise<unknown>;
     listTools?: () => Promise<ModelContextTool[]>;
   }
 

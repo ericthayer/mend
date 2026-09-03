@@ -148,11 +148,46 @@ const STAGE_RECOVERY_PLAN_SCHEMA = {
   additionalProperties: false,
 } as const;
 
+const STAGE_OUTREACH_DRAFT_SCHEMA = {
+  type: 'object',
+  properties: {
+    audience: {
+      type: 'string',
+      enum: [
+        'landlord',
+        'property_manager',
+        'insurer',
+        'employer',
+        'service_provider',
+        'family_or_friend',
+        'other',
+      ],
+    },
+    subject: { type: 'string', minLength: 3, maxLength: 120 },
+    body: {
+      type: 'string',
+      minLength: 10,
+      maxLength: 2000,
+      description:
+        'Plain-text factual draft. Do not claim attachments, filings, or completed actions that are not in the case.',
+    },
+    relatedRecordIds: {
+      type: 'array',
+      maxItems: 10,
+      uniqueItems: true,
+      items: { type: 'string' },
+    },
+  },
+  required: ['audience', 'subject', 'body'],
+  additionalProperties: false,
+} as const;
+
 const CORE_IMPERATIVE_ACTIONS: AllowedAction[] = [
   'get_recovery_snapshot',
   'create_recovery_case',
   'add_case_record',
   'stage_recovery_plan',
+  'stage_outreach_draft',
 ];
 
 const CORE_IMPERATIVE_ACTIONS_SET = new Set<AllowedAction>(CORE_IMPERATIVE_ACTIONS);
@@ -270,6 +305,27 @@ export function createRecoveryImperativeTools(commands: RecoveryCommands): Recov
           actor: 'agent',
           source: 'webmcp',
           toolName: 'stage_recovery_plan',
+          signal: options?.signal,
+        });
+
+        const state = getCurrentDomainState();
+        return fromCommandResult(result, nextSuggestedTools(state));
+      },
+    },
+    {
+      name: 'stage_outreach_draft',
+      description:
+        'Creates an unsent message draft based on facts already in the case. Use when the person asks for help preparing communication. This tool never sends a message or submits information to another party.',
+      inputSchema: STAGE_OUTREACH_DRAFT_SCHEMA,
+      annotations: {
+        readOnlyHint: false,
+        untrustedContentHint: true,
+      },
+      execute: async (input, options) => {
+        const result = commands.stageOutreachDraft(input, {
+          actor: 'agent',
+          source: 'webmcp',
+          toolName: 'stage_outreach_draft',
           signal: options?.signal,
         });
 

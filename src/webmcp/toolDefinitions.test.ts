@@ -38,6 +38,7 @@ describe('recovery imperative tool definitions', () => {
       'create_recovery_case',
       'add_case_record',
       'stage_recovery_plan',
+      'stage_outreach_draft',
     ]);
 
     const snapshot = tools[0];
@@ -144,6 +145,44 @@ describe('recovery imperative tool definitions', () => {
         },
       },
     });
+
+    const stageDraft = tools[4];
+    expect(stageDraft.description).toBe(
+      'Creates an unsent message draft based on facts already in the case. Use when the person asks for help preparing communication. This tool never sends a message or submits information to another party.'
+    );
+    expect(stageDraft.annotations).toEqual({
+      readOnlyHint: false,
+      untrustedContentHint: true,
+    });
+    expect(stageDraft.inputSchema).toMatchObject({
+      type: 'object',
+      required: ['audience', 'subject', 'body'],
+      additionalProperties: false,
+      properties: {
+        audience: {
+          type: 'string',
+          enum: [
+            'landlord',
+            'property_manager',
+            'insurer',
+            'employer',
+            'service_provider',
+            'family_or_friend',
+            'other',
+          ],
+        },
+        subject: {
+          type: 'string',
+          minLength: 3,
+          maxLength: 120,
+        },
+        body: {
+          type: 'string',
+          minLength: 10,
+          maxLength: 2000,
+        },
+      },
+    });
   });
 
   it('selects available tools correctly for no-case, unsafe, safe, and pending-plan states', () => {
@@ -187,6 +226,7 @@ describe('recovery imperative tool definitions', () => {
       'get_recovery_snapshot',
       'add_case_record',
       'stage_recovery_plan',
+      'stage_outreach_draft',
     ]);
 
     commands.stagePlan(
@@ -212,6 +252,7 @@ describe('recovery imperative tool definitions', () => {
       'get_recovery_snapshot',
       'add_case_record',
       'stage_recovery_plan',
+      'stage_outreach_draft',
     ]);
   });
 
@@ -268,5 +309,52 @@ describe('recovery imperative tool definitions', () => {
     expect(result.message).toMatch(/some fields need correction/i);
     expect(result.message.toLowerCase()).not.toContain('zoderror');
     expect(result.message.toLowerCase()).not.toContain('stack');
+  });
+
+  it('validates stage_outreach_draft related record ids against current case records', async () => {
+    const createCaseTool = getToolByName('create_recovery_case');
+    const stageDraftTool = getToolByName('stage_outreach_draft');
+
+    const createResult = (await createCaseTool.execute({
+      incidentType: 'home_flood',
+      summary: 'A burst pipe flooded our apartment and immediate danger has passed.',
+      safetyStatus: 'confirmed_safe',
+    })) as AnyToolResult;
+
+    expect(createResult.ok).toBe(true);
+
+    const draftResult = (await stageDraftTool.execute({
+      audience: 'insurer',
+      subject: 'Flood documentation update',
+      body: 'I documented current damage and can share a factual update.',
+      relatedRecordIds: ['missing-record-id'],
+    })) as AnyToolResult;
+
+    expect(draftResult.ok).toBe(false);
+    expect(draftResult.code).toBe('validation_error');
+    expect(draftResult.fieldErrors?.relatedRecordIds).toContain('Unknown record ID');
+  });
+
+  it('rejects stage_outreach_draft attachment claims that are not grounded in linked records', async () => {
+    const createCaseTool = getToolByName('create_recovery_case');
+    const stageDraftTool = getToolByName('stage_outreach_draft');
+
+    const createResult = (await createCaseTool.execute({
+      incidentType: 'home_flood',
+      summary: 'A burst pipe flooded our apartment and immediate danger has passed.',
+      safetyStatus: 'confirmed_safe',
+    })) as AnyToolResult;
+
+    expect(createResult.ok).toBe(true);
+
+    const draftResult = (await stageDraftTool.execute({
+      audience: 'insurer',
+      subject: 'Flood update',
+      body: 'I attached photos of the damage for your review.',
+    })) as AnyToolResult;
+
+    expect(draftResult.ok).toBe(false);
+    expect(draftResult.code).toBe('validation_error');
+    expect(draftResult.fieldErrors?.body).toContain('Attachment claims require supporting record evidence.');
   });
 });

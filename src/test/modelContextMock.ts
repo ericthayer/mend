@@ -7,11 +7,29 @@ export function installModelContextMock(targetDocument: Document = document) {
   const originalModelContext = targetDocument.modelContext;
 
   const modelContext: ModelContext = {
-    registerTool(tool) {
+    registerTool(tool, options) {
+      if (options?.signal?.aborted) {
+        return {
+          unregister: () => {
+            // no-op when registration was already aborted
+          },
+        };
+      }
+
       registeredTools.set(tool.name, tool);
+
+      const handleAbort = () => {
+        const current = registeredTools.get(tool.name);
+        if (current === tool) {
+          registeredTools.delete(tool.name);
+        }
+      };
+
+      options?.signal?.addEventListener('abort', handleAbort, { once: true });
 
       return {
         unregister: () => {
+          options?.signal?.removeEventListener('abort', handleAbort);
           const current = registeredTools.get(tool.name);
           if (current === tool) {
             registeredTools.delete(tool.name);

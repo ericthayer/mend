@@ -159,6 +159,32 @@ function buildPlanVersion(state: RecoveryDomainState): number {
   return Math.max(...plansForCase.map((plan) => plan.version)) + 1;
 }
 
+const attachmentClaimPattern = /\b(attached|attachment|attachments|enclosed)\b/i;
+const attachmentEvidencePattern = /\b(photo|photos|image|images|attachment|attachments|document|documents|receipt|receipts|file|files)\b/i;
+
+function draftClaimsAttachment(body: string): boolean {
+  return attachmentClaimPattern.test(body);
+}
+
+function hasGroundedAttachmentEvidence(params: {
+  state: RecoveryDomainState;
+  relatedRecordIds: string[];
+}): boolean {
+  if (params.relatedRecordIds.length === 0) {
+    return false;
+  }
+
+  const relatedRecordIdSet = new Set(params.relatedRecordIds);
+
+  return params.state.records.some((record) => {
+    if (!relatedRecordIdSet.has(record.id)) {
+      return false;
+    }
+
+    return attachmentEvidencePattern.test(`${record.title} ${record.note}`);
+  });
+}
+
 export function createRecoveryCommands(): RecoveryCommands {
   const createCase: RecoveryCommands['createCase'] = (input, context) => {
     const current = getCurrentDomainState();
@@ -549,6 +575,25 @@ export function createRecoveryCommands(): RecoveryCommands {
       }
     }
 
+    const normalizedBody = normalizePlainText(parsed.data.body);
+    if (draftClaimsAttachment(normalizedBody)) {
+      const relatedRecordIds = parsed.data.relatedRecordIds ?? [];
+      if (!hasGroundedAttachmentEvidence({ state: current, relatedRecordIds })) {
+        return fail(current, {
+          ok: false,
+          code: 'validation_error',
+          message:
+            'The draft references attachments, but no supporting case record was linked. Add a factual record first or remove the attachment claim.',
+          retryable: true,
+          fieldErrors: {
+            body: 'Attachment claims require supporting record evidence.',
+            relatedRecordIds:
+              'Add related record IDs that confirm attached photos/documents, or remove the attachment claim.',
+          },
+        });
+      }
+    }
+
     let result: CommandResult<(typeof current.drafts)[number]> = fail(current, {
       ok: false,
       code: 'internal_error',
@@ -572,7 +617,7 @@ export function createRecoveryCommands(): RecoveryCommands {
         caseId: state.case.id,
         audience: parsed.data.audience,
         subject: normalizePlainText(parsed.data.subject),
-        body: normalizePlainText(parsed.data.body),
+        body: normalizedBody,
         relatedRecordIds: parsed.data.relatedRecordIds ?? [],
         status: 'draft' as const,
         createdBy: context.actor,

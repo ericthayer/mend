@@ -1,0 +1,51 @@
+{
+  "startedAt": "2026-09-03T07:28:51.718Z",
+  "completedAt": "2026-09-03T07:31:17.313Z",
+  "url": "http://localhost:5173/",
+  "featureFlags": "--enable-features=WebMCPTesting,WebMCP,WebMCPDeclarativeFileInput,WebMCPFormAssociatedCustomElements,DevToolsWebMCPSupport",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "initialProbe": {
+    "hasModelContext": true,
+    "tools": [
+      {
+        "name": "create_recovery_case",
+        "description": "Creates a local recovery case from facts the person supplied. Use after the person describes a household disruption and explicitly states whether immediate safety is resolved. This organizes information only and does not contact anyone or apply for services."
+      },
+      {
+        "name": "get_recovery_snapshot",
+        "description": "Returns the current local recovery case, its latest plan state, important records, household constraints, and allowed next actions. Use this before proposing changes or answering questions about the case."
+      }
+    ]
+  },
+  "evals": {},
+  "runErrors": [
+    {
+      "eval": "E01",
+      "error": "Error: page.evaluate: Target page, context or browser has been closed"
+    },
+    {
+      "eval": "E02",
+      "error": "Error: page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "eval": "E03",
+      "error": "Error: page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "eval": "E04",
+      "error": "Error: page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "eval": "E05",
+      "error": "Error: page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "eval": "E06",
+      "error": "Error: page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "eval": "E07",
+      "error": "Error: page.goto: Target page, context or browser has been closed"
+    }
+  ]
+}

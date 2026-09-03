@@ -18,7 +18,7 @@
 | T3.2 | DONE | P0 | Hardened accessibility & states | Keyboard traversal, axe a11y checks, live regions |
 | T3.3 | DONE | P1 | End-to-end browser journeys | Playwright happy-path test suite |
 | T4.1 | DONE | P0 | Production Netlify build | Headers, redirects, static build verification |
-| T4.2 | READY | P0 | Real WebMCP client smoke tests | Chrome DevTools & in-app browser evals |
+| T4.2 | BLOCKED | P0 | Real WebMCP client smoke tests | Chrome DevTools & in-app browser evals |
 | T5.1 | BLOCKED | P0 | Judge-ready documentation | README, screenshots, reproduction steps |
 | T5.2 | BLOCKED | P0 | Sub-three-minute demo video | Video recording and public link |
 | T5.3 | BLOCKED | P0 | Submission & repository freeze | Devpost copy verification and branch freeze |
@@ -532,3 +532,77 @@
   * `SECRET_PATTERN=absent` for `NETLIFY_AUTH_TOKEN|NETLIFY_AUTH_KEY|nfp_...` scans.
 * **Result:** All T4.1 acceptance criteria met and validated on the live HTTPS deployment.
 * **Next eligible task:** `T4.2` (now `READY`; dependency T4.1 is DONE).
+
+### Entry: T4.2 — Validate with Real WebMCP Clients
+* **Status:** BLOCKED
+* **Depends on:** T4.1 (DONE)
+* **Acceptance criteria (BUILD_SPEC.md §T4.2):**
+  * Tools appear with correct schemas in Chrome DevTools WebMCP panel.
+  * Each tool completes once with expected visible state and output.
+  * Primary prompt passes twice consecutively in ChatGPT's in-app browser and Chrome.
+  * E-02 through E-07 pass with no safety/authority failure.
+  * Any remaining issue is documented and either fixed or removed from submission claims.
+* **Planned Files:**
+  * `docs/EVAL_RESULTS.md` (edit) — record E-01..E-07 real-client runs with tool arguments, outcomes, and pass/fail.
+  * `docs/IMPLEMENTATION_LOG.md` (edit) — capture smoke checklist evidence, timestamps, client details, commit SHA, and final disposition.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`
+* **Smoke attempts completed in this run:**
+  * Opened production URL `https://mend-webmcp.netlify.app/` in the integrated browser runtime and confirmed UI health.
+  * Runtime probe in integrated browser reported:
+    * `userAgent`: `Code/1.135.0 Chrome/148.0.7778.280 Electron/42.8.1`
+    * `document.modelContext`: `undefined`
+    * Visible state: `Agent tools: unavailable`
+  * Captured live reload telemetry: no page errors/request failures; one warning in this context (`Permissions-Policy` feature recognition warning).
+  * Verified local Chrome install and version: `Google Chrome 152.0.7977.65`.
+  * Executed headed/headless Playwright probes in Chrome with flags `--enable-webmcp-testing` and `--categoryWebMCP`; `document.modelContext` remained `undefined` in all tested combinations.
+  * Saved local evidence artifacts:
+    * `docs/evidence/t4.2/prod-chrome-status.png`
+    * `docs/evidence/t4.2/runtime-probe.json`
+  * Updated `docs/EVAL_RESULTS.md` with blocked real-client matrix rows plus deterministic proxy evidence references.
+* **Validation Results (all passed):**
+  * `npm run lint` — exit 0.
+  * `npm run typecheck` — exit 0.
+  * `npm run test:run` — 11 test files, 47 tests passed.
+  * `npm run build` — exit 0 (bundle-size warning only; non-blocking for this task).
+* **Changed Files:**
+  * `docs/EVAL_RESULTS.md` — real-client status, blocked matrix outcomes, deterministic proxy evidence mapping.
+  * `docs/IMPLEMENTATION_LOG.md` — T4.2 execution evidence and blocker record.
+  * `docs/evidence/t4.2/prod-chrome-status.png` — production screenshot from local Chrome probe.
+  * `docs/evidence/t4.2/runtime-probe.json` — timestamped client capability probe (`modelContext` availability + warnings).
+* **Blocker:**
+  * Required real-client WebMCP execution context was unavailable from this automation environment (`document.modelContext` absent in tested local clients), preventing completion of the mandatory manual WebMCP tool-invocation checklist and E-01..E-07 real-client runs.
+* **Secondary risk noted:**
+  * `stage_outreach_draft` remains deferred (`T2.4`) from imperative WebMCP registration, which can impact strict evaluation of E-04 unless either implemented or explicitly removed from final submission claims.
+* **Result:**
+  * `T4.2` is not complete. Evidence is recorded and reproducible, but the task remains blocked on true WebMCP-capable client execution.
+* **Unblock steps:**
+  1. In a real interactive Chrome user profile, enable `chrome://flags/#enable-webmcp-testing`, relaunch, and verify `document.modelContext` is present.
+  2. Run ChatGPT in-app browser smoke runs twice from reset seed using the canonical primary prompt.
+  3. In Chrome DevTools → Application → WebMCP, capture screenshots of available tools and one completed invocation with input/output.
+  4. Execute and record E-01..E-07 from fresh seeds in `docs/EVAL_RESULTS.md` with tools called, arguments, final state, and pass/fail.
+  5. Resolve E-04 by either implementing `T2.4` tool exposure or removing outreach-draft behavior from submission claims/evals.
+* **Next eligible task:** None while `T4.2` remains blocked.
+
+* **Follow-up (2026-09-03): test runtime acceleration plan for T4.2 validation loops**
+  * **Task ID:** `T4.2`
+  * **Planned Files:**
+    * `playwright.config.ts` — add local fast-mode defaults and optional web-server skip toggle for repeated runs.
+    * `package.json` — add short scripts for quick/smoke e2e runs to reduce turnaround while debugging.
+  * **Validation Commands:** `npm run test:e2e:smoke`, `npm run test:e2e:quick`, `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`
+  * **Implemented changes:**
+    * `playwright.config.ts` now supports:
+      * `PLAYWRIGHT_FAST=1` for faster local settings (parallel workers, reduced per-test timeout, trace off).
+      * `PLAYWRIGHT_SKIP_WEBSERVER=1` to skip server startup when a local dev server is already running.
+      * CI-safe defaults remain conservative (`workers: 1` in CI).
+    * `package.json` now includes fast scripts:
+      * `test:e2e:quick`
+      * `test:e2e:quick:hot`
+      * `test:e2e:smoke`
+      * `test:e2e:smoke:hot`
+  * **Validation Results:**
+    * `npm run test:e2e:smoke` — 1 passed in **1.7s**.
+    * `npm run test:e2e:quick` — 5 passed in **2.2s** (`3` workers).
+    * `npm run lint` — exit 0.
+    * `npm run typecheck` — exit 0.
+    * `npm run test:run` — 11 files, 52 tests passed.
+    * `npm run build` — exit 0.

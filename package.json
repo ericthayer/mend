@@ -10,7 +10,11 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:quick": "PLAYWRIGHT_FAST=1 playwright test",
+    "test:e2e:quick:hot": "PLAYWRIGHT_FAST=1 PLAYWRIGHT_SKIP_WEBSERVER=1 playwright test",
+    "test:e2e:smoke": "PLAYWRIGHT_FAST=1 playwright test tests/e2e/primary-journey.spec.ts -g \"mobile happy path persists on reload and supports reset\"",
+    "test:e2e:smoke:hot": "PLAYWRIGHT_FAST=1 PLAYWRIGHT_SKIP_WEBSERVER=1 playwright test tests/e2e/primary-journey.spec.ts -g \"mobile happy path persists on reload and supports reset\""
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
