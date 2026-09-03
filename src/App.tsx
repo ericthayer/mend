@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Stack } from '@mui/material';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Box, Stack } from '@mui/material';
 import { AppShell } from './app/AppShell';
 import { ActivityTimeline } from './components/ActivityTimeline';
 import { CaseSummary } from './components/CaseSummary';
@@ -44,6 +44,9 @@ function App() {
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [inlineError, setInlineError] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [pendingFocus, setPendingFocus] = useState<'next-actions' | null>(null);
+  const nextActionsHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const [webmcpStatus, setWebmcpStatus] = useState<WebMCPCapabilityStatus>('registering');
   const [webmcpErrorMessage, setWebmcpErrorMessage] = useState<string | undefined>(undefined);
 
@@ -69,6 +72,15 @@ function App() {
       registration.cleanup();
     };
   }, [imperativeTools, webmcpRegistrationStateKey]);
+
+  useEffect(() => {
+    if (pendingFocus !== 'next-actions') {
+      return;
+    }
+
+    nextActionsHeadingRef.current?.focus();
+    setPendingFocus(null);
+  }, [pendingFocus, approvedPlan]);
 
   const handleStartBlank = () => {
     setBusy(true);
@@ -133,6 +145,13 @@ function App() {
 
     if (!result.ok) {
       setInlineError(result.message);
+    } else if (input.decision === 'approve') {
+      setStatusMessage(
+        `Plan v${result.data.version} approved. Your next actions are ready below.`
+      );
+      setPendingFocus('next-actions');
+    } else {
+      setStatusMessage('Changes requested. The plan stays in review until a new version is ready.');
     }
 
     setReviewSubmitting(false);
@@ -162,6 +181,7 @@ function App() {
 
   const handleConfirmReset = () => {
     setInlineError(null);
+    setStatusMessage(null);
     const result = commands.resetLocalData({
       actor: 'user',
       source: 'ui',
@@ -180,28 +200,42 @@ function App() {
       webmcpErrorMessage={webmcpErrorMessage}
       storageWarning={storageWarning}
       inlineError={inlineError}
+      statusMessage={statusMessage}
+      onDismissStatus={() => setStatusMessage(null)}
       onResetRequested={caseData ? () => setIsResetDialogOpen(true) : undefined}
     >
       {caseData ? (
-        <Stack spacing={3}>
-          <CaseSummary caseData={caseData} />
-          <NextActions
-            approvedPlan={approvedPlan}
-            busyTaskId={updatingTaskId}
-            onUpdateTaskStatus={handleUpdateTaskStatus}
-          />
-          {pendingPlan ? (
-            <PlanReview
-              pendingPlan={pendingPlan}
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 3,
+            gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 7fr) minmax(0, 5fr)' },
+            alignItems: 'start',
+          }}
+        >
+          <Stack spacing={3} sx={{ minWidth: 0 }}>
+            {pendingPlan ? (
+              <PlanReview
+                pendingPlan={pendingPlan}
+                approvedPlan={approvedPlan}
+                submitting={reviewSubmitting}
+                onSubmit={handleReviewSubmit}
+              />
+            ) : null}
+            <NextActions
               approvedPlan={approvedPlan}
-              submitting={reviewSubmitting}
-              onSubmit={handleReviewSubmit}
+              busyTaskId={updatingTaskId}
+              onUpdateTaskStatus={handleUpdateTaskStatus}
+              headingRef={nextActionsHeadingRef}
             />
-          ) : null}
-          <CaseRecordList records={records} />
-          <DraftList drafts={drafts} />
-          <ActivityTimeline activity={activity} />
-        </Stack>
+            <DraftList drafts={drafts} />
+          </Stack>
+          <Stack spacing={3} sx={{ minWidth: 0 }}>
+            <CaseSummary caseData={caseData} />
+            <CaseRecordList records={records} />
+            <ActivityTimeline activity={activity} />
+          </Stack>
+        </Box>
       ) : (
         <EmptyState onStartBlank={handleStartBlank} onLoadDemo={handleLoadDemo} busy={busy} />
       )}

@@ -1,5 +1,7 @@
-import { Paper, Stack, Typography } from '@mui/material';
-import { sectionSurfaceSx } from '../styles/surfaces';
+import { Box, Stack, Typography } from '@mui/material';
+import { SECTION_TINTS } from '../styles/surfaces';
+import { ClockIcon } from './icons';
+import { SectionCard } from './SectionCard';
 import type { ActivityEvent } from '../domain/types';
 
 type ActivityTimelineProps = {
@@ -21,20 +23,55 @@ export function ActivityTimeline({ activity }: ActivityTimelineProps) {
   );
 
   return (
-    <Paper component="section" elevation={0} sx={sectionSurfaceSx}>
-      <Stack spacing={1.5}>
-        <Typography component="h2" variant="h2">
-          Activity
+    <SectionCard id="activity" tint="activity" icon={<ClockIcon />} title="Activity">
+      {sorted.length === 0 ? (
+        <Typography component="p" variant="body1" color="text.secondary">
+          No activity yet.
         </Typography>
-
-        {sorted.length === 0 ? (
-          <Typography component="p" variant="body2" color="text.secondary">
-            No activity yet.
-          </Typography>
-        ) : (
-          <Stack component="ol" spacing={1.5} sx={{ m: 0, pl: 2.5 }}>
-            {sorted.map((event) => (
-              <Stack key={event.id} component="li" spacing={0.5}>
+      ) : (
+        <Stack component="ol" role="list" spacing={0} sx={{ m: 0, p: 0, listStyle: 'none', position: 'relative' }}>
+          {sorted.map((event, index) => (
+            <Stack
+              key={event.id}
+              component="li"
+              direction="row"
+              spacing={1.5}
+              sx={{ position: 'relative', pb: index === sorted.length - 1 ? 0 : 2.5 }}
+            >
+              <Box
+                aria-hidden="true"
+                sx={{
+                  position: 'relative',
+                  flex: '0 0 auto',
+                  width: 12,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  pt: '7px',
+                  '&::before':
+                    index === sorted.length - 1
+                      ? undefined
+                      : {
+                          content: '""',
+                          position: 'absolute',
+                          top: 19,
+                          bottom: -20,
+                          left: 5,
+                          width: 2,
+                          bgcolor: 'divider',
+                        },
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: '50%',
+                    bgcolor: event.actor === 'user' ? 'primary.main' : SECTION_TINTS.activity.fg,
+                    boxShadow: '0 0 0 3px #ffffff',
+                  }}
+                />
+              </Box>
+              <Stack spacing={0.25} sx={{ minWidth: 0 }}>
                 <Typography component="p" variant="body1" sx={{ fontWeight: 600 }}>
                   {event.summary}
                 </Typography>
@@ -43,10 +80,10 @@ export function ActivityTimeline({ activity }: ActivityTimelineProps) {
                   <time dateTime={event.createdAt}>{formatTimestamp(event.createdAt)}</time>
                 </Typography>
               </Stack>
-            ))}
-          </Stack>
-        )}
-      </Stack>
-    </Paper>
+            </Stack>
+          ))}
+        </Stack>
+      )}
+    </SectionCard>
   );
 }

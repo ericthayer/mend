@@ -1,8 +1,11 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { Alert, Box, Button, Container, Stack, Typography } from '@mui/material';
+import { alpha } from '@mui/material/styles';
+import { MendMark } from '../components/icons';
 import { SafetyBanner } from '../components/SafetyBanner';
 import {
-  WebMCPStatus,
+  WebMCPStatusChip,
+  WebMCPStatusNotice,
   type WebMCPCapabilityStatus,
 } from '../components/WebMCPStatus';
 
@@ -11,6 +14,8 @@ type AppShellProps = {
   webmcpErrorMessage?: string;
   storageWarning?: string | null;
   inlineError?: string | null;
+  statusMessage?: string | null;
+  onDismissStatus?: () => void;
   onResetRequested?: () => void;
   children: ReactNode;
 };
@@ -20,6 +25,8 @@ export function AppShell({
   webmcpErrorMessage,
   storageWarning,
   inlineError,
+  statusMessage,
+  onDismissStatus,
   onResetRequested,
   children,
 }: AppShellProps) {
@@ -34,31 +41,59 @@ export function AppShell({
   }, [inlineError]);
 
   return (
-    <Box component="div" sx={{ py: { xs: 2, sm: 4 } }}>
-      <Container maxWidth="lg">
-        <Stack spacing={3}>
-          <Box component="header" sx={{ display: 'grid', gap: 1 }}>
-            <Stack
-              direction={{ xs: 'column', sm: 'row' }}
-              spacing={1.5}
-              sx={{ alignItems: { sm: 'center' } }}
-            >
-              <Typography component="h1" variant="h1" sx={{ mr: 'auto' }}>
-                Mend
-              </Typography>
-              <Typography component="p" variant="body2" color="text.secondary">
-                Local-only contest build
-              </Typography>
-              {onResetRequested ? (
-                <Button type="button" variant="outlined" color="error" onClick={onResetRequested}>
-                  Delete local case
-                </Button>
-              ) : null}
-            </Stack>
-            <WebMCPStatus status={webmcpStatus} errorMessage={webmcpErrorMessage} />
-          </Box>
+    <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
+      <Box
+        component="header"
+        sx={(theme) => ({
+          position: 'sticky',
+          top: 0,
+          zIndex: theme.zIndex.appBar,
+          bgcolor: alpha(theme.palette.background.default, 0.88),
+          backdropFilter: 'blur(14px)',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+        })}
+      >
+        <Container
+          maxWidth="lg"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            columnGap: 2,
+            rowGap: 1,
+            minHeight: 64,
+            py: 1,
+          }}
+        >
+          <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
+            <MendMark />
+            <Typography component="h1" variant="h1">
+              Mend
+            </Typography>
+          </Stack>
 
-          <SafetyBanner />
+          <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+            <WebMCPStatusChip status={webmcpStatus} />
+            {onResetRequested ? (
+              <Button
+                type="button"
+                variant="text"
+                onClick={onResetRequested}
+                sx={{ color: 'text.secondary', minHeight: 40, px: 1.5 }}
+              >
+                Delete local case
+              </Button>
+            ) : null}
+          </Box>
+        </Container>
+      </Box>
+
+      <Container maxWidth="lg" sx={{ flex: 1, pt: { xs: 3, md: 5 }, pb: { xs: 5, md: 8 } }}>
+        <Stack spacing={{ xs: 3, md: 4 }}>
+          {webmcpStatus === 'error' ? (
+            <WebMCPStatusNotice status={webmcpStatus} errorMessage={webmcpErrorMessage} />
+          ) : null}
 
           {storageWarning ? (
             <Alert severity="warning" variant="outlined" role="status" aria-live="polite">
@@ -78,7 +113,23 @@ export function AppShell({
             </Alert>
           ) : null}
 
+          <SafetyBanner />
+
+          <Box role="status" aria-live="polite" sx={{ display: statusMessage ? 'block' : 'contents' }}>
+            {statusMessage ? (
+              <Alert severity="success" variant="outlined" onClose={onDismissStatus}>
+                {statusMessage}
+              </Alert>
+            ) : null}
+          </Box>
+
           <Box component="main">{children}</Box>
+
+          {webmcpStatus === 'unsupported' ? (
+            <Box component="footer">
+              <WebMCPStatusNotice status={webmcpStatus} errorMessage={webmcpErrorMessage} />
+            </Box>
+          ) : null}
         </Stack>
       </Container>
     </Box>

@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import {
+  Box,
   Button,
   Chip,
   FormControl,
   FormLabel,
-  Paper,
   Stack,
   Typography,
 } from '@mui/material';
-import { reviewSurfaceSx } from '../styles/surfaces';
+import { reviewSurfaceSx, SECTION_TINTS } from '../styles/surfaces';
+import { ClipboardCheckIcon } from './icons';
+import { SectionCard } from './SectionCard';
 import type { CommandResult, RecoveryPlan } from '../domain/types';
 
 type ReviewDecision = 'approve' | 'request_changes';
@@ -36,6 +38,15 @@ const DECISION_TOOL_PARAM_DESCRIPTION =
   'The proposed review decision. The person can change it before submitting.';
 const NOTE_TOOL_PARAM_DESCRIPTION =
   'Optional review note for the plan history.';
+
+const NATIVE_FIELD_STYLE = {
+  borderRadius: 10,
+  border: '1px solid rgba(20, 24, 31, 0.24)',
+  fontSize: '1rem',
+  fontFamily: 'inherit',
+  backgroundColor: '#ffffff',
+  color: '#14181f',
+} as const;
 
 type PlanReviewProps = {
   pendingPlan: RecoveryPlan;
@@ -150,56 +161,94 @@ export function PlanReview({
   }, []);
 
   return (
-    <Paper component="section" elevation={0} sx={reviewSurfaceSx}>
-      <Stack spacing={2}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ alignItems: { sm: 'center' } }}>
-          <Typography component="h2" variant="h2" sx={{ mr: 'auto' }}>
-            Needs your review
-          </Typography>
-          <Chip
-            label={`Plan v${pendingPlan.version}`}
-            color="warning"
-            variant="outlined"
-            sx={{ color: 'text.primary', borderColor: 'warning.main', fontWeight: 600 }}
-          />
-        </Stack>
+    <SectionCard
+      id="review"
+      tint="review"
+      icon={<ClipboardCheckIcon />}
+      title="Needs your review"
+      sx={reviewSurfaceSx}
+      meta={
+        <Chip
+          label={`Plan v${pendingPlan.version}`}
+          size="small"
+          variant="outlined"
+          sx={{ color: 'text.primary', borderColor: 'warning.main' }}
+        />
+      }
+    >
+      <Typography component="p" variant="body2" color="text.secondary" sx={{ maxWidth: '65ch' }}>
+        {approvedPlan
+          ? `Approved plan v${approvedPlan.version} stays active until you confirm this revision.`
+          : 'No plan is active until you confirm this review decision.'}
+      </Typography>
 
-        <Typography component="p" variant="body2" color="text.secondary">
-          {approvedPlan
-            ? `Approved plan v${approvedPlan.version} stays active until you confirm this revision.`
-            : 'No plan is active until you confirm this review decision.'}
-        </Typography>
+      <Typography component="p" variant="body1" sx={{ fontWeight: 650, maxWidth: '65ch' }}>
+        {pendingPlan.goal}
+      </Typography>
 
-        <Typography component="p" variant="body1" sx={{ fontWeight: 600 }}>
-          {pendingPlan.goal}
-        </Typography>
-
-        <Stack component="ol" spacing={1.5} sx={{ m: 0, pl: 2.5 }}>
-          {pendingPlan.tasks.map((task) => (
-            <Stack key={task.id} component="li" spacing={0.5}>
-              <Typography component="p" variant="body1" sx={{ fontWeight: 600 }}>
+      <Stack component="ol" role="list" spacing={0} sx={{ m: 0, p: 0, listStyle: 'none' }}>
+        {pendingPlan.tasks.map((task, index) => (
+          <Stack
+            key={task.id}
+            component="li"
+            direction="row"
+            spacing={1.5}
+            sx={{
+              py: 1.5,
+              borderTop: index === 0 ? 'none' : '1px solid',
+              borderColor: 'rgba(143, 98, 16, 0.18)',
+            }}
+          >
+            <Box
+              aria-hidden="true"
+              sx={{
+                width: 28,
+                height: 28,
+                flex: '0 0 auto',
+                borderRadius: '50%',
+                display: 'grid',
+                placeItems: 'center',
+                bgcolor: SECTION_TINTS.review.bg,
+                color: SECTION_TINTS.review.fg,
+                fontSize: '0.875rem',
+                fontWeight: 700,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {index + 1}
+            </Box>
+            <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+              <Typography component="p" variant="body1" sx={{ fontWeight: 650 }}>
                 {task.title}
               </Typography>
-              <Typography component="p" variant="body2" color="text.secondary">
+              <Typography component="p" variant="body2" color="text.secondary" sx={{ maxWidth: '65ch' }}>
                 {task.rationale}
               </Typography>
               <Typography component="p" variant="body2" color="text.secondary">
                 Priority: {task.priority}
               </Typography>
             </Stack>
-          ))}
-        </Stack>
+          </Stack>
+        ))}
+      </Stack>
 
-        <Typography component="p" role="status" aria-live="polite" variant="body2" sx={{ minHeight: 22 }}>
-          {liveAnnouncement || ' '}
-        </Typography>
+      <Typography component="p" role="status" aria-live="polite" variant="body2" sx={{ minHeight: 22, fontWeight: 600 }}>
+        {liveAnnouncement || ' '}
+      </Typography>
 
-        <Stack
-          component="form"
-          ref={formRef}
-          data-tool-active={isToolFormActive ? 'true' : 'false'}
-          spacing={1.5}
-          onSubmit={(event) => {
+      <Stack
+        component="form"
+        ref={formRef}
+        data-tool-active={isToolFormActive ? 'true' : 'false'}
+        spacing={2}
+        sx={{
+          p: { xs: 2, sm: 2.5 },
+          borderRadius: 3,
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+        }}
+        onSubmit={(event) => {
             event.preventDefault();
             const result = onSubmit({
               planId: pendingPlan.id,
@@ -242,8 +291,11 @@ export function PlanReview({
             }
           }}
         >
-          <FormControl size="small" sx={{ maxWidth: 260 }}>
-            <FormLabel htmlFor="review-decision">Decision</FormLabel>
+        <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: 'minmax(0, 260px) 1fr' } }}>
+          <FormControl size="small">
+            <FormLabel htmlFor="review-decision" sx={{ mb: 0.75, fontWeight: 600, color: 'text.primary' }}>
+              Decision
+            </FormLabel>
             <select
               id="review-decision"
               ref={decisionSelectRef}
@@ -252,14 +304,9 @@ export function PlanReview({
               value={decision}
               onChange={(event) => setDecision(event.target.value as ReviewDecision)}
               style={{
+                ...NATIVE_FIELD_STYLE,
                 minHeight: 44,
-                borderRadius: 8,
-                border: '1px solid rgba(31, 39, 51, 0.4)',
                 padding: '0 12px',
-                fontSize: '1rem',
-                fontFamily: 'inherit',
-                backgroundColor: '#fffdf8',
-                color: '#1f2733',
               }}
             >
               <option value="approve">Approve plan</option>
@@ -267,39 +314,39 @@ export function PlanReview({
             </select>
           </FormControl>
 
-          <Stack spacing={0.5}>
-            <FormLabel htmlFor="review-note">Review note (optional)</FormLabel>
+          <Stack spacing={0.75}>
+            <FormLabel htmlFor="review-note" sx={{ fontWeight: 600, color: 'text.primary' }}>
+              Review note (optional)
+            </FormLabel>
             <textarea
               id="review-note"
               ref={noteTextareaRef}
               name="note"
-              rows={4}
+              rows={3}
               maxLength={500}
               value={note}
               onChange={(event) => setNote(event.target.value)}
               style={{
+                ...NATIVE_FIELD_STYLE,
                 width: '100%',
-                minHeight: 120,
-                borderRadius: 8,
-                border: '1px solid rgba(31, 39, 51, 0.4)',
+                minHeight: 88,
                 padding: '10px 12px',
-                fontSize: '1rem',
-                fontFamily: 'inherit',
                 resize: 'vertical',
                 boxSizing: 'border-box',
-                backgroundColor: '#fffdf8',
-                color: '#1f2733',
               }}
             />
           </Stack>
+        </Box>
 
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-            <Button type="submit" variant="contained" disabled={submitting}>
-              Confirm decision
-            </Button>
-          </Stack>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ alignItems: { sm: 'center' } }}>
+          <Button type="submit" variant="contained" disabled={submitting} sx={{ minWidth: 200 }}>
+            Confirm decision
+          </Button>
+          <Typography component="p" variant="body2" color="text.secondary">
+            Nothing changes until you confirm. Your assistant can only prepare this form.
+          </Typography>
         </Stack>
       </Stack>
-    </Paper>
+    </SectionCard>
   );
 }

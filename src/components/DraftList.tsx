@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Alert, Button, Chip, Paper, Stack, Typography } from '@mui/material';
-import { sectionSurfaceSx } from '../styles/surfaces';
+import { Alert, Box, Button, Chip, Stack, Typography } from '@mui/material';
+import { MailIcon } from './icons';
+import { SectionCard } from './SectionCard';
 import type { OutreachDraft } from '../domain/types';
 
 type DraftListProps = {
@@ -54,47 +55,68 @@ export function DraftList({ drafts }: DraftListProps) {
   };
 
   return (
-    <Paper component="section" elevation={0} sx={sectionSurfaceSx}>
-      <Stack spacing={1.5}>
-        <Typography component="h2" variant="h2">
-          Drafts
+    <SectionCard
+      id="drafts"
+      tint="drafts"
+      icon={<MailIcon />}
+      title="Drafts"
+      meta={sorted.length > 0 ? <Chip label={`${sorted.length}`} size="small" variant="outlined" /> : undefined}
+    >
+      {copyState.kind === 'success' ? <Alert severity="success">{copyState.message}</Alert> : null}
+      {copyState.kind === 'error' ? <Alert severity="warning">{copyState.message}</Alert> : null}
+
+      {sorted.length === 0 ? (
+        <Typography component="p" variant="body1" color="text.secondary">
+          No drafts prepared yet.
         </Typography>
-
-        {copyState.kind === 'success' ? <Alert severity="success">{copyState.message}</Alert> : null}
-        {copyState.kind === 'error' ? <Alert severity="warning">{copyState.message}</Alert> : null}
-
-        {sorted.length === 0 ? (
-          <Typography component="p" variant="body2" color="text.secondary">
-            No drafts prepared yet.
-          </Typography>
-        ) : (
-          <Stack component="ol" spacing={1.5} sx={{ m: 0, pl: 2.5 }}>
-            {sorted.map((draft) => (
-              <Stack key={draft.id} component="li" spacing={1}>
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ alignItems: { sm: 'center' } }}>
-                  <Typography component="h3" variant="body1" sx={{ fontWeight: 650, mr: 'auto' }}>
-                    {draft.subject}
-                  </Typography>
-                  <Chip label="Draft — not sent" size="small" color="warning" variant="outlined" />
-                </Stack>
-
-                <Typography component="p" variant="body2" color="text.secondary">
-                  {draft.body}
+      ) : (
+        <Stack component="ol" role="list" spacing={0} sx={{ m: 0, p: 0, listStyle: 'none' }}>
+          {sorted.map((draft, index) => (
+            <Stack
+              key={draft.id}
+              component="li"
+              spacing={1.5}
+              sx={{
+                py: 2,
+                borderTop: index === 0 ? 'none' : '1px solid',
+                borderColor: 'divider',
+                '&:first-of-type': { pt: 0.5 },
+                '&:last-of-type': { pb: 0.5 },
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', columnGap: 1.5, rowGap: 1 }}>
+                <Typography component="h3" variant="h3" sx={{ mr: 'auto' }}>
+                  {draft.subject}
                 </Typography>
+                <Chip label="Draft — not sent" size="small" color="warning" variant="outlined" />
+              </Box>
 
-                <Typography component="p" variant="body2" color="text.secondary">
-                  Audience: {draft.audience} · By: {draft.createdBy} · Created:{' '}
-                  <time dateTime={draft.createdAt}>{formatTimestamp(draft.createdAt)}</time>
-                </Typography>
+              <Typography
+                component="p"
+                variant="body1"
+                sx={{
+                  maxWidth: '65ch',
+                  whiteSpace: 'pre-wrap',
+                  p: 2,
+                  borderRadius: 3,
+                  bgcolor: 'background.default',
+                }}
+              >
+                {draft.body}
+              </Typography>
 
-                <Button type="button" variant="outlined" sx={{ width: 'fit-content' }} onClick={() => handleCopy(draft)}>
-                  Copy draft text
-                </Button>
-              </Stack>
-            ))}
-          </Stack>
-        )}
-      </Stack>
-    </Paper>
+              <Typography component="p" variant="body2" color="text.secondary">
+                Audience: {draft.audience} · By: {draft.createdBy} · Created:{' '}
+                <time dateTime={draft.createdAt}>{formatTimestamp(draft.createdAt)}</time>
+              </Typography>
+
+              <Button type="button" variant="outlined" sx={{ width: 'fit-content' }} onClick={() => handleCopy(draft)}>
+                Copy draft text
+              </Button>
+            </Stack>
+          ))}
+        </Stack>
+      )}
+    </SectionCard>
   );
 }

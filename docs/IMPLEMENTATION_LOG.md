@@ -784,3 +784,17 @@
     * `npm run build` — passed: 973 modules transformed; emitted only the known chunk-size warning (`index` bundle 545.23 kB minified).
   * **Disposition:** all T4.2 acceptance criteria are documented as met. T4.2 is promoted from **BLOCKED** to **DONE**.
   * **Next eligible task:** `T5.1` — make the repository judge-ready.
+
+### Entry: UX-1 — Visual design refresh (user-directed, out-of-backlog)
+* **Status:** DONE
+* **Trigger:** operator request on 2026-09-03 for a design critique and a modern visual refresh (reference: light-neutral canvas, white hairline cards, pastel icon tiles, centered greeting header). Critique snapshot: `.impeccable/critique/2026-09-03T09-08-02Z__src-app-appshell-tsx.md` (22/40).
+* **Scope agreed with operator:** shell + layout + section surfaces; no sidebar rail; fix both critique P0s (spec §7 two-column layout at ≥900px; approval confirmation/focus loss when `PlanReview` unmounts). Copy/enum-label fixes explicitly out of scope. No changes to WebMCP contracts, commands, store, or the declarative review form's native `<select>`/`<textarea>`.
+* **Planned files:** `src/styles/theme.ts`, `src/styles/surfaces.ts`, `src/styles/global.css`, `src/app/AppShell.tsx`, `src/App.tsx`, `src/components/SectionCard.tsx` (new), `src/components/icons.tsx` (new), `src/components/{CaseSummary,NextActions,PlanReview,CaseRecordList,DraftList,ActivityTimeline,EmptyState,SafetyBanner,WebMCPStatus}.tsx`.
+* **Validation commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`.
+* **What changed:**
+  * Theme: `#f4f4f1` canvas, white 16px-radius hairline `Paper`, 44px buttons, pill chips, softened `info` alert, system font stack retained.
+  * New `SectionCard` (icon tile + h2 header + meta slot) and inline SVG `icons.tsx`; all six section components plus `SafetyBanner`/`EmptyState` restyled on top of it. `INCIDENT_LABELS` moved to `src/domain/labels.ts`.
+  * Shell: sticky translucent header (wordmark + WebMCP status chip + text-style "Delete local case"); unsupported-browser notice moved to a footer; error notice stays at top.
+  * P0 layout: `App.tsx` renders a `7fr/5fr` grid at `md+` (primary: review → next actions → drafts; secondary: what we know → records → activity), single column below.
+  * P0 focus: on approval `App.tsx` sets a dismissible success status (`role="status"`, polite) and moves focus to the "Next actions" heading via new `NextActions.headingRef`; on request-changes it posts a status message only.
+* **Verification (2026-09-03):** `npm run lint` ✓ · `npm run typecheck` ✓ · `npm run test:run` ✓ (11 files, 52 tests) · `npm run build` ✓ (553 kB JS, pre-existing chunk-size warning). `impeccable detect` on changed targets → no findings. Browser check at 1280px and 390px: two-column/single-column behaviour confirmed; empty state and dashboard rendered as designed.

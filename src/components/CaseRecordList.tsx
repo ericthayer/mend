@@ -1,5 +1,6 @@
-import { Chip, Paper, Stack, Typography } from '@mui/material';
-import { sectionSurfaceSx } from '../styles/surfaces';
+import { Box, Chip, Stack, Typography } from '@mui/material';
+import { FolderIcon } from './icons';
+import { SectionCard } from './SectionCard';
 import type { CaseRecord } from '../domain/types';
 
 type CaseRecordListProps = {
@@ -21,46 +22,57 @@ export function CaseRecordList({ records }: CaseRecordListProps) {
   );
 
   return (
-    <Paper component="section" elevation={0} sx={sectionSurfaceSx}>
-      <Stack spacing={1.5}>
-        <Typography component="h2" variant="h2">
-          Case records
+    <SectionCard
+      id="records"
+      tint="records"
+      icon={<FolderIcon />}
+      title="Case records"
+      meta={sorted.length > 0 ? <Chip label={`${sorted.length}`} size="small" variant="outlined" /> : undefined}
+    >
+      {sorted.length === 0 ? (
+        <Typography component="p" variant="body1" color="text.secondary">
+          No records added yet.
         </Typography>
-
-        {sorted.length === 0 ? (
-          <Typography component="p" variant="body2" color="text.secondary">
-            No records added yet.
-          </Typography>
-        ) : (
-          <Stack component="ol" spacing={1.5} sx={{ m: 0, pl: 2.5 }}>
-            {sorted.map((record) => (
-              <Stack key={record.id} component="li" spacing={1}>
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ alignItems: { sm: 'center' } }}>
-                  <Typography component="h3" variant="body1" sx={{ fontWeight: 650, mr: 'auto' }}>
-                    {record.title}
-                  </Typography>
-                  <Chip label={record.category} size="small" variant="outlined" />
-                </Stack>
-
-                <Typography component="p" variant="body2" color="text.secondary">
-                  {record.note}
+      ) : (
+        <Stack component="ol" role="list" spacing={0} sx={{ m: 0, p: 0, listStyle: 'none' }}>
+          {sorted.map((record, index) => (
+            <Stack
+              key={record.id}
+              component="li"
+              spacing={1}
+              sx={{
+                py: 2,
+                borderTop: index === 0 ? 'none' : '1px solid',
+                borderColor: 'divider',
+                '&:first-of-type': { pt: 0.5 },
+                '&:last-of-type': { pb: 0.5 },
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', columnGap: 1.5, rowGap: 1 }}>
+                <Typography component="h3" variant="h3" sx={{ mr: 'auto' }}>
+                  {record.title}
                 </Typography>
+                <Chip label={record.category} size="small" variant="outlined" />
+              </Box>
 
+              <Typography component="p" variant="body2" sx={{ maxWidth: '65ch' }}>
+                {record.note}
+              </Typography>
+
+              <Typography component="p" variant="body2" color="text.secondary">
+                Type: {record.category} · By: {record.createdBy} · Logged:{' '}
+                <time dateTime={record.createdAt}>{formatTimestamp(record.createdAt)}</time>
+              </Typography>
+
+              {record.dueAt ? (
                 <Typography component="p" variant="body2" color="text.secondary">
-                  Type: {record.category} · By: {record.createdBy} · Logged:{' '}
-                  <time dateTime={record.createdAt}>{formatTimestamp(record.createdAt)}</time>
+                  Due: <time dateTime={record.dueAt}>{formatTimestamp(record.dueAt)}</time>
                 </Typography>
-
-                {record.dueAt ? (
-                  <Typography component="p" variant="body2" color="text.secondary">
-                    Due: <time dateTime={record.dueAt}>{formatTimestamp(record.dueAt)}</time>
-                  </Typography>
-                ) : null}
-              </Stack>
-            ))}
-          </Stack>
-        )}
-      </Stack>
-    </Paper>
+              ) : null}
+            </Stack>
+          ))}
+        </Stack>
+      )}
+    </SectionCard>
   );
 }
