@@ -1511,12 +1511,6 @@ Only these decisions require the project owner; implementation should proceed wi
 | OD-03 | Netlify account/site | **Resolved:** Netlify project ID `6074f418-73e0-4416-a297-f3cbf9f856bf`. Deployment is pending; use the exact ID and stop if authorization is unavailable. |
 | OD-04 | Optional outreach-draft beat | **Resolved:** Defer it unless the core demo and all contest-critical gates are complete. |
 
-## 17. Suggested first prompt for the implementation agent
-
-```text
-Read AGENTS.md and docs/BUILD_SPEC.md completely. Treat docs/BUILD_SPEC.md as the source of truth. The project is Mend, the public repository is https://github.com/ericthayer/mend, and the Netlify project ID is 6074f418-73e0-4416-a297-f3cbf9f856bf; deployment has not happened yet. Inspect the repository and docs/IMPLEMENTATION_LOG.md, verify the owner-created harness files, identify the first READY task whose dependencies are DONE, and implement only that task. Before editing, record the task ID, relevant acceptance criteria, planned files, and validation commands in the implementation log. After editing, run the required checks, record evidence, update task statuses, and name the next READY task. Do not implement the deferred outreach feature or weaken the human approval, safety, validation, privacy, or WebMCP boundaries.
-```
-
 ## 18. Authoritative references
 
 - WebMCP Challenge rules and submission requirements: https://webmcp.devpost.com/rules
