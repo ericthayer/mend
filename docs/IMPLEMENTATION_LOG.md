@@ -12,9 +12,9 @@
 | T1.4 | DONE | P1 | Supporting case views | Record list, draft view, activity timeline, reset modal |
 | T2.1 | DONE | P0 | WebMCP platform adapter | Adapter, type augmentation, model-context mock |
 | T2.2 | DONE | P0 | Imperative WebMCP tools | Snapshot, create case, add record, stage plan tools |
-| T2.3 | READY | P0 | Declarative review form | Semantic `<form toolname="start_plan_review">` |
+| T2.3 | DONE | P0 | Declarative review form | Semantic `<form toolname="start_plan_review">` |
 | T2.4 | BLOCKED | P1 | Safe outreach drafting tool | `stage_outreach_draft` tool & draft list wiring |
-| T3.1 | BLOCKED | P0 | Unit & integration tests | Test coverage for domain invariants & authority gates |
+| T3.1 | READY | P0 | Unit & integration tests | Test coverage for domain invariants & authority gates |
 | T3.2 | BLOCKED | P0 | Hardened accessibility & states | Keyboard traversal, axe a11y checks, live regions |
 | T3.3 | BLOCKED | P1 | End-to-end browser journeys | Playwright happy-path test suite |
 | T4.1 | BLOCKED | P0 | Production Netlify build | Headers, redirects, static build verification |
@@ -335,3 +335,40 @@
   * Successful tool calls immediately update visible UI state via shared command-layer mutations.
   * Validation failures return correctable field-level hints without stack traces or internal implementation details.
 * **Next eligible task:** `T2.3` (next in backlog order). `T2.4` remains blocked behind T2.2 plus core critical-path completion policy.
+
+### Entry: T2.3 — Make Plan Review Declarative and Human-Controlled
+* **Status:** DONE
+* **Depends on:** T1.3 (DONE)
+* **Acceptance criteria (BUILD_SPEC.md §T2.3):**
+  * Exact `toolname`/`tooldescription` are present only while a plan is pending.
+  * `toolautosubmit` is absent in source and rendered DOM.
+  * Tool activation cannot change plan status.
+  * Manual submission is keyboard accessible and updates via `reviewPlan(... actor: user)`.
+  * Cancellation restores form state.
+* **Planned Files:**
+  * `src/components/PlanReview.tsx` — declarative tool form attributes, activation/cancel handlers, live announcements, and submit-response behavior.
+  * `src/styles/global.css` — active-tool state styles for `:tool-form-active` and `:tool-submit-active`.
+  * `src/App.tsx` — return review command result to declarative submit responder.
+  * `src/components/T2DeclarativeReview.test.tsx` — source/DOM assertions and activation/cancel/submit integration coverage.
+  * `docs/IMPLEMENTATION_LOG.md` — T2.3 execution evidence.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`
+* **Additional Verification:** `grep -R "toolautosubmit=" -n src` (confirmed no declarative autosubmit attribute usage)
+* **Validation Results (all passed):**
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — `vitest run`: 9 test files passed, 34 tests passed total.
+    * Added `src/components/T2DeclarativeReview.test.tsx` covering exact declarative attributes, no-autosubmit behavior, `toolactivated` prefill/focus, `toolcancel` restoration, and manual submit response behavior.
+  * `npm run build` — `tsc -b && vite build` exit 0.
+* **Changed Files:**
+  * `src/components/PlanReview.tsx` — declarative `start_plan_review` form semantics, tool activation/cancel listeners, live announcements, manual-submit gate, and `respondWith(...)` support for agent-invoked submits.
+  * `src/styles/global.css` — explicit `:tool-form-active` / `:tool-submit-active` styles with non-color-only emphasis plus data-attribute fallback styling.
+  * `src/App.tsx` — review submit handler now returns command result for declarative submit response mapping.
+  * `src/components/T2DeclarativeReview.test.tsx` (new) — declarative form integration and authority-boundary tests.
+  * `docs/IMPLEMENTATION_LOG.md` — T2.3 status and execution evidence.
+* **Result:** T2.3 acceptance criteria met:
+  * `start_plan_review` metadata appears only when a pending plan is visible.
+  * No `toolautosubmit` attribute is defined or rendered.
+  * Tool activation can prefill/focus and announce readiness, but does not mutate plan approval status.
+  * Manual submit remains keyboard operable and routes through `reviewPlan(... actor: user)`.
+  * Tool cancellation restores prior form values and announces the cancellation state.
+* **Next eligible task:** `T3.1` (now `READY`; dependencies T2.2 + T2.3 are DONE).

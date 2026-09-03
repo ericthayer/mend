@@ -136,6 +136,8 @@ function App() {
     }
 
     setReviewSubmitting(false);
+
+    return result;
   };
 
   const handleUpdateTaskStatus = (input: {
