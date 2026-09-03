@@ -205,17 +205,16 @@ function App() {
       onResetRequested={caseData ? () => setIsResetDialogOpen(true) : undefined}
     >
       {caseData ? (
-        <Stack spacing={3}>
+        <Stack spacing={0} sx={{ gap: 3 }}>
           <CaseSummary caseData={caseData} />
           <Box
             sx={{
               display: 'grid',
               gap: 3,
               gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 7fr) minmax(0, 5fr)' },
-              alignItems: 'start',
             }}
           >
-            <Stack spacing={3} sx={{ minWidth: 0 }}>
+            <Stack spacing={0} sx={{ gap: 3, minWidth: 0 }}>
               {pendingPlan ? (
                 <PlanReview
                   pendingPlan={pendingPlan}
@@ -232,8 +231,10 @@ function App() {
               />
               <DraftList drafts={drafts} />
             </Stack>
-            <Stack spacing={3} sx={{ minWidth: 0 }}>
+            <Stack spacing={0} sx={{ gap: 3, minWidth: 0 }}>
               <CaseRecordList records={records} />
+            </Stack>
+            <Stack spacing={0} sx={{ gap: 3, minWidth: 0, gridColumn: 'span 2' }}>
               <ActivityTimeline activity={activity} />
             </Stack>
           </Box>

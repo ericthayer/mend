@@ -87,7 +87,7 @@ export function ActivityTimeline({ activity }: ActivityTimelineProps) {
                   }
                 />
               </Box>
-              <Stack spacing={0.25} sx={{ minWidth: 0 }}>
+              <Stack spacing={0.25} sx={{ minWidth: 0, flex: 1 }}>
                 <Typography component="p" variant="body1" sx={{ fontWeight: 600 }}>
                   {event.summary}
                 </Typography>

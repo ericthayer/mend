@@ -1017,3 +1017,45 @@
   * `npm run build` — exit 0. Only the pre-existing non-blocking bundle-size advisory was emitted.
 * **Browser Evidence:** Verified in the shared browser session at 1440×900 and 390×844, in both light and dark color schemes: no horizontal overflow at any combination; the promoted "What we know" hero band, tonal chips, pill buttons, and soft-shadow cards render correctly; dark mode correctly shows the inset-highlight/hairline-border treatment (not the light-mode ambient shadow, which would be invisible on a near-black canvas). The browser session was reset to the clean empty state afterward (`localStorage.clear()` + reload) so no demo data was left behind as a side effect of visual QA.
 * **Result:** The dashboard now reads as a deliberate, distinctive product surface (bold display headline, tonal badges, pill controls, soft-elevated cards) rather than default MUI/Tailwind scaffolding, while every WebMCP tool contract, command-layer boundary, native review-form semantic, and piece of copy remains exactly as before.
+
+### Follow-up: T5.1 — Refresh README screenshots
+* **Status:** DONE
+* **Trigger:** operator request on 2026-09-03 to update the README evidence for the UX-7 visual rework.
+* **Scope:** replace only the three synthetic screenshot assets referenced by the existing `README.md` flow table. No README links, application behavior, WebMCP contracts, or state transitions changed.
+* **Capture states:** clean start surface; seeded flood case with a staged pending plan; the same deterministic case after visible human approval.
+* **Changed Files:**
+  * `docs/screenshots/empty-state.png` — refreshed start/safety surface.
+  * `docs/screenshots/pending-review.png` — refreshed case-summary hero and review gate.
+  * `docs/screenshots/approved-next-actions.png` — refreshed approved-plan actions and activity view.
+  * `docs/IMPLEMENTATION_LOG.md` — screenshot refresh evidence.
+* **Verification:** Captures were taken from the local app using the deterministic WebMCP test harness and contain no real personal data or fabricated agent evidence. Existing README paths remain valid. The browser was reset to an empty local state after capture.
+
+### Entry: UX-9 — Clarify the start decision (user-directed, out-of-backlog)
+* **Status:** IN PROGRESS
+* **Trigger:** operator requested a redesign of the start surface so people can more clearly understand what to do first.
+* **Design read:** trust-first recovery start screen for a stressed, non-expert household user; calm, directive, low-motion instructional hierarchy (`DESIGN_VARIANCE: 3`, `MOTION_INTENSITY: 2`, `VISUAL_DENSITY: 4`).
+* **Scope:** refine copy, information hierarchy, and responsive visual treatment in the empty/start surface only. Preserve the existing two startup actions, command-layer behavior, local-only data boundary, manual plan-review boundary, MUI theme, and no-network constraint.
+* **Planned Files:**
+  * `src/components/EmptyState.tsx` — replace ambiguous startup wording with clear first-action guidance and a compact explanation of what follows.
+  * `src/components/T1Shell.test.tsx` — assert the new user-facing guidance alongside the existing start controls.
+  * `docs/IMPLEMENTATION_LOG.md` — record implementation and verification evidence.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`, plus desktop/mobile browser review.
+* **Implementation:**
+  * Replaced the ambiguous `Next useful step` heading with `Choose how to begin` and gave the person a direct choice: start a private case for their situation or first inspect the sample flood case.
+  * Reframed the supporting panel as `What each choice does`, with concise, outcome-based descriptions for the blank case and demo plus an explicit manual-review reminder.
+  * Retained the browser-only, no-account, deletable-data assurance. No action labels, state transitions, command calls, tool contracts, or authority boundaries changed.
+* **Regression Coverage:** Updated the shell test to require the new heading, both choice descriptions, the manual-review explanation, and both existing action buttons. The targeted test passed: 1 test passed (4 intentionally filtered tests skipped).
+* **Browser Evidence:**
+  * Desktop (`1440 × 900`): start surface rendered with no horizontal overflow (`scrollWidth = clientWidth = 1440`).
+  * Mobile (`390 × 844`): the surface collapsed to one column with no horizontal overflow (`scrollWidth = clientWidth = 390`); the primary action measured `308 × 44` CSS pixels.
+  * Screen-reader snapshot exposes the main instruction, both buttons, and the explanatory complementary region in that order.
+* **Validation Results:**
+  * `npm run lint` — passed.
+  * `npm run typecheck` — passed.
+  * `npm run build` — passed (`vite build` completed in 836 ms).
+  * `npm run test:run` — blocked by two pre-existing, unrelated `AppShell` working-tree changes: the Light/Dark controls are rendered in a `display: none` footer (breaking `switches between light and dark modes from the header`) and the reset label changed from `Delete local case` to `Delete Case` (breaking the supporting-views test). The suite result was 10 files passed, 2 failed; 55 tests passed, 2 failed. UX-9's focused regression passed.
+* **Changed Files:**
+  * `src/components/EmptyState.tsx` — clearer startup decision and outcome-based supporting guidance.
+  * `src/components/T1Shell.test.tsx` — regression coverage for the new user-facing instructions.
+  * `docs/IMPLEMENTATION_LOG.md` — UX-9 scope, results, and scoped validation blocker.
+* **Status:** IN PROGRESS — implementation and direct UX evidence are complete; do not mark DONE until the unrelated AppShell regressions are resolved and the full suite is green.
