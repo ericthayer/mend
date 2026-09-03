@@ -8,11 +8,11 @@
 | T0.2 | DONE | P0 | Install agent execution harness (pre-created) | `AGENTS.md`, `docs/BUILD_SPEC.md`, `docs/IMPLEMENTATION_LOG.md`, `docs/EVAL_RESULTS.md`, `docs/decisions/0001-local-first-contest-architecture.md` |
 | T1.1 | DONE | P0 | Domain, schemas, commands, store | Domain logic, Zod schemas, Zustand store, fixtures |
 | T1.2 | DONE | P0 | Responsive shell & base views | Tokens, header, safety banner, empty state |
-| T1.3 | READY | P0 | Plan review & next actions | Review card, manual review commands, priority lists |
+| T1.3 | DONE | P0 | Plan review & next actions | Review card, manual review commands, priority lists |
 | T1.4 | READY | P1 | Supporting case views | Record list, draft view, activity timeline, reset modal |
 | T2.1 | READY | P0 | WebMCP platform adapter | Adapter, type augmentation, model-context mock |
 | T2.2 | BLOCKED | P0 | Imperative WebMCP tools | Snapshot, create case, add record, stage plan tools |
-| T2.3 | BLOCKED | P0 | Declarative review form | Semantic `<form toolname="start_plan_review">` |
+| T2.3 | READY | P0 | Declarative review form | Semantic `<form toolname="start_plan_review">` |
 | T2.4 | BLOCKED | P1 | Safe outreach drafting tool | `stage_outreach_draft` tool & draft list wiring |
 | T3.1 | BLOCKED | P0 | Unit & integration tests | Test coverage for domain invariants & authority gates |
 | T3.2 | BLOCKED | P0 | Hardened accessibility & states | Keyboard traversal, axe a11y checks, live regions |
@@ -180,3 +180,39 @@
   * Layout remains responsive from small mobile to desktop widths without horizontal scrolling.
   * Core controls are keyboard reachable and satisfy 44 px target floor via shared button theming.
 * **Next eligible task:** `T1.3` (next in backlog order). `T1.4` and `T2.1` are also `READY`.
+
+### Entry: T1.3 — Implement Plan Review and Next Actions
+* **Status:** DONE
+* **Depends on:** T1.1 (DONE), T1.2 (DONE)
+* **Acceptance criteria (BUILD_SPEC.md §T1.3):**
+  * A locally staged plan appears as `Needs your review`.
+  * Approved plan remains current while a revision is pending.
+  * Only a UI-sourced review command can approve/request changes.
+  * Approval promotes tasks to the next-actions section without page reload.
+  * `now`, `next`, and `later` ordering is deterministic.
+* **Planned Files:**
+  * `src/components/PlanReview.tsx` (new) — pending plan card + review form + status context.
+  * `src/components/NextActions.tsx` (new) — approved plan tasks sorted deterministically with status controls.
+  * `src/domain/selectors.ts` (edit) — deterministic task ordering helper and latest-plan convenience selectors.
+  * `src/App.tsx` (edit) — compose case summary, pending review, and next-actions with command-layer handlers.
+  * `src/components/T1PlanFlow.test.tsx` (new) — integration flow seed → stage plan command → approve in UI → reload persistence.
+  * `src/domain/commands.test.ts` (edit) — add explicit UI-source review success and stale-state guard coverage if needed.
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`
+* **Validation Results (all passed):**
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — `vitest run`: 5 test files passed, 17 tests passed total (including T1.3 integration flow coverage).
+  * `npm run build` — `tsc -b && vite build` exit 0.
+* **Changed Files:**
+  * `src/components/PlanReview.tsx` — pending-plan review card with explicit manual decision form (`Approve plan` / `Request changes`).
+  * `src/components/NextActions.tsx` — approved-plan next actions with deterministic ordering and UI task-status controls.
+  * `src/domain/selectors.ts` — deterministic priority/title/id task ordering selector.
+  * `src/App.tsx` — integrates pending-plan review + approved-plan next actions and UI-sourced command handlers.
+  * `src/components/T1PlanFlow.test.tsx` — integration coverage for seed → stage command → approve in UI → persisted approved plan on reload.
+* **Result:** T1.3 acceptance criteria met:
+  * Pending plans render as `Needs your review`.
+  * Approved plan remains active while a revision is pending.
+  * Review actions route through UI context and command-layer authority checks.
+  * Approval promotes tasks to next-actions immediately (no reload required).
+  * Task order is deterministic by `now` → `next` → `later`, then stable lexical/id tie-breaks.
+* **Next eligible task:** `T1.4` (next in backlog order). `T2.1` and `T2.3` are also `READY`.

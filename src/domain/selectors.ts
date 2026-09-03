@@ -5,8 +5,15 @@ import type {
   RecoveryCase,
   RecoveryDomainState,
   RecoveryPlan,
+  RecoveryTask,
 } from './types';
 import { deriveAllowedActions, getLatestApprovedPlan, getPendingPlan } from './invariants';
+
+const TASK_PRIORITY_ORDER: Record<RecoveryTask['priority'], number> = {
+  now: 0,
+  next: 1,
+  later: 2,
+};
 
 function capText(value: string, maxLength: number): string {
   if (value.length <= maxLength) {
@@ -69,6 +76,28 @@ export function selectLatestApprovedPlan(state: RecoveryDomainState): RecoveryPl
 
 export function selectAllowedActions(state: RecoveryDomainState): AllowedAction[] {
   return deriveAllowedActions(state);
+}
+
+export function selectDeterministicTasksForPlan(
+  plan: RecoveryPlan | null
+): RecoveryTask[] {
+  if (!plan) {
+    return [];
+  }
+
+  return [...plan.tasks].sort((a, b) => {
+    const priorityOrderDiff = TASK_PRIORITY_ORDER[a.priority] - TASK_PRIORITY_ORDER[b.priority];
+    if (priorityOrderDiff !== 0) {
+      return priorityOrderDiff;
+    }
+
+    const titleOrder = a.title.localeCompare(b.title);
+    if (titleOrder !== 0) {
+      return titleOrder;
+    }
+
+    return a.id.localeCompare(b.id);
+  });
 }
 
 export function selectSnapshot(
