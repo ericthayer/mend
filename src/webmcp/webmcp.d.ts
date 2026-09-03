@@ -16,11 +16,11 @@ interface ModelContext {
   listTools?: () => Promise<ModelContextTool[]>;
 }
 
-interface Document {
-  modelContext?: ModelContext;
-}
-
 declare global {
+  interface Document {
+    modelContext?: ModelContext;
+  }
+
   interface DocumentEventMap {
     toolactivated: CustomEvent<{ toolName: string; params?: Record<string, unknown> }>;
     toolcancel: CustomEvent<{ toolName: string }>;
