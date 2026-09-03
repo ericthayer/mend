@@ -18,6 +18,7 @@ import {
 import { useRecoveryStore } from './state/recoveryStore';
 import type { WebMCPCapabilityStatus } from './components/WebMCPStatus';
 import type { TaskStatus } from './domain/types';
+import { registerRecoveryTools } from './webmcp/registerRecoveryTools';
 
 function App() {
   const commands = useMemo(() => createRecoveryCommands(), []);
@@ -38,17 +39,23 @@ function App() {
   const [webmcpErrorMessage, setWebmcpErrorMessage] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    try {
-      if (typeof document === 'undefined') {
-        setWebmcpStatus('unsupported');
-        return;
-      }
+    const registration = registerRecoveryTools({
+      tools: [],
+      onStatusChange: (status, errorMessage) => {
+        setWebmcpStatus(status);
+        setWebmcpErrorMessage(errorMessage);
+      },
+    });
 
-      setWebmcpStatus(document.modelContext ? 'supported' : 'unsupported');
-    } catch (error) {
-      setWebmcpStatus('error');
-      setWebmcpErrorMessage(error instanceof Error ? error.message : 'Unknown capability check error.');
+    if (registration.errorMessage) {
+      setWebmcpErrorMessage(registration.errorMessage);
     }
+
+    setWebmcpStatus(registration.status);
+
+    return () => {
+      registration.cleanup();
+    };
   }, []);
 
   const handleStartBlank = () => {

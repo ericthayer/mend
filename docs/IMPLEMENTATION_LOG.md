@@ -10,8 +10,8 @@
 | T1.2 | DONE | P0 | Responsive shell & base views | Tokens, header, safety banner, empty state |
 | T1.3 | DONE | P0 | Plan review & next actions | Review card, manual review commands, priority lists |
 | T1.4 | DONE | P1 | Supporting case views | Record list, draft view, activity timeline, reset modal |
-| T2.1 | READY | P0 | WebMCP platform adapter | Adapter, type augmentation, model-context mock |
-| T2.2 | BLOCKED | P0 | Imperative WebMCP tools | Snapshot, create case, add record, stage plan tools |
+| T2.1 | DONE | P0 | WebMCP platform adapter | Adapter, type augmentation, model-context mock |
+| T2.2 | READY | P0 | Imperative WebMCP tools | Snapshot, create case, add record, stage plan tools |
 | T2.3 | READY | P0 | Declarative review form | Semantic `<form toolname="start_plan_review">` |
 | T2.4 | BLOCKED | P1 | Safe outreach drafting tool | `stage_outreach_draft` tool & draft list wiring |
 | T3.1 | BLOCKED | P0 | Unit & integration tests | Test coverage for domain invariants & authority gates |
@@ -257,3 +257,38 @@
   * Resource links are drawn exclusively from the owned static catalog URLs.
   * Reset uses explicit confirmation and returns the app to the empty startup state.
 * **Next eligible task:** `T2.1` (next in backlog order). `T2.3` is also `READY`.
+
+### Entry: T2.1 — Add the WebMCP Platform Adapter
+* **Status:** DONE
+* **Depends on:** T1.1 (DONE)
+* **Acceptance criteria (BUILD_SPEC.md §T2.1):**
+  * App never crashes when `document.modelContext` is absent.
+  * Adapter exposes register and cleanup without leaking browser details into domain code.
+  * Tests can list and execute registered tools with a mock.
+  * Re-registration aborts the old registration set.
+* **Planned Files:**
+  * `src/webmcp/modelContextAdapter.ts` (new) — capability detection and tool-set registration helpers.
+  * `src/webmcp/registerRecoveryTools.ts` (new) — stateful registration lifecycle with cleanup + re-registration abort.
+  * `src/test/modelContextMock.ts` (new) — model-context mock install/list/execute utility for deterministic tests.
+  * `src/webmcp/registerRecoveryTools.test.ts` (new) — unsupported/supported/re-registration test coverage.
+  * `src/webmcp/webmcp.d.ts` (edit) — promote WebMCP interfaces to global declarations for adapter/test typing.
+  * `src/App.tsx` (edit) — route capability status through adapter registration lifecycle (unsupported/supported/registering/error).
+* **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`
+* **Validation Results (all passed):**
+  * `npm run lint` — `eslint .` exit 0.
+  * `npm run typecheck` — `tsc --noEmit` exit 0.
+  * `npm run test:run` — `vitest run`: 7 test files passed, 24 tests passed total; includes new adapter lifecycle tests.
+  * `npm run build` — `tsc -b && vite build` exit 0.
+* **Changed Files:**
+  * `src/webmcp/modelContextAdapter.ts` — WebMCP capability detection + safe tool registration wrapper.
+  * `src/webmcp/registerRecoveryTools.ts` — registration manager with singleton cleanup and old-registration abort semantics.
+  * `src/test/modelContextMock.ts` — mock model context for list/execute testing.
+  * `src/webmcp/registerRecoveryTools.test.ts` — unsupported, supported+execute, and re-registration abort assertions.
+  * `src/webmcp/webmcp.d.ts` — global `ModelContext` / `ModelContextTool` type declarations.
+  * `src/App.tsx` — adapter-based capability status setup and registration cleanup on unmount.
+* **Result:** T2.1 acceptance criteria met:
+  * Unsupported environments render safely with no crashes.
+  * WebMCP registration logic is isolated behind a local adapter and cleanup manager.
+  * Mock tooling supports tool listing and execution tests.
+  * Re-registration aborts/unregisters the prior registration set deterministically.
+* **Next eligible task:** `T2.2` (next in backlog order). `T2.3` remains `READY`.
