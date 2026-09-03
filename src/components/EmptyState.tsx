@@ -1,5 +1,5 @@
 import { Box, Button, Paper, Stack, Typography } from '@mui/material';
-import { HouseIcon } from './icons';
+import { ClipboardCheckIcon, FolderIcon, HouseIcon, ListChecksIcon } from './icons';
 import { IconTile } from './SectionCard';
 
 type EmptyStateProps = {
@@ -15,7 +15,7 @@ export function EmptyState({ onStartBlank, onLoadDemo, busy = false }: EmptyStat
       elevation={0}
       aria-labelledby="empty-state-heading"
       sx={{
-        p: { xs: 1, sm: 1.5 },
+        p: { xs: 1.5, sm: 2, md: 2.5 },
         mx: 'auto',
         position: 'relative',
         isolation: 'isolate',
@@ -26,8 +26,8 @@ export function EmptyState({ onStartBlank, onLoadDemo, busy = false }: EmptyStat
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1.12fr) minmax(17rem, 0.88fr)' },
-          gap: { xs: 1, md: 1.5 },
+          gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1.15fr) minmax(19rem, 0.85fr)' },
+          gap: { xs: 2, md: 2.5 },
           alignItems: 'stretch',
         }}
       >
@@ -101,48 +101,149 @@ export function EmptyState({ onStartBlank, onLoadDemo, busy = false }: EmptyStat
           component="aside"
           aria-labelledby="start-control-heading"
           sx={{
-            p: { xs: 2.5, sm: 3, md: 3.5 },
+            p: { xs: 2.5, sm: 3 },
             display: 'flex',
-            alignItems: 'center',
-            borderRadius: '12px',
-            backgroundColor: 'rgb(var(--mui-palette-primary-mainChannel) / 0.07)',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            borderRadius: '16px',
+            backgroundColor: 'rgb(var(--mui-palette-primary-mainChannel) / 0.04)',
             border: '1px solid',
-            borderColor: 'rgb(var(--mui-palette-primary-mainChannel) / 0.14)',
+            borderColor: 'rgb(var(--mui-palette-primary-mainChannel) / 0.12)',
+            position: 'relative',
+            overflow: 'hidden',
           }}
         >
-          <Stack spacing={2.25} sx={{ width: '100%' }}>
+          <Stack spacing={2.5} sx={{ width: '100%', position: 'relative', zIndex: 1 }}>
             <Box>
-              <Typography component="h3" variant="h3" id="start-control-heading" sx={{ mb: 0.75 }}>
+              <Typography
+                component="h3"
+                variant="h3"
+                id="start-control-heading"
+                sx={{
+                  fontSize: '1.0625rem',
+                  fontWeight: 750,
+                  letterSpacing: '-0.015em',
+                  mb: 0.5,
+                }}
+              >
                 What each choice does
               </Typography>
-              <Typography component="p" variant="body2" color="text.secondary" sx={{ maxWidth: '35ch' }}>
+              <Typography component="p" variant="body2" color="text.secondary" sx={{ maxWidth: '38ch' }}>
                 Both options keep planning visible and under your control.
               </Typography>
             </Box>
-            <Box component="ul" sx={{ display: 'grid', gap: 1.5, m: 0, p: 0, listStyle: 'none' }}>
-              <Box component="li" sx={{ borderLeft: '2px solid', borderColor: 'primary.main', pl: 1.5 }}>
-                <Typography variant="body2" sx={{ fontWeight: 650 }}>
-                  Start a blank case
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Creates a private space for your situation.
-                </Typography>
+
+            <Box
+              component="ul"
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1.5,
+                m: 0,
+                p: 0,
+                listStyle: 'none',
+              }}
+            >
+              <Box
+                component="li"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 1.75,
+                  p: 1.5,
+                  borderRadius: '12px',
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  border: '1px solid',
+                  borderColor: 'var(--mui-palette-divider)',
+                  boxShadow: '0 2px 8px rgb(20 24 31 / 0.04)',
+                  transition: 'transform 180ms ease, box-shadow 180ms ease',
+                  '@media (hover: hover)': {
+                    '&:hover': {
+                      boxShadow: '0 6px 16px rgb(var(--mui-palette-primary-darkChannel) / 0.08)',
+                      borderColor: 'rgb(var(--mui-palette-primary-mainChannel) / 0.25)',
+                    },
+                  },
+                }}
+              >
+                <IconTile tint="actions" size={36}>
+                  <ListChecksIcon width={18} height={18} />
+                </IconTile>
+                <Box sx={{ minWidth: 0, flex: '1 1 auto' }}>
+                  <Typography variant="body2" sx={{ fontWeight: 700, lineHeight: 1.35, mb: 0.25 }}>
+                    Start a blank case
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.45 }}>
+                    Creates a private space for your situation.
+                  </Typography>
+                </Box>
               </Box>
-              <Box component="li" sx={{ borderLeft: '2px solid', borderColor: 'primary.main', pl: 1.5 }}>
-                <Typography variant="body2" sx={{ fontWeight: 650 }}>
-                  Load flood demo
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Opens a sample case so you can see the workflow.
-                </Typography>
+
+              <Box
+                component="li"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 1.75,
+                  p: 1.5,
+                  borderRadius: '12px',
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  border: '1px solid',
+                  borderColor: 'var(--mui-palette-divider)',
+                  boxShadow: '0 2px 8px rgb(20 24 31 / 0.04)',
+                  transition: 'transform 180ms ease, box-shadow 180ms ease',
+                  '@media (hover: hover)': {
+                    '&:hover': {
+                      boxShadow: '0 6px 16px rgb(var(--mui-palette-primary-darkChannel) / 0.08)',
+                      borderColor: 'rgb(var(--mui-palette-primary-mainChannel) / 0.25)',
+                    },
+                  },
+                }}
+              >
+                <IconTile tint="records" size={36}>
+                  <FolderIcon width={18} height={18} />
+                </IconTile>
+                <Box sx={{ minWidth: 0, flex: '1 1 auto' }}>
+                  <Typography variant="body2" sx={{ fontWeight: 700, lineHeight: 1.35, mb: 0.25 }}>
+                    Load flood demo
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.45 }}>
+                    Opens a sample case so you can see the workflow.
+                  </Typography>
+                </Box>
               </Box>
-              <Box component="li" sx={{ borderLeft: '2px solid', borderColor: 'primary.main', pl: 1.5 }}>
-                <Typography variant="body2" sx={{ fontWeight: 650 }}>
-                  Review before deciding
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  You review every proposed plan before it becomes active.
-                </Typography>
+
+              <Box
+                component="li"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 1.75,
+                  p: 1.5,
+                  borderRadius: '12px',
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  border: '1px solid',
+                  borderColor: 'var(--mui-palette-divider)',
+                  boxShadow: '0 2px 8px rgb(20 24 31 / 0.04)',
+                  transition: 'transform 180ms ease, box-shadow 180ms ease',
+                  '@media (hover: hover)': {
+                    '&:hover': {
+                      boxShadow: '0 6px 16px rgb(var(--mui-palette-primary-darkChannel) / 0.08)',
+                      borderColor: 'rgb(var(--mui-palette-primary-mainChannel) / 0.25)',
+                    },
+                  },
+                }}
+              >
+                <IconTile tint="review" size={36}>
+                  <ClipboardCheckIcon width={18} height={18} />
+                </IconTile>
+                <Box sx={{ minWidth: 0, flex: '1 1 auto' }}>
+                  <Typography variant="body2" sx={{ fontWeight: 700, lineHeight: 1.35, mb: 0.25 }}>
+                    Review before deciding
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.45 }}>
+                    You review every proposed plan before it becomes active.
+                  </Typography>
+                </Box>
               </Box>
             </Box>
           </Stack>

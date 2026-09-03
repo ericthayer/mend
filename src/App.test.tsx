@@ -18,7 +18,7 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'Start a blank case' })).toBeInTheDocument();
   });
 
-  it('places supporting case surfaces in the masonry workspace after a case begins', async () => {
+  it('places supporting case surfaces in the stable workspace after a case begins', async () => {
     window.localStorage.clear();
     replaceDomainState(createEmptyDomainState());
 

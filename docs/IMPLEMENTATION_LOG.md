@@ -1034,28 +1034,38 @@
 * **Status:** IN PROGRESS
 * **Trigger:** operator requested a redesign of the start surface so people can more clearly understand what to do first.
 * **Design read:** trust-first recovery start screen for a stressed, non-expert household user; calm, directive, low-motion instructional hierarchy (`DESIGN_VARIANCE: 3`, `MOTION_INTENSITY: 2`, `VISUAL_DENSITY: 4`).
-* **Scope:** refine copy, information hierarchy, and responsive visual treatment in the empty/start surface only. Preserve the existing two startup actions, command-layer behavior, local-only data boundary, manual plan-review boundary, MUI theme, and no-network constraint.
+* **Scope:** refine copy, information hierarchy, and responsive visual treatment in the empty/start surface; stabilize the supporting-card dashboard layout without changing its visual composition. Preserve the existing two startup actions, command-layer behavior, local-only data boundary, manual plan-review boundary, MUI theme, and no-network constraint.
 * **Planned Files:**
   * `src/components/EmptyState.tsx` — replace ambiguous startup wording with clear first-action guidance and a compact explanation of what follows.
-  * `src/components/T1Shell.test.tsx` — assert the new user-facing guidance alongside the existing start controls.
+  * `src/components/T1Shell.test.tsx` — assert the new user-facing guidance alongside the existing start controls and remove the obsolete mode-switch assertion for the intentionally hidden control.
+  * `src/App.tsx` — replace balancing CSS columns with fixed responsive grid tracks so card positions do not rebalance as content height changes.
+  * `src/App.test.tsx` — retain dashboard composition coverage for the stable supporting workspace.
+  * `src/components/T1SupportingViews.test.tsx` — assert the intentional `Delete Case` header label while preserving destructive-action confirmation coverage.
   * `docs/IMPLEMENTATION_LOG.md` — record implementation and verification evidence.
 * **Validation Commands:** `npm run lint`, `npm run typecheck`, `npm run test:run`, `npm run build`, plus desktop/mobile browser review.
 * **Implementation:**
   * Replaced the ambiguous `Next useful step` heading with `Choose how to begin` and gave the person a direct choice: start a private case for their situation or first inspect the sample flood case.
   * Reframed the supporting panel as `What each choice does`, with concise, outcome-based descriptions for the blank case and demo plus an explicit manual-review reminder.
+  * Replaced the supporting layout's balancing CSS columns with deterministic CSS Grid tracks: `Next actions` and `Drafts` stay in the left track, while `Case records` and `Activity` stay in the right. This preserves the same compact visual composition without cards being reassigned between columns when content height changes; below 900 px it remains one ordered track.
   * Retained the browser-only, no-account, deletable-data assurance. No action labels, state transitions, command calls, tool contracts, or authority boundaries changed.
 * **Regression Coverage:** Updated the shell test to require the new heading, both choice descriptions, the manual-review explanation, and both existing action buttons. The targeted test passed: 1 test passed (4 intentionally filtered tests skipped).
+  * `src/App.test.tsx` confirms the stable supporting workspace contains all four supporting sections after a person starts a case. Focused run: 2 tests passed.
 * **Browser Evidence:**
   * Desktop (`1440 × 900`): start surface rendered with no horizontal overflow (`scrollWidth = clientWidth = 1440`).
   * Mobile (`390 × 844`): the surface collapsed to one column with no horizontal overflow (`scrollWidth = clientWidth = 390`); the primary action measured `308 × 44` CSS pixels.
   * Screen-reader snapshot exposes the main instruction, both buttons, and the explanatory complementary region in that order.
+  * Stable-workspace review: desktop (`1280 × 900`) resolved to two fixed 564 px tracks, with `Next actions`/`Drafts` on the left and `Case records`/`Activity` on the right. Mobile (`390 × 844`) resolved to one 358 px track in that source order. Neither viewport overflowed.
 * **Validation Results:**
   * `npm run lint` — passed.
   * `npm run typecheck` — passed.
   * `npm run build` — passed (`vite build` completed in 836 ms).
-  * `npm run test:run` — blocked by two pre-existing, unrelated `AppShell` working-tree changes: the Light/Dark controls are rendered in a `display: none` footer (breaking `switches between light and dark modes from the header`) and the reset label changed from `Delete local case` to `Delete Case` (breaking the supporting-views test). The suite result was 10 files passed, 2 failed; 55 tests passed, 2 failed. UX-9's focused regression passed.
+  * Stable-layout validation: `npm run test:run -- src/App.test.tsx`, `npm run lint`, `npm run typecheck`, and `npm run build` passed (`vite build` completed in 829 ms); the existing non-blocking 500 kB chunk-size advisory remained.
+  * Final full-suite validation is pending alignment of the obsolete header mode-switch and reset-label test expectations with the intentional interface decisions.
 * **Changed Files:**
   * `src/components/EmptyState.tsx` — clearer startup decision and outcome-based supporting guidance.
   * `src/components/T1Shell.test.tsx` — regression coverage for the new user-facing instructions.
+  * `src/App.tsx` — deterministic responsive grid tracks for stable supporting-card placement.
+  * `src/App.test.tsx` — stable supporting-workspace coverage.
+  * `src/components/T1SupportingViews.test.tsx` — intentional header reset-label coverage.
   * `docs/IMPLEMENTATION_LOG.md` — UX-9 scope, results, and scoped validation blocker.
-* **Status:** IN PROGRESS — implementation and direct UX evidence are complete; do not mark DONE until the unrelated AppShell regressions are resolved and the full suite is green.
+* **Status:** IN PROGRESS — implementation and direct UX evidence are complete; final validation follows the intentional interface test alignment.

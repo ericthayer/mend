@@ -134,7 +134,7 @@ describe('T1.4 supporting views', () => {
     await user.click(screen.getByRole('button', { name: 'Load flood demo' }));
     expect(await screen.findByRole('heading', { name: 'What we know' })).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Delete local case' }));
+    await user.click(screen.getByRole('button', { name: 'Delete Case' }));
 
     const dialog = await screen.findByRole('dialog');
     expect(within(dialog).getByText(/removes all local case records/i)).toBeInTheDocument();

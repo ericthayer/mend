@@ -218,30 +218,25 @@ function App() {
           <Box
             data-testid="supporting-workspace-masonry"
             sx={{
-              columnCount: { xs: 1, md: 2 },
-              columnGap: 3,
-              columnFill: 'balance',
-              // Each masonry item supplies the inter-card gutter; offset the final one.
-              mb: -3,
+              display: 'grid',
+              gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'repeat(2, minmax(0, 1fr))' },
+              gap: 3,
+              alignItems: 'start',
             }}
           >
-            <Box sx={{ breakInside: 'avoid', mb: 3, minWidth: 0 }}>
+            <Stack spacing={3} sx={{ minWidth: 0 }}>
               <NextActions
                 approvedPlan={approvedPlan}
                 busyTaskId={updatingTaskId}
                 onUpdateTaskStatus={handleUpdateTaskStatus}
                 headingRef={nextActionsHeadingRef}
               />
-            </Box>
-            <Box sx={{ breakInside: 'avoid', mb: 3, minWidth: 0 }}>
               <DraftList drafts={drafts} />
-            </Box>
-            <Box sx={{ breakInside: 'avoid', mb: 3, minWidth: 0 }}>
+            </Stack>
+            <Stack spacing={3} sx={{ minWidth: 0 }}>
               <CaseRecordList records={records} />
-            </Box>
-            <Box sx={{ breakInside: 'avoid', mb: 3, minWidth: 0 }}>
               <ActivityTimeline activity={activity} />
-            </Box>
+            </Stack>
           </Box>
         </Stack>
       ) : (
